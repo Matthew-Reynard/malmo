@@ -1,65 +1,115 @@
 #!/usr/bin/env python
 # $MALMO_MINECRAFT_ROOT/launchClient.sh -port 10000
 
-# MarLo-CliffWalking-v0
-# MarLo-FindTheGoal-v0
+from __future__ import print_function
 
-import malmo.minecraftbootstrap
+import os, sys
+sys.path.insert(0, os.getcwd()) 
+
+from builtins import range
+from malmo import MalmoPython
+import time
+import json
+import random
+
+if sys.version_info[0] == 2:
+    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)  # flush print output immediately
+else:
+    import functools
+    print = functools.partial(print, flush=True)
+
+# import malmo.minecraftbootstrap
+# malmo.minecraftbootstrap.set_malmo_xsd_path()
+
 # import random
-# import time
 # import numpy as np
 # import tensorflow as tf
-# import time # Used to measure how long training takes
-import os
 
-# if "MALMO_XSD_PATH" not in os.environ:
-os.environ["MALMO_XSD_PATH"] = "/home/matthew/Malmo/Schemas"
+if "MALMO_XSD_PATH" not in os.environ:
+	os.environ["MALMO_XSD_PATH"] = "/home/matthew/Malmo/Schemas"
 
-# if "MALMO_MINECRAFT_ROOT" not in os.environ:
-os.environ["MALMO_MINECRAFT_ROOT"] = "/home/matthew/Malmo/Minecraft"
+if "MALMO_MINECRAFT_ROOT" not in os.environ:
+	os.environ["MALMO_MINECRAFT_ROOT"] = "/home/matthew/Malmo/Minecraft"
 
-os.environ["JAVA_HOME"] = "/usr/lib/jvm/java-8-openjdk-amd64"
+if "JAVA_HOME" not in os.environ:
+	os.environ["JAVA_HOME"] = "/usr/lib/jvm/java-8-openjdk-amd64"
 
-# X_ = -4
-# Y_ = 0
-# Z_ = -4
-# X = 4
-# Y = 0
-# Z = 4
 
-# observe_grid = [X_,Y_,Z_,X,Y,Z]
-# client_pool = [('127.0.0.1', 10000)]
+# Create default Malmo objects:
 
-# help(malmo)
+agent_host = MalmoPython.AgentHost()
+try:
+    agent_host.parse( sys.argv )
+except RuntimeError as e:
+    print('ERROR:',e)
+    print(agent_host.getUsage())
+    exit(1)
+if agent_host.receivedArgument("help"):
+    print(agent_host.getUsage())
+    exit(0)
 
-# malmo.run_mission.run()
+# -- set up the mission -- #
+mission_file = './mission.xml'
+with open(mission_file, 'r') as f:
+    print("Loading mission from %s" % mission_file)
+    mission_xml = f.read()
+    my_mission = MalmoPython.MissionSpec(mission_xml, True)
 
-# join_tokens = marlo.make('MarLo-FindTheGoal-v0',
-# # join_tokens = marlo.make("./templates/mission.xml",
-#                           params={
-#                             "client_pool": client_pool,
-#                             "tick_length": 20,
-#                             "observeGrid": observe_grid,
-# 	                          "kill_clients_after_num_rounds": 150
-#                           })
-# # As this is a single agent scenario,
-# # there will just be a single token
-# assert len(join_tokens) == 1
-# join_token = join_tokens[0]
+my_mission.drawBlock(0, 110, 0, "stone")
 
-# env = marlo.init(join_token)
+my_mission_record = MalmoPython.MissionRecordSpec()
 
-# print("action:", env.action_space)
-# print("action:", env.action_names)
+# Attempt to start a mission:
+max_retries = 3
+for retry in range(max_retries):
+    try:
+        agent_host.startMission( my_mission, my_mission_record )
+        break
+    except RuntimeError as e:
+        if retry == max_retries - 1:
+            print("Error starting mission:",e)
+            exit(1)
+        else:
+            time.sleep(2)
 
-# observation = env.reset()
+# Loop until mission starts:
+print("Waiting for the mission to start ", end=' ')
+world_state = agent_host.getWorldState()
+while not world_state.has_mission_begun:
+    print(".", end="")
+    time.sleep(0.1)
+    world_state = agent_host.getWorldState()
+    for error in world_state.errors:
+        print("Error:",error.text)
 
-# done = False
+print()
+print("Mission running ", end=' ')
 
-# while not done:
-#   _action = env.action_space.sample()
-#   obs, reward, done, info = env.step(_action)
-#   print("reward:", reward)
-#   print("done:", done)
-#   print("info", info)
-# env.close()
+my_mission.drawBlock(0, 110, 0, "stone")
+
+# Loop until mission ends:
+while world_state.is_mission_running:
+    print(".", end="")
+    time.sleep(0.1)
+    world_state = agent_host.getWorldState()
+    for error in world_state.errors:
+        print("Error:",error.text)
+    if world_state.number_of_observations_since_last_state > 0: # Have any observations come in?
+        msg = world_state.observations[-1].text                 # Yes, so get the text
+        observations = json.loads(msg)                          # and parse the JSON
+        grid = observations.get(u'floor3x3', 0)                 # and get the grid we asked for
+        # ADD SOME CODE HERE TO SAVE YOUR AGENT
+
+        if grid[4] == "redstone_block":
+        	# agent_host.sendCommand("jump 1")
+        	agent_xPos = int(observations.get(u"XPos", 0))
+        	agent_yPos = int(observations.get(u"YPos", 0))
+        	agent_zPos = int(observations.get(u"ZPos", 0))
+        	my_mission.drawBlock(agent_xPos, agent_yPos, agent_zPos, "stone")
+        	my_mission.drawBlock(random.randint(0,10), agent_yPos, random.randint(0,10), "redstone_block")
+        	
+        	
+
+print()
+print("Mission ended")
+# Mission has ended.

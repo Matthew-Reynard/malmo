@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Mission xmlns="http://ProjectMalmo.microsoft.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <About>
+    <Summary>Snake game</Summary>
+  </About>
+
+  <ModSettings>
+    <MsPerTick>50</MsPerTick>
+  </ModSettings>
+
+  <ServerSection>
+    <ServerInitialConditions>
+        <Time>
+          <StartTime>1</StartTime>
+          <AllowPassageOfTime>true</AllowPassageOfTime>
+        </Time>
+        <!-- <AllowSpawning>false</AllowSpawning> -->
+        <Weather>clear</Weather>
+    </ServerInitialConditions>
+    <ServerHandlers>
+      <FlatWorldGenerator generatorString="3;7,100*1,5*3,2;3;,biome_1"/>
+      <!-- <FlatWorldGenerator generatorString="3;7,44*49,73,35:1,159:4,95:13,35:13,159:11,95:10,159:14,159:6,35:6,95:6;12;"/> -->
+      <!-- <DefaultWorldGenerator/> -->
+      <DrawingDecorator>
+        <!-- coordinates for cuboid are inclusive -->
+        <!-- <DrawCuboid x1="-2" y1="46" z1="-2" x2="7" y2="50" z2="13" type="air" />            -->
+        <!-- <DrawCuboid x1="-2" y1="45" z1="-2" x2="7" y2="45" z2="13" type="lava" />            -->
+        <!-- <DrawCuboid x1="1"  y1="45" z1="1"  x2="3" y2="45" z2="17" type="sandstone" />       -->
+        <!-- <DrawBlock x="4"  y="45" z="1" type="cobblestone" />     -->
+        <!-- <DrawBlock x="4"  y="45" z="7" type="lapis_block" />      -->
+        <!-- <DrawLine x1="5" y1="110" z1="0" x2="2" y2="230" z2="0" type="air"/> -->
+        <DrawCuboid x1="-2" y1="106" z1="-2" x2="11" y2="106" z2="11" type="lava" />
+        <DrawCuboid x1="0" y1="107" z1="0" x2="9" y2="107" z2="9" type="stone" />
+        <DrawCuboid x1="-2" y1="108" z1="-2" x2="11" y2="110" z2="11" type="air" />
+        <DrawBlock x="5" y="107" z="5" type="redstone_block"/>
+      </DrawingDecorator>
+      <!--
+      <MazeDecorator>
+        <SizeAndPosition length="20" width="20" xOrigin="0" yOrigin="215" zOrigin="410" height="180"/>
+        <GapProbability variance="0.1">0.9</GapProbability>
+        <Seed>random</Seed>
+        <MaterialSeed>random</MaterialSeed>
+        <AllowDiagonalMovement>false</AllowDiagonalMovement>
+        <StartBlock fixedToEdge="true" type="emerald_block" height="1"/>
+        <EndBlock fixedToEdge="true" type="redstone_block" height="12"/>
+        <PathBlock type="glowstone" colour="WHITE ORANGE MAGENTA LIGHT_BLUE YELLOW LIME PINK GRAY SILVER CYAN PURPLE BLUE BROWN GREEN RED BLACK" height="1"/>
+        <FloorBlock type="air"/>
+        <SubgoalBlock type="beacon"/>
+        <GapBlock type="stained_hardened_clay" colour="WHITE ORANGE MAGENTA LIGHT_BLUE YELLOW LIME PINK GRAY SILVER CYAN PURPLE BLUE BROWN GREEN RED BLACK" height="3"/>
+      </MazeDecorator>
+      -->
+      <!--
+      <ClassroomDecorator>
+        <complexity>
+          <building>0.5</building>
+          <path>0.5</path>
+          <division>1</division>
+          <obstacle>1</obstacle>
+          <hint>0</hint>
+        </complexity>
+      </ClassroomDecorator>
+      -->
+      <ServerQuitFromTimeUp timeLimitMs="20000" description="out_of_time"/>
+      <ServerQuitWhenAnyAgentFinishes/>
+    </ServerHandlers>
+  </ServerSection>
+
+  <AgentSection mode="Creative">
+    <Name>Steve</Name>
+    <AgentStart>
+      <Placement x="1" y="108.0" z="1" pitch="0" yaw="0"/>
+      <Inventory>
+        <InventoryItem slot="0" type="diamond_pickaxe"/>
+      </Inventory>
+    </AgentStart>
+    <AgentHandlers>
+      <DiscreteMovementCommands/>
+      <ObservationFromFullStats/>
+      <ObservationFromGrid>
+        <Grid name="floor3x3">
+          <min x="-1" y="-1" z="-1"/>
+          <max x="1" y="-1" z="1"/>
+        </Grid>
+      </ObservationFromGrid>
+      <InventoryCommands/>
+      <!--
+      <RewardForMissionEnd rewardForDeath="-10000">
+        <Reward description="found_goal" reward="1000" />
+        <Reward description="out_of_time" reward="-1000" />
+      </RewardForMissionEnd>
+      -->
+      <RewardForTouchingBlockType>
+        <Block reward="-100.0" type="lava" behaviour="onceOnly"/>
+        <Block reward="100.0" type="lapis_block" behaviour="onceOnly"/>
+      </RewardForTouchingBlockType>
+      <RewardForSendingCommand reward="-1" />
+      <!-- 
+      <VideoProducer want_depth="true">
+        <Width>432</Width>
+        <Height>240</Height>
+      </VideoProducer> 
+      -->
+      <ContinuousMovementCommands turnSpeedDegs="180">
+      <!--
+      <ModifierList type="deny-list">
+        <command>attack</command>
+      </ModifierList>
+      -->
+      </ContinuousMovementCommands>
+      <AgentQuitFromTouchingBlockType>
+          <Block type="lava" description="death"/>
+          <Block type="lapis_block" description="found_goal"/>
+          <!-- <Block type="redstone_block" description="found_goal"/> -->
+      </AgentQuitFromTouchingBlockType>
+      <!-- 
+      <AgentQuitFromReachingPosition>
+        <Marker x="-26.5" y="40" z="0.5" tolerance="0.5" description="Goal_found"/>
+      </AgentQuitFromReachingPosition> 
+      -->
+    </AgentHandlers>
+  </AgentSection>
+
+</Mission>
