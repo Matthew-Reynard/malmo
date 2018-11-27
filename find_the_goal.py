@@ -49,7 +49,7 @@ def get_state(grid):
         if grid[i] == "cobblestone" or grid[i] == "stone":
             state[2, 8-int(i/9), 8-int(i%9)] = 1
 
-    return state
+    return state.numpy()
     # needs to be put to cpu before you can convert it to numpy array
 
     # DEBUGGING
@@ -87,7 +87,7 @@ def reset(agent, max_retries=3):
 action_space = ["move 1", "move -1", "strafe 1", "strafe -1"]
 # action_space = ["move 0", "move 1", "move -1", "strafe 0", "strafe 1", "strafe -1"]
 
-brain = Agent(gamma = 0.99, epsilon = 1.0, alpha = 0.001, maxMemorySize = 100, replace = None)
+brain = Agent(gamma = 0.99, epsilon = 1.0, alpha = 0.003, maxMemorySize = 100, replace = None)
 
 # Create default Malmo objects:
 
@@ -116,6 +116,14 @@ my_mission_record = MalmoPython.MissionRecordSpec()
 
 # Attempt to start a mission:
 max_retries = 3
+
+try:
+    path = "./Models/Torch/my_model.pth"
+    brain.load_model(path)
+    print("Model loaded from path:", path)
+except Exception:
+    print('Could not load model')
+    quit()
 
 print(my_mission.getSummary())
 
@@ -161,6 +169,8 @@ while brain.memCntr < brain.memSize:
             reward = world_state.rewards[-1].getValue()
             
             # Store the transitions
+            # device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+            # brain.storeTransition(state, torch.Tensor(action_taken, dtype=torch.int32).to(device), torch.Tensor(reward,dtype=torch.float32).to(device), new_state)
             brain.storeTransition(state, action_taken, reward, new_state)
 
             # Not neccesrily true, might be a few observations after
@@ -170,8 +180,8 @@ print("Done initialising memory")
 
 # scores = []
 epsHistory = []
-num_episodes = 10
-batch_size = 16
+num_episodes = 1000
+batch_size = 1
 
 avg_score = 0
 avg_loss = 0
@@ -211,8 +221,11 @@ for i in range(num_episodes):
 
         # action based on current state
         # print(state)
-        action_taken = np.random.choice(len(action_space))
-        agent_host.sendCommand(action_space[action_taken])
+        # action_taken = np.random.choice(len(action_space))
+        # agent_host.sendCommand(action_space[action_taken])
+
+        action = brain.chooseAction(state)
+        agent_host.sendCommand(action_space[action])
 
         world_state = agent_host.getWorldState()
 
@@ -232,15 +245,25 @@ for i in range(num_episodes):
             score += reward
             
             # Store the transitions
-            brain.storeTransition(state, action_taken, reward, new_state)
+            # device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+            # brain.storeTransition(state, torch.Tensor(action_taken, dtype=torch.int32).to(device), torch.Tensor(reward,dtype=torch.float32).to(device), new_state)
+            brain.storeTransition(state, action, reward, new_state)
 
             # Not neccesrily true, might be a few observations after
             state = new_state
 
             loss = brain.learn(batch_size)
 
-    avg_score += info["score"]
-    avg_loss += loss.item()
+            avg_score += score
+            avg_loss += loss.item()
+
+    print("Episode", i, 
+        "\tepsilon: %.4f" %brain.EPSILON,
+        "\tavg score", avg_score/1,
+        "avg loss:", avg_loss/1)
+
+    avg_score = 0
+    avg_loss = 0
             	
     print()	
     print("Mission {} ended".format(i+1))

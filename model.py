@@ -3,14 +3,15 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import numpy as np
+import os
 
 class DeepQNetwork(nn.Module):
 	def __init__(self, ALPHA):
 		super(DeepQNetwork, self).__init__()
 		self.conv1 = nn.Conv2d(3, 16, 3, stride=1, padding=0)
-		self.conv2 = nn.Conv2d(16, 32, 3, stride=1)
+		self.conv2 = nn.Conv2d(16, 32, 3, stride=1, padding=0)
 		# self.conv3 = nn.Conv2d(64, 128, 3)
-		self.fc1 = nn.Linear(3*3*32, 256)
+		self.fc1 = nn.Linear(5*5*32, 256)
 		self.fc2 = nn.Linear(256, 4)
 
 		self.optimiser = optim.SGD(self.parameters(), lr=ALPHA)
@@ -24,15 +25,15 @@ class DeepQNetwork(nn.Module):
 		observation = F.relu(self.conv1(observation))
 		observation = F.relu(self.conv2(observation))
 		# observation = F.relu(self.conv3(observation))
-		observation = observation.view(-1, 3*3*32) # flatten
-		observation = F.relu(self.fc1(self.observation))
-
+		# print(observation)
+		observation = observation.view(-1, 5*5*32) # flatten
+		observation = F.relu(self.fc1(observation))
 		actions = self.fc2(observation)
 
 		return actions
 
 class Agent(object):
-	def __init__(self, gamma, epsilon, alpha, maxMemorySize, epsEnd = 0.05, replace=10000, actionSpace=[0,1,2,3]):
+	def __init__(self, gamma, epsilon, alpha, maxMemorySize, epsEnd=0.05, replace=10000, actionSpace=[0,1,2,3]):
 		self.GAMMA = gamma
 		self.EPSILON = epsilon
 		self.EPS_END = epsEnd
@@ -44,6 +45,7 @@ class Agent(object):
 		self.replace_target_cnt = replace
 		self.Q_eval = DeepQNetwork(alpha)
 		self.Q_next = DeepQNetwork(alpha)
+		self.actionSpace = actionSpace
 
 	def storeTransition(self, state, action, reward, state_):
 		if self.memCntr < self.memSize:
@@ -53,8 +55,9 @@ class Agent(object):
 		self.memCntr += 1
 
 	def chooseAction(self, observation):
-		rand = npp.random.random()
+		rand = np.random.random()
 		actions = self.Q_eval.forward(observation)
+		# print(actions)
 		if rand < 1 - self.EPSILON:
 			action = T.argmax(actions[0]).item()
 		else:
@@ -77,8 +80,9 @@ class Agent(object):
 			memStart = int(np.random.choice(range(self.memSize-batch_size-1)))
 
 		miniBatch = self.memory[memStart:memStart+batch_size]
-		print(miniBatch)
+		# print(miniBatch)
 		memory = np.array(miniBatch)
+		# memory = miniBatch
 
 		Qpred = self.Q_eval.forward(list(memory[:, 0][:])).to(self.Q_eval.device)
 		Qnext = self.Q_next.forward(list(memory[:, 3][:])).to(self.Q_eval.device)
@@ -92,9 +96,9 @@ class Agent(object):
 			Qtarget[i][maxA[i]] = reward[i] + self.GAMMA*T.max(Qnext[i])
 
 		# linear decrease of epsilon
-		if self.steps > 500:
-			if self.EPSILON - 1e-4 > self.EPS_END:
-				self.EPSILON -= 1e-4
+		if self.steps > 50:
+			if self.EPSILON - 1e-3 > self.EPS_END:
+				self.EPSILON -= 1e-3
 			else:
 				self.EPSILON = self.EPS_END
 
@@ -102,6 +106,8 @@ class Agent(object):
 		loss.backward() # back propagate
 		self.Q_eval.optimiser.step()
 		self.learn_step_counter += 1
+
+		return loss
 
 	def save_model(self, name):
 		try:
