@@ -122,8 +122,9 @@ try:
     brain.load_model(path)
     print("Model loaded from path:", path)
 except Exception:
-    print('Could not load model')
-    quit()
+    print('Could not load model, continue with random initialision (y/n):')
+    input()
+    # quit()
 
 print(my_mission.getSummary())
 

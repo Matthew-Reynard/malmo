@@ -9,10 +9,12 @@ class DeepQNetwork(nn.Module):
 	def __init__(self, ALPHA):
 		super(DeepQNetwork, self).__init__()
 		self.conv1 = nn.Conv2d(3, 16, 3, stride=1, padding=0)
+		# self.maxp1 = nn.MaxPool2d(3, stride=2)
 		self.conv2 = nn.Conv2d(16, 32, 3, stride=1, padding=0)
+		self.maxp2 = nn.MaxPool2d(2, stride=1)
 		# self.conv3 = nn.Conv2d(64, 128, 3)
-		self.fc1 = nn.Linear(5*5*32, 256)
-		self.fc2 = nn.Linear(256, 4)
+		self.fc1 = nn.Linear(4*4*32, 256)
+		self.fc2 = nn.Linear(256, 5)
 
 		self.optimiser = optim.SGD(self.parameters(), lr=ALPHA)
 		self.loss = nn.MSELoss()
@@ -23,17 +25,21 @@ class DeepQNetwork(nn.Module):
 		observation = T.Tensor(observation).to(self.device)
 		observation = observation.view(-1, 3, 9, 9) # size of image 185 x 95
 		observation = F.relu(self.conv1(observation))
+		# observation = F.relu(self.maxp1(observation))
 		observation = F.relu(self.conv2(observation))
+		observation = F.relu(self.maxp2(observation))
 		# observation = F.relu(self.conv3(observation))
 		# print(observation)
-		observation = observation.view(-1, 5*5*32) # flatten
+		observation = observation.view(-1, 4*4*32) # flatten
 		observation = F.relu(self.fc1(observation))
+		
 		actions = self.fc2(observation)
 
 		return actions
 
 class Agent(object):
-	def __init__(self, gamma, epsilon, alpha, maxMemorySize, epsEnd=0.05, replace=10000, actionSpace=[0,1,2,3]):
+	def __init__(self, gamma, epsilon, alpha, maxMemorySize, epsEnd=0.05, replace=10000, actionSpace=[0,1,2,3,4]):
+		self.ALPHA = alpha
 		self.GAMMA = gamma
 		self.EPSILON = epsilon
 		self.EPS_END = epsEnd
@@ -47,12 +53,14 @@ class Agent(object):
 		self.Q_next = DeepQNetwork(alpha)
 		self.actionSpace = actionSpace
 
+
 	def storeTransition(self, state, action, reward, state_):
 		if self.memCntr < self.memSize:
 			self.memory.append([state, action, reward, state_])
 		else:
 			self.memory[self.memCntr%self.memSize] = [state, action, reward, state_]
 		self.memCntr += 1
+
 
 	def chooseAction(self, observation):
 		rand = np.random.random()
@@ -66,8 +74,8 @@ class Agent(object):
 
 		return action
 
-
-	# mitigate being trapped in a local minimum - break correlations between state transitions
+	# Batch optimisation
+	# Mitigate being trapped in a local minimum - break correlations between state transitions
 	def learn(self, batch_size):
 		self.Q_eval.optimiser.zero_grad() # batch optimisation instead of full optimisation
 		
@@ -96,9 +104,9 @@ class Agent(object):
 			Qtarget[i][maxA[i]] = reward[i] + self.GAMMA*T.max(Qnext[i])
 
 		# linear decrease of epsilon
-		if self.steps > 50:
-			if self.EPSILON - 1e-3 > self.EPS_END:
-				self.EPSILON -= 1e-3
+		if self.steps > 500:
+			if self.EPSILON - 5e-5 > self.EPS_END:
+				self.EPSILON -= 5e-5
 			else:
 				self.EPSILON = self.EPS_END
 
