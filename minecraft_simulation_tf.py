@@ -9,7 +9,7 @@ if __name__ == '__main__':
 	print("RUNNING THE MINECRAFT SIMULATION")
 	print()
 
-	RENDER = True
+	RENDER = False
 	LOAD_MODEL = False
 	start_eps = 0.8
 
