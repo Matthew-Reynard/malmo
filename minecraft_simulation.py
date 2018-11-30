@@ -13,11 +13,11 @@ if __name__ == '__main__':
 	LOAD_MODEL = True
 	start_eps = 0.8
 
-	GRID_SIZE = 6
+	GRID_SIZE = 4
 	LOCAL_GRID_SIZE = 9 # Has to be an odd number (I think...)
 	SEED = 1
 	WRAP = False
-	FOOD_COUNT = 5
+	FOOD_COUNT = 3
 	OBSTACLE_COUNT = 0
 	# MAP_PATH = "./Maps/Grid{}/map2.txt".format(GRID_SIZE)
 	MAP_PATH = None
@@ -25,7 +25,7 @@ if __name__ == '__main__':
 	env = Environment(wrap = WRAP, 
 					  grid_size = GRID_SIZE, 
 					  rate = 80, 
-					  max_time = 50,
+					  max_time = 60,
 					  food_count = FOOD_COUNT,
 					  obstacle_count = OBSTACLE_COUNT,
 					  zombie_count = 0,
@@ -38,7 +38,7 @@ if __name__ == '__main__':
 
 	if LOAD_MODEL:
 		try:
-		    path = "./Models/Torch/my_model.pth"
+		    path = "./Models/Torch/my_model2500.pth"
 		    brain.load_model(path)
 		    print("Model loaded from path:", path)
 		    print()
@@ -71,7 +71,7 @@ if __name__ == '__main__':
 			if done:
 				# reward = -1
 				games_played += 1
-			brain.storeTransition(observation, action, reward, observation_)
+			brain.storeTransition(observation, action, reward, done, observation_)
 
 			observation = observation_
 			if RENDER: env.render()
@@ -111,7 +111,7 @@ if __name__ == '__main__':
 
 			# print(observation_)
 
-			brain.storeTransition(observation, action, reward, observation_)
+			brain.storeTransition(observation, action, reward, done, observation_)
 
 			observation = observation_
 			loss = brain.learn(batch_size)
@@ -144,5 +144,4 @@ if __name__ == '__main__':
 	fileName = str(numGames) + 'Games' + 'Gamma' + str(brain.GAMMA) + 'Alpha' + str(brain.ALPHA) + 'Memory' + str(brain.memSize) + '.png'
 
 	plotLearning(x, scores, epsHistory, fileName)
-
 

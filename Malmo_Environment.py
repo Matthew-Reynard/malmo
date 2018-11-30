@@ -52,7 +52,7 @@ class Environment:
         self.UPDATE_RATE = rate
         self.SCALE = 20 # Scale of each block 20x20 pixels
         self.GRID_SIZE = grid_size
-        self.LOCAL_GRID_SIZE = 9 # Has to be an odd number
+        self.LOCAL_GRID_SIZE = 7 # Has to be an odd number
         self.ENABLE_WRAP = wrap
         if not self.ENABLE_WRAP: 
             self.GRID_SIZE += 2
