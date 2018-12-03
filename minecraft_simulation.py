@@ -4,20 +4,21 @@ from model import DeepQNetwork, Agent
 from Malmo_Environment import Environment
 from utils import plotLearning
 
-if __name__ == '__main__':
+# Train the model. (or run it to see how the training went)
+def train():
 	print()
 	print("RUNNING THE MINECRAFT SIMULATION")
 	print()
 
-	RENDER = True
+	RENDER = False
 	LOAD_MODEL = False
 	start_eps = 0.8
 
+	WRAP = False
 	GRID_SIZE = 5
 	LOCAL_GRID_SIZE = 9 # Has to be an odd number (I think...)
 	SEED = 1
-	WRAP = False
-	FOOD_COUNT = 1
+	FOOD_COUNT = 3
 	OBSTACLE_COUNT = 0
 	# MAP_PATH = "./Maps/Grid{}/map2.txt".format(GRID_SIZE)
 	MAP_PATH = None
@@ -34,19 +35,18 @@ if __name__ == '__main__':
 
 	brain = Agent(gamma = 0.99, epsilon = start_eps, alpha = 0.003, maxMemorySize = 10000, replace = None)
 
-	# env.play()
-
 	if LOAD_MODEL:
 		try:
 		    path = "./Models/Torch/my_model.pth"
 		    brain.load_model(path)
 		    print("Model loaded from path:", path)
 		    print()
-		    brain.EPSILON = 0.1
+		    brain.EPSILON = 0.05
 		except Exception:
-		    print('Could not load model, continue with random initialision (y/n):')
+		    print('Could not load model')
+		    print('Press <ENTER> to continue with random initialision')
 		    print()
-		    # input()
+		    input()
 		    # quit()
 	
 	if RENDER: env.prerender()
@@ -144,3 +144,37 @@ if __name__ == '__main__':
 	fileName = str(numGames) + 'Games' + 'Gamma' + str(brain.GAMMA) + 'Alpha' + str(brain.ALPHA) + 'Memory' + str(brain.memSize) + '.png'
 
 	plotLearning(x, scores, epsHistory, fileName)
+
+# Just play the game. (for debugging)
+def play():
+
+	print()
+	print("PLAYING THE MINECRAFT SIMULATION")
+	print()
+
+	GRID_SIZE = 5
+	LOCAL_GRID_SIZE = 9 # Has to be an odd number (I think...)
+	SEED = 1
+	WRAP = False
+	FOOD_COUNT = 1
+	OBSTACLE_COUNT = 0
+	# MAP_PATH = "./Maps/Grid{}/map2.txt".format(GRID_SIZE)
+	MAP_PATH = None
+	
+	env = Environment(wrap = WRAP, 
+					  grid_size = GRID_SIZE, 
+					  rate = 250, 
+					  food_count = FOOD_COUNT,
+					  obstacle_count = OBSTACLE_COUNT,
+					  zombie_count = 0,
+					  action_space = 5,
+					  map_path = MAP_PATH)
+
+	env.play()
+
+
+if __name__ == '__main__':
+	
+	train()
+
+	# play()

@@ -24,14 +24,14 @@ class DeepQNetwork(nn.Module):
 	def forward(self, observation):
 		observation = T.Tensor(observation).to(self.device)
 		observation = observation.view(-1, 3, 7, 7) # size of image 185 x 95
-		observation = F.relu(self.conv1(observation))
+		observation = F.leaky_relu(self.conv1(observation))
 		# observation = F.relu(self.maxp1(observation))
-		observation = F.relu(self.conv2(observation))
-		observation = F.relu(self.maxp2(observation))
+		observation = F.leaky_relu(self.conv2(observation))
+		observation = F.leaky_relu(self.maxp2(observation))
 		# observation = F.relu(self.conv3(observation))
 		# print(observation)
 		observation = observation.view(-1, 2*2*32) # flatten
-		observation = F.relu(self.fc1(observation))
+		observation = F.leaky_relu(self.fc1(observation))
 		
 		actions = self.fc2(observation)
 
@@ -108,8 +108,8 @@ class Agent(object):
 
 		# linear decrease of epsilon
 		if self.steps > 500:
-			if self.EPSILON - 5e-5 > self.EPS_END:
-				self.EPSILON -= 5e-5
+			if self.EPSILON - 2e-5 > self.EPS_END:
+				self.EPSILON -= 2e-5
 			else:
 				self.EPSILON = self.EPS_END
 

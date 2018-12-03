@@ -90,6 +90,7 @@ class Environment:
         self.font = None
 
         self.steps = 0
+        self.spawn_new_food = False
 
         # Used putting food and obstacles on the grid
         self.grid = []
@@ -287,10 +288,11 @@ class Environment:
 
         # Initialze to -1 for every time step - to find the fastest route (can be a more negative reward)
         # reward = -1
-        reward = -0.01
+        reward = -0.05
 
+        # Test: if moving, give a reward
         if self.steve.dx != 0 or self.steve.dy != 0:
-            reward = 0.01
+            reward = 0
 
 
         # Update the position of steve 
@@ -351,25 +353,37 @@ class Environment:
         #     reward = ((self.GRID_SIZE**2) / np.sqrt(((self.steve.x/self.SCALE-self.food.x/self.SCALE)**2 + (self.steve.y/self.SCALE-self.food.y/self.SCALE)**2) + 1)**2)/(self.GRID_SIZE**2)
             # print(reward) 
 
+        if self.spawn_new_food:
+            disallowed = []
+            [disallowed.append(grid_pos) for grid_pos in self.obstacle.array]
+            [disallowed.append(grid_pos) for grid_pos in self.zombie.array]
+            # if self.steve.pos not in disallowed:
+            #     disallowed.append(self.steve.pos)
+            self.food.make(self.grid, disallowed, index = eaten_food)
+            self.spawn_new_food = False
+            reached_food = False
         
         # If Steve reaches the food, increment score
         if reached_food:
             self.score += 1
 
+            self.spawn_new_food = True
             # Create a piece of food that is not within Steve
-            disallowed = []
-            [disallowed.append(grid_pos) for grid_pos in self.obstacle.array]
-            [disallowed.append(grid_pos) for grid_pos in self.zombie.array]
-            self.food.make(self.grid, disallowed, index = eaten_food)
+            # disallowed = []
+            # [disallowed.append(grid_pos) for grid_pos in self.obstacle.array]
+            # [disallowed.append(grid_pos) for grid_pos in self.zombie.array]
+            # self.food.make(self.grid, disallowed, index = eaten_food)
 
             # Test for one food item at a time
-            # done = True 
+            # done = True
 
             # Reward functions
-            reward = 10
+            reward = 1
             # reward = 100 / (np.sqrt((self.steve.x-self.food.x)**2 + (self.steve.y-self.food.y)**2) + 1) # Including the distance between them
             # reward = 1000 * self.score
             # reward = 1000 / self.time # Including the time in the reward function
+        else:
+            self.spawn_new_food = False
 
         # If the episode takes longer than the max time, it ends
         if self.time == self.MAX_TIME_PER_EPISODE:
@@ -629,7 +643,6 @@ class Environment:
 
         while not GAME_OVER:
 
-            # print(self.local_state_vector_3D()) # DEBUGGING
             # print(self.steve.history)
 
             action = self.render()
@@ -640,7 +653,8 @@ class Environment:
             # action_space has to be 3 for the players controls, 
             # because they know that the steve can't go backwards
             s, r, GAME_OVER, i = self.step(action)
-
+            print("\n\n",self.local_state_vector_3D()) # DEBUGGING
+            print(r)
             # For the steve to look like it ate the food, render needs to be last
             # Next piece of code if very BAD programming
             if GAME_OVER:
