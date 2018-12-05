@@ -91,6 +91,7 @@ class Environment:
 
         self.steps = 0
         self.spawn_new_food = False
+        self.last_eaten_food = -1
 
         # Used putting food and obstacles on the grid
         self.grid = []
@@ -182,7 +183,8 @@ class Environment:
         self.zombie.reset(self.grid, disallowed)
 
         # Fill the state array with the appropriate state representation
-        self.state = self.state_array()
+        # self.state = self.state_array()
+        self.state = self.local_state_vector_3D()
 
         # Reset the time
         self.time = 0
@@ -359,13 +361,14 @@ class Environment:
             [disallowed.append(grid_pos) for grid_pos in self.zombie.array]
             # if self.steve.pos not in disallowed:
             #     disallowed.append(self.steve.pos)
-            self.food.make(self.grid, disallowed, index = eaten_food)
+            self.food.make(self.grid, disallowed, index = self.last_eaten_food)
             self.spawn_new_food = False
             reached_food = False
         
         # If Steve reaches the food, increment score
         if reached_food:
             self.score += 1
+            self.last_eaten_food = eaten_food
 
             self.spawn_new_food = True
             # Create a piece of food that is not within Steve
@@ -390,7 +393,8 @@ class Environment:
             done = True
 
         # Get the new_state
-        new_state = self.state_array()
+        # new_state = self.state_array()
+        new_state = self.local_state_vector_3D()
 
         # A dictionary of information that may be useful
         info = {"time": self.time, "score": self.score}
@@ -653,8 +657,8 @@ class Environment:
             # action_space has to be 3 for the players controls, 
             # because they know that the steve can't go backwards
             s, r, GAME_OVER, i = self.step(action)
-            print("\n\n",self.local_state_vector_3D()) # DEBUGGING
-            print(r)
+            # print("\n\n",self.local_state_vector_3D()) # DEBUGGING
+            # print(r)
             # For the steve to look like it ate the food, render needs to be last
             # Next piece of code if very BAD programming
             if GAME_OVER:

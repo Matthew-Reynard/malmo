@@ -31,44 +31,45 @@ import tensorflow as tf
 import time # Used to measure how long training takes
 import math # Time formatting
 
-from Malmo_Environment import Environment
+from Snake_Environment import Environment
 from utils import Trajectory
 
 # GLOBAL VARIABLES
 # Paths
-MODEL_PATH_SAVE = "./Models/Tensorflow/model_0.ckpt"
-MODEL_PATH_LOAD = "./Models/Tensorflow/model_0.ckpt"
+MODEL_PATH_SAVE = "./Models/CNN_local/model_0.ckpt"
+MODEL_PATH_LOAD = "./Models/CNN_local/model_0.ckpt"
 
 # Not text files. Some of these arrays are 4D which can't be neatly written to a text file.
-W_conv1_textfile_path_save = "./Data/W_conv1.npy"
-b_conv1_textfile_path_save = "./Data/b_conv1.npy"
+W_conv1_textfile_path_save = "./Data/CNN_local/CNN_variables/W_conv1.npy"
+b_conv1_textfile_path_save = "./Data/CNN_local/CNN_variables/b_conv1.npy"
 
-W_conv2_textfile_path_save = "./Data/W_conv2.npy"
-b_conv2_textfile_path_save = "./Data/b_conv2.npy"
+W_conv2_textfile_path_save = "./Data/CNN_local/CNN_variables/W_conv2.npy"
+b_conv2_textfile_path_save = "./Data/CNN_local/CNN_variables/b_conv2.npy"
 
-W_fc_textfile_path_save = "./Data/W_fc.npy"
-b_fc_textfile_path_save = "./Data/b_fc.npy"
+W_fc_textfile_path_save = "./Data/CNN_local/CNN_variables/W_fc.npy"
+b_fc_textfile_path_save = "./Data/CNN_local/CNN_variables/b_fc.npy"
 
-W_out_textfile_path_save = "./Data/W_out.npy"
-b_out_textfile_path_save = "./Data/b_out.npy" 
+W_out_textfile_path_save = "./Data/CNN_local/CNN_variables/W_out.npy"
+b_out_textfile_path_save = "./Data/CNN_local/CNN_variables/b_out.npy" 
 
 # This is for viewing the model and summaries in Tensorboard
-LOGDIR = "./Logs/log0"
+LOGDIR = "./Logs/CNN_local/log0"
 
 # Parameters
-GRID_SIZE = 5
-LOCAL_GRID_SIZE = 7 # Has to be an odd number (I think...)
+GRID_SIZE = 6
+LOCAL_GRID_SIZE = 9 # Has to be an odd number (I think...)
 SEED = 1
 WRAP = False
+TAIL = False
 FOOD_COUNT = 3
 OBSTACLE_COUNT = 0
 MAP_PATH = "./Maps/Grid{}/map4.txt".format(GRID_SIZE)
 
-REPLAY_MEMORY = 25000
+REPLAY_MEMORY = 250000
 
 # Number of hidden layers, nodes, channels, etc. 
 
-n_input_channels = 3 # Using history
+n_input_channels = 4 # Using history
 
 # these still need to be added to the code
 n_out_channels_conv1 = 16
@@ -139,7 +140,7 @@ def createDeepModel(data, load_variables = False):
 		
 		weights = {'W_conv1':tf.Variable(tf.truncated_normal([3, 3, n_input_channels, n_out_channels_conv1], mean=0, stddev=1.0, seed=0), name = 'W_conv1'),
 			   	   'W_conv2':tf.Variable(tf.truncated_normal([3, 3, n_out_channels_conv1, n_out_channels_conv2], mean=0, stddev=1.0, seed=1), name = 'W_conv2'),
-			   	   'W_fc':tf.Variable(tf.truncated_normal([2*2*n_out_channels_conv2, n_out_fc], mean=0, stddev=1.0, seed=2), name = 'W_fc'),
+			   	   'W_fc':tf.Variable(tf.truncated_normal([4*4*n_out_channels_conv2, n_out_fc], mean=0, stddev=1.0, seed=2), name = 'W_fc'),
 			   	   'W_out':tf.Variable(tf.truncated_normal([n_out_fc, n_actions], mean=0, stddev=1.0, seed=3), name = 'W_out')}
 
 		biases = {'b_conv1':tf.Variable(tf.constant(0.1, shape=[n_out_channels_conv1]), name = 'b_conv1'),
@@ -156,7 +157,7 @@ def createDeepModel(data, load_variables = False):
 	conv2 = conv2d(conv1, weights['W_conv2'], name = 'conv2')
 	conv2 = maxpool2d(conv2, name = 'max_pool2')
 
-	fc = tf.reshape(conv2,[-1, 2*2*n_out_channels_conv2])
+	fc = tf.reshape(conv2,[-1, 4*4*n_out_channels_conv2])
 	fc = tf.nn.relu(tf.matmul(fc, weights['W_fc']) + biases['b_fc'])
 
 	output = tf.matmul(fc, weights['W_out']) + biases['b_out']
@@ -184,10 +185,11 @@ def trainDeepModel(load = False):
 	env = Environment(wrap = WRAP, 
 					  grid_size = GRID_SIZE, 
 					  rate = 80, 
-					  max_time = 60,
+					  max_time = 120, 
+					  tail = TAIL,
 					  food_count = FOOD_COUNT,
 					  obstacle_count = OBSTACLE_COUNT,
-					  zombie_count = 0, 
+					  multiplier_count = 0, 
 					  action_space = 5,
 					  map_path = None)
 	
@@ -200,7 +202,7 @@ def trainDeepModel(load = False):
 	epsilon = 0.01  # Probability to choose random action instead of best action
 
 	epsilon_function = False
-	epsilon_start = 0.8
+	epsilon_start = 0.1
 	epsilon_end = 0.05
 	epsilon_percentage = 0.5 # in decimal
 
@@ -319,12 +321,12 @@ def trainDeepModel(load = False):
 				new_state, reward, done, info = env.step(action)
 
 				
-				#'''
+				'''
 				## Standard training with learning after every step
 
 				# Q_vector = sess.run(Q_values, feed_dict={x: state})
 				# if final state of the episode
-				# print("Q_vector:", Q_vector)
+				print("Q_vector:", Q_vector)
 				if done:
 					Q_vector[:,action] = reward
 					# print("Reward:", reward)
@@ -340,9 +342,9 @@ def trainDeepModel(load = False):
 
 				_, e = sess.run([optimizer, error], feed_dict={x: state, y: Q_vector})
 				
-				#'''
-
 				'''
+
+				#'''
 				## Training using replay memory
 
 				# Update trajectory (Update replay memory)
@@ -375,7 +377,7 @@ def trainDeepModel(load = False):
 
 				_, e = sess.run([optimizer, error], feed_dict={x: tau[random_tau].state, y: Q_vector})
 				
-				'''
+				#'''
 
 				# Add to the error list, to show the plot at the end of training - RAM OVERLOAD!!!
 				# errors.append(e)
@@ -439,7 +441,7 @@ def trainDeepModel(load = False):
 				writer.add_summary(s, episode)
 
 		save_path = saver.save(sess, MODEL_PATH_SAVE)
-		print("Model saved in path: %s" % save_path)
+		print( "Model saved in path: %s" % save_path)
 
 	# DISPLAY THE ERROR GRAPH
 	# plt.plot([np.mean(errors[i:i+500]) for i in range(len(errors) - 500)])
@@ -464,10 +466,11 @@ def runDeepModel():
 	env = Environment(wrap = WRAP, 
 					  grid_size = GRID_SIZE, 
 					  rate = 80, 
-					  max_time = 200,
+					  max_time = 200, 
+					  tail = TAIL,
 					  food_count = FOOD_COUNT,
 					  obstacle_count = OBSTACLE_COUNT,
-					  zombie_count = 0,  
+					  multiplier_count = 0,  
 					  action_space  =5,
 					  map_path = None)
 	
@@ -579,17 +582,17 @@ def runDeepModel():
 def play():
 	print("\n ----- Playing the game -----\n")
 
-	GRID_SIZE = 5
+	GRID_SIZE = 50
 
-	# MAP_PATH = "./Maps/Grid{}/map4.txt".format(GRID_SIZE)
-	MAP_PATH = None
+	MAP_PATH = "./Maps/Grid{}/map4.txt".format(GRID_SIZE)
 
-	env = Environment(wrap = False, 
+	env = Environment(wrap = True, 
 					  grid_size = GRID_SIZE, 
-					  rate = 300,
-					  food_count = 3,
-					  obstacle_count = 0,
-					  zombie_count = 0,
+					  rate = 100, 
+					  tail = False, 
+					  food_count = 1,
+					  obstacle_count = 15,
+					  multiplier_count = 0,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
