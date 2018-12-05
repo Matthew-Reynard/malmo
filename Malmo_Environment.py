@@ -290,11 +290,11 @@ class Environment:
 
         # Initialze to -1 for every time step - to find the fastest route (can be a more negative reward)
         # reward = -1
-        reward = -0.05
+        reward = -0.1
 
         # Test: if moving, give a reward
         if self.steve.dx != 0 or self.steve.dy != 0:
-            reward = 0
+            reward = -0.01
 
 
         # Update the position of steve 
@@ -326,12 +326,12 @@ class Environment:
 
 
         # Make the most recent history have the most negative rewards
-        # decay = (1+reward_each_time_step)/(self.steve.history_size-1)
-        # for i in range(len(self.steve.history) - 1):
-        #     # print(-1*(1-decay*i))
-        #     if ((self.steve.x, self.steve.y) == (self.steve.history[-i-2][0], self.steve.history[-i-2][1])):
-        #         reward = -1*(1-decay*i)
-        #         break
+        decay = (1+reward_each_time_step)/(self.steve.history_size-1)
+        for i in range(len(self.steve.history) - 1):
+            # print(-1*(1-decay*i))
+            if ((self.steve.x, self.steve.y) == (self.steve.history[-i-2][0], self.steve.history[-i-2][1])):
+                reward = -1*(1-decay*i)
+                break
 
         # Checking if Steve has reached the food
         reached_food, eaten_food = self.food.eat(self.steve)
@@ -519,24 +519,24 @@ class Environment:
         sy = int(self.steve.y/self.SCALE)
 
         # state = np.zeros((3, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE))
-        state = np.zeros((3, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE)) # When using history
+        state = np.zeros((4, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE)) # When using history
 
         # Agent
         local_pos = int((self.LOCAL_GRID_SIZE-1)/2)
         state[0, local_pos, local_pos] = 1
 
         # History
-        # decay = 1/self.steve.history_size
+        decay = 1/self.steve.history_size
 
-        # for i in range(len(self.steve.history)-1):
-        #     x_prime = local_pos+int(self.steve.history[-i-2][0]/self.SCALE)-int(self.steve.x/self.SCALE)
-        #     y_prime = local_pos+int(self.steve.history[-i-2][1]/self.SCALE)-int(self.steve.y/self.SCALE)
+        for i in range(len(self.steve.history)-1):
+            x_prime = local_pos+int(self.steve.history[-i-2][0]/self.SCALE)-int(self.steve.x/self.SCALE)
+            y_prime = local_pos+int(self.steve.history[-i-2][1]/self.SCALE)-int(self.steve.y/self.SCALE)
 
-        #     if x_prime < self.LOCAL_GRID_SIZE and x_prime >= 0 and y_prime < self.LOCAL_GRID_SIZE and y_prime >= 0:
-        #         if 1-decay*i >= 0 and state[3, y_prime, x_prime] == 0:
-        #             state[3, y_prime, x_prime] = 1-decay*i
-        #         # else:
-        #             # state[3, y_prime, x_prime] = 0
+            if x_prime < self.LOCAL_GRID_SIZE and x_prime >= 0 and y_prime < self.LOCAL_GRID_SIZE and y_prime >= 0:
+                if 1-decay*i >= 0 and state[3, y_prime, x_prime] == 0:
+                    state[3, y_prime, x_prime] = 1-decay*i
+                # else:
+                    # state[3, y_prime, x_prime] = 0
 
         # Food
         for i in range(self.NUM_OF_FOOD):
@@ -657,7 +657,7 @@ class Environment:
             # action_space has to be 3 for the players controls, 
             # because they know that the steve can't go backwards
             s, r, GAME_OVER, i = self.step(action)
-            # print("\n\n",self.local_state_vector_3D()) # DEBUGGING
+            print("\n\n",self.local_state_vector_3D()) # DEBUGGING
             # print(r)
             # For the steve to look like it ate the food, render needs to be last
             # Next piece of code if very BAD programming
