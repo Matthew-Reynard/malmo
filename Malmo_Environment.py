@@ -100,6 +100,17 @@ class Environment:
             for i in range(self.GRID_SIZE):
                 self.grid.append((i*self.SCALE, j*self.SCALE))
 
+        self.maze = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+
 
     def prerender(self):
         """
@@ -290,15 +301,19 @@ class Environment:
 
         # Initialze to -1 for every time step - to find the fastest route (can be a more negative reward)
         # reward = -1
-        reward = -0.1
+        # reward = -0.05
+        reward = 0.05
 
         # Test: if moving, give a reward
-        if self.steve.dx != 0 or self.steve.dy != 0:
-            reward = -0.01
+        # if self.steve.dx != 0 or self.steve.dy != 0:
+        #     reward = -0.01
 
 
         # Update the position of steve 
         self.steve.update(self.SCALE, action, self.ACTION_SPACE)
+
+        # Update the position of the zombie 
+        self.zombie.move(self.maze, self.steve, self.steps)
 
         if self.ENABLE_WRAP:
             self.wrap()
@@ -322,16 +337,24 @@ class Environment:
 
             if hit_obstacle:
                 done = True
-                reward = -1
+                reward = -0.8
+
+        # Check if zombie gets steve
+        for i in range(len(self.zombie.array)):
+            zombie_hit = (self.steve.pos == self.zombie.array[i])
+
+            if zombie_hit:
+                done = True
+                reward = -1.0
 
 
         # Make the most recent history have the most negative rewards
-        decay = (1+reward_each_time_step)/(self.steve.history_size-1)
-        for i in range(len(self.steve.history) - 1):
-            # print(-1*(1-decay*i))
-            if ((self.steve.x, self.steve.y) == (self.steve.history[-i-2][0], self.steve.history[-i-2][1])):
-                reward = -1*(1-decay*i)
-                break
+        # decay = (1+reward_each_time_step)/(self.steve.history_size-1)
+        # for i in range(len(self.steve.history) - 1):
+        #     # print(-1*(1-decay*i))
+        #     if ((self.steve.x, self.steve.y) == (self.steve.history[-i-2][0], self.steve.history[-i-2][1])):
+        #         reward = -1*(1-decay*i)
+        #         break
 
         # Checking if Steve has reached the food
         reached_food, eaten_food = self.food.eat(self.steve)
@@ -358,7 +381,7 @@ class Environment:
         if self.spawn_new_food:
             disallowed = []
             [disallowed.append(grid_pos) for grid_pos in self.obstacle.array]
-            [disallowed.append(grid_pos) for grid_pos in self.zombie.array]
+            # [disallowed.append(grid_pos) for grid_pos in self.zombie.array]
             # if self.steve.pos not in disallowed:
             #     disallowed.append(self.steve.pos)
             self.food.make(self.grid, disallowed, index = self.last_eaten_food)
@@ -381,7 +404,7 @@ class Environment:
             # done = True
 
             # Reward functions
-            reward = 1
+            reward = 10
             # reward = 100 / (np.sqrt((self.steve.x-self.food.x)**2 + (self.steve.y-self.food.y)**2) + 1) # Including the distance between them
             # reward = 1000 * self.score
             # reward = 1000 / self.time # Including the time in the reward function
@@ -518,25 +541,25 @@ class Environment:
         sx = int(self.steve.x/self.SCALE)
         sy = int(self.steve.y/self.SCALE)
 
-        # state = np.zeros((3, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE))
-        state = np.zeros((4, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE)) # When using history
+        state = np.zeros((3, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE))
+        # state = np.zeros((4, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE)) # When using history
 
         # Agent
         local_pos = int((self.LOCAL_GRID_SIZE-1)/2)
         state[0, local_pos, local_pos] = 1
 
         # History
-        decay = 1/self.steve.history_size
+        # decay = 1/self.steve.history_size
 
-        for i in range(len(self.steve.history)-1):
-            x_prime = local_pos+int(self.steve.history[-i-2][0]/self.SCALE)-int(self.steve.x/self.SCALE)
-            y_prime = local_pos+int(self.steve.history[-i-2][1]/self.SCALE)-int(self.steve.y/self.SCALE)
+        # for i in range(len(self.steve.history)-1):
+        #     x_prime = local_pos+int(self.steve.history[-i-2][0]/self.SCALE)-int(self.steve.x/self.SCALE)
+        #     y_prime = local_pos+int(self.steve.history[-i-2][1]/self.SCALE)-int(self.steve.y/self.SCALE)
 
-            if x_prime < self.LOCAL_GRID_SIZE and x_prime >= 0 and y_prime < self.LOCAL_GRID_SIZE and y_prime >= 0:
-                if 1-decay*i >= 0 and state[3, y_prime, x_prime] == 0:
-                    state[3, y_prime, x_prime] = 1-decay*i
-                # else:
-                    # state[3, y_prime, x_prime] = 0
+        #     if x_prime < self.LOCAL_GRID_SIZE and x_prime >= 0 and y_prime < self.LOCAL_GRID_SIZE and y_prime >= 0:
+        #         if 1-decay*i >= 0 and state[3, y_prime, x_prime] == 0:
+        #             state[3, y_prime, x_prime] = 1-decay*i
+        #         # else:
+        #             # state[3, y_prime, x_prime] = 0
 
         # Food
         for i in range(self.NUM_OF_FOOD):
@@ -571,6 +594,12 @@ class Environment:
                     state[2, j, i] = 1
 
         # Need to add Zombies
+        for i in range(len(self.zombie.array)):
+            x_prime_obs = local_pos+int(self.zombie.array[i][0]/self.SCALE)-int(self.steve.x/self.SCALE)
+            y_prime_obs = local_pos+int(self.zombie.array[i][1]/self.SCALE)-int(self.steve.y/self.SCALE)
+
+            if x_prime_obs < self.LOCAL_GRID_SIZE and x_prime_obs >= 0 and y_prime_obs < self.LOCAL_GRID_SIZE and y_prime_obs >= 0:
+                state[2, y_prime_obs, x_prime_obs] = 1
 
         return state
 
@@ -639,6 +668,20 @@ class Environment:
         Useful for debugging and testing out the environment
         """
 
+        maze = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+
+        start = (0, 0)
+        end = (7, 6)
+
         GAME_OVER = False
 
         self.prerender()
@@ -657,10 +700,18 @@ class Environment:
             # action_space has to be 3 for the players controls, 
             # because they know that the steve can't go backwards
             s, r, GAME_OVER, i = self.step(action)
-            print("\n\n",self.local_state_vector_3D()) # DEBUGGING
+            # print("\n\n\n") # DEBUGGING
+            # if r != -0.05:
+            #     print("Reward: ",r) # DEBUGGING
+            # print(self.local_state_vector_3D()) # DEBUGGING
             # print(r)
             # For the steve to look like it ate the food, render needs to be last
             # Next piece of code if very BAD programming
+
+            self.zombie.move(maze, self.steve, self.steps)
+
+            # print("")
+
             if GAME_OVER:
                 print("Game Over")
                 # self.render()

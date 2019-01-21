@@ -4,6 +4,21 @@ import time
 import threading
 
 
+class Node():
+    """A node class for A* Pathfinding"""
+
+    def __init__(self, parent=None, position=None):
+        self.parent = parent
+        self.position = position
+
+        self.g = 0
+        self.h = 0
+        self.f = 0
+
+    def __eq__(self, other):
+        return self.position == other.position
+
+
 class Trajectory():
     
     def __init__(self, state, action, reward, new_state, done):
@@ -13,11 +28,14 @@ class Trajectory():
         self.new_state = new_state
         self.done = done
 
+
 def plot_loss():
 	pass
 
+
 def loading():
 	threading.Thread(target=print_rotation)
+
 
 def print_rotation():
 	for i in range(1000):
@@ -43,6 +61,7 @@ class myThread (threading.Thread):
 		print_time(self.name, 5, self.counter)
 		print("Exiting " + self.name)
 
+
 def print_time(threadName, counter, delay):
 	while counter:
 		if False:
@@ -56,6 +75,7 @@ def print_time(threadName, counter, delay):
 		print("\\", end="\r")
 		time.sleep(0.1)
 		counter -= 1
+
 
 def plotLearning(x, scores, epsilons, filename):   
 	fig=plt.figure()

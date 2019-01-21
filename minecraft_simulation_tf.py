@@ -60,7 +60,7 @@ GRID_SIZE = 5
 LOCAL_GRID_SIZE = 7 # Has to be an odd number (I think...)
 SEED = 1
 WRAP = False
-FOOD_COUNT = 3
+FOOD_COUNT = 0
 OBSTACLE_COUNT = 0
 MAP_PATH = "./Maps/Grid{}/map4.txt".format(GRID_SIZE)
 
@@ -69,6 +69,7 @@ REPLAY_MEMORY = 25000
 # Number of hidden layers, nodes, channels, etc. 
 
 n_input_channels = 3 # Using history
+# n_input_channels = 4 # Using history
 
 # these still need to be added to the code
 n_out_channels_conv1 = 16
@@ -187,7 +188,7 @@ def trainDeepModel(load = False):
 					  max_time = 60,
 					  food_count = FOOD_COUNT,
 					  obstacle_count = OBSTACLE_COUNT,
-					  zombie_count = 0, 
+					  zombie_count = 1, 
 					  action_space = 5,
 					  map_path = None)
 	
@@ -199,10 +200,10 @@ def trainDeepModel(load = False):
 	gamma = 0.99  # Discount factor, i.e. to which extent the algorithm considers possible future rewards
 	epsilon = 0.01  # Probability to choose random action instead of best action
 
-	epsilon_function = False
-	epsilon_start = 0.8
-	epsilon_end = 0.05
-	epsilon_percentage = 0.5 # in decimal
+	epsilon_function = True
+	epsilon_start = 0.1
+	epsilon_end = 0.01
+	epsilon_percentage = 0.3 # in decimal
 
 	alpha_function = False
 	alpha_start = 0.01
@@ -392,7 +393,7 @@ def trainDeepModel(load = False):
 
 
 			if (episode % print_episode == 0 and episode != 0) or (episode == total_episodes-1):
-				current_time = time.time()-start_time
+				current_time = math.floor(time.time()-start_time)
 				print("Ep:", episode, 
 					"\tavg t: {0:.3f}".format(avg_time/print_episode), 
 					"\tavg score: {0:.3f}".format(avg_score/print_episode), 
@@ -586,10 +587,10 @@ def play():
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE, 
-					  rate = 300,
+					  rate = 100,
 					  food_count = 3,
 					  obstacle_count = 0,
-					  zombie_count = 0,
+					  zombie_count = 1,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
