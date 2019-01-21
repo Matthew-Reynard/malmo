@@ -16,9 +16,9 @@ def train():
 
 	WRAP = False
 	GRID_SIZE = 5
-	LOCAL_GRID_SIZE = 9 # Has to be an odd number (I think...)
+	LOCAL_GRID_SIZE = 7 # Has to be an odd number (I think...)
 	SEED = 1
-	FOOD_COUNT = 3
+	FOOD_COUNT = 6
 	OBSTACLE_COUNT = 0
 	# MAP_PATH = "./Maps/Grid{}/map2.txt".format(GRID_SIZE)
 	MAP_PATH = None
@@ -33,7 +33,7 @@ def train():
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
-	brain = Agent(gamma = 0.99, epsilon = start_eps, alpha = 0.003, maxMemorySize = 10000, replace = None)
+	brain = Agent(gamma = 0.99, epsilon = start_eps, alpha = 0.001, maxMemorySize = 10000, replace = 10)
 
 	if LOAD_MODEL:
 		try:
@@ -67,7 +67,7 @@ def train():
 
 			observation_, reward, done, info = env.step(action)
 			observation_ = env.local_state_vector_3D()
-			# print(observation_)
+			# print(reward)
 			if done:
 				# reward = -1
 				games_played += 1
@@ -80,9 +80,9 @@ def train():
 
 	scores = []
 	epsHistory = []
-	numGames = 10000
-	print_episode = 100
-	batch_size = 16
+	numGames = 100000
+	print_episode = 1000
+	batch_size = 8
 
 	avg_score = 0
 	avg_time = 0
