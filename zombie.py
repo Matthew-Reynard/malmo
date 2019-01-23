@@ -130,7 +130,7 @@ class Zombie:
             # print(path)
 
             # 1st zombie moves according to the a* algorithm
-            star_steps = 5
+            star_steps = 7
             self.array[0] = list(self.array[0])
             if path != None:
                 if len(path) > 1 and steps%star_steps == 0:
@@ -144,7 +144,7 @@ class Zombie:
             self.array[0] = tuple(self.array[0])
 
             # 2nd zombie moves randomly
-            random_steps = 3
+            random_steps = 5
             # print(self.array)
             if self.amount > 1 and steps%random_steps == 0:
                 self.array[1] = list(self.array[1])

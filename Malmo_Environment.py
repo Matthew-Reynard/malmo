@@ -299,7 +299,7 @@ class Environment:
         # Initialze to -1 for every time step - to find the fastest route (can be a more negative reward)
         # reward = -1
         # reward = -0.05
-        reward = 0.05
+        reward = 0.1
 
         # Test: if moving, give a reward
         # if self.steve.dx != 0 or self.steve.dy != 0:
@@ -338,7 +338,13 @@ class Environment:
 
         # Check if zombie gets steve
         for i in range(self.zombie.amount):
-            zombie_hit = (self.steve.pos == self.zombie.array[i])
+            if self.steve.pos == (self.zombie.array[i][0]+1*20, self.zombie.array[i][1]) \
+            or self.steve.pos == (self.zombie.array[i][0]-1*20, self.zombie.array[i][1]) \
+            or self.steve.pos == (self.zombie.array[i][0], self.zombie.array[i][1]+1*20) \
+            or self.steve.pos == (self.zombie.array[i][0], self.zombie.array[i][1]-1*20):
+                zombie_hit = True
+            else:
+                zombie_hit = False
             # print(zombie_hit)
             if zombie_hit:
                 done = True

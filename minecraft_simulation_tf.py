@@ -204,7 +204,7 @@ def trainDeepModel(load = False):
 	epsilon_function = True
 	epsilon_start = 0.5
 	epsilon_end = 0.05
-	epsilon_percentage = 0.08 # in decimal
+	epsilon_percentage = 0.5 # in decimal
 
 	alpha_function = False
 	alpha_start = 0.01
@@ -581,7 +581,7 @@ def runDeepModel():
 def play():
 	print("\n ----- Playing the game -----\n")
 
-	GRID_SIZE = 5
+	GRID_SIZE = 8
 
 	# MAP_PATH = "./Maps/Grid{}/map2.txt".format(GRID_SIZE)
 	MAP_PATH = None
