@@ -36,6 +36,7 @@ from obstacle import Obstacle
 from zombie import Zombie
 import sys
 import math # Used for infinity game time
+from utils import createGrid
 
 # import csv
 # import pandas as pd
@@ -100,16 +101,7 @@ class Environment:
             for i in range(self.GRID_SIZE):
                 self.grid.append((i*self.SCALE, j*self.SCALE))
 
-        self.maze = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+        self.maze = [] # created in reset()
 
 
     def prerender(self):
@@ -173,6 +165,11 @@ class Environment:
 
         disallowed = []
         [disallowed.append(grid_pos) for grid_pos in self.obstacle.array]
+
+        self.maze = createGrid(self.GRID_SIZE, self.obstacle.array, self.SCALE)
+        # print(self.obstacle.array)
+        # print("\n")
+        # print(self.maze)
 
         # Reseting Steve at a random (or specific) position
         self.steve.reset(self.grid, disallowed)
@@ -340,12 +337,13 @@ class Environment:
                 reward = -0.8
 
         # Check if zombie gets steve
-        for i in range(len(self.zombie.array)):
+        for i in range(self.zombie.amount):
             zombie_hit = (self.steve.pos == self.zombie.array[i])
-
+            # print(zombie_hit)
             if zombie_hit:
                 done = True
                 reward = -1.0
+                break
 
 
         # Make the most recent history have the most negative rewards
@@ -668,20 +666,6 @@ class Environment:
         Useful for debugging and testing out the environment
         """
 
-        maze = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
-
-        start = (0, 0)
-        end = (7, 6)
-
         GAME_OVER = False
 
         self.prerender()
@@ -708,7 +692,7 @@ class Environment:
             # For the steve to look like it ate the food, render needs to be last
             # Next piece of code if very BAD programming
 
-            self.zombie.move(maze, self.steve, self.steps)
+            # self.zombie.move(self.maze, self.steve, self.steps)
 
             # print("")
 
