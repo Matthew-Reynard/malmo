@@ -298,8 +298,8 @@ class Environment:
 
         # Initialze to -1 for every time step - to find the fastest route (can be a more negative reward)
         # reward = -1
-        # reward = -0.05
-        reward = 0.1
+        reward = -0.1
+        # reward = 0.3
 
         # Test: if moving, give a reward
         # if self.steve.dx != 0 or self.steve.dy != 0:
@@ -338,10 +338,11 @@ class Environment:
 
         # Check if zombie gets steve
         for i in range(self.zombie.amount):
-            if self.steve.pos == (self.zombie.array[i][0]+1*20, self.zombie.array[i][1]) \
-            or self.steve.pos == (self.zombie.array[i][0]-1*20, self.zombie.array[i][1]) \
-            or self.steve.pos == (self.zombie.array[i][0], self.zombie.array[i][1]+1*20) \
-            or self.steve.pos == (self.zombie.array[i][0], self.zombie.array[i][1]-1*20):
+            # if self.steve.pos == (self.zombie.array[i][0]+1*20, self.zombie.array[i][1]) \
+            # or self.steve.pos == (self.zombie.array[i][0]-1*20, self.zombie.array[i][1]) \
+            # or self.steve.pos == (self.zombie.array[i][0], self.zombie.array[i][1]+1*20) \
+            # or self.steve.pos == (self.zombie.array[i][0], self.zombie.array[i][1]-1*20):
+            if self.steve.pos == (self.zombie.array[i][0], self.zombie.array[i][1]):
                 zombie_hit = True
             else:
                 zombie_hit = False
@@ -408,12 +409,17 @@ class Environment:
             # done = True
 
             # Reward functions
-            reward = 10
+            reward = 5
             # reward = 100 / (np.sqrt((self.steve.x-self.food.x)**2 + (self.steve.y-self.food.y)**2) + 1) # Including the distance between them
             # reward = 1000 * self.score
             # reward = 1000 / self.time # Including the time in the reward function
         else:
             self.spawn_new_food = False
+
+        # To make it compatible with malmo
+        if self.score == self.NUM_OF_FOOD:
+            reward = 100
+            done = True
 
         # If the episode takes longer than the max time, it ends
         if self.time == self.MAX_TIME_PER_EPISODE:
@@ -566,7 +572,7 @@ class Environment:
         #             # state[3, y_prime, x_prime] = 0
 
         # Food
-        for i in range(self.NUM_OF_FOOD):
+        for i in range(self.food.amount):
             x_prime_food = local_pos+int(self.food.array[i][0]/self.SCALE)-int(self.steve.x/self.SCALE)
             y_prime_food = local_pos+int(self.food.array[i][1]/self.SCALE)-int(self.steve.y/self.SCALE)
 
@@ -693,7 +699,7 @@ class Environment:
             # print("\n\n\n") # DEBUGGING
             # if r != -0.05:
             #     print("Reward: ",r) # DEBUGGING
-            # print(self.local_state_vector_3D()) # DEBUGGING
+            print(self.local_state_vector_3D()) # DEBUGGING
             # print(r)
             # For the steve to look like it ate the food, render needs to be last
             # Next piece of code if very BAD programming

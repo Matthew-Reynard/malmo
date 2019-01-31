@@ -144,7 +144,7 @@ class Zombie:
             self.array[0] = tuple(self.array[0])
 
             # 2nd zombie moves randomly
-            random_steps = 5
+            random_steps = 3
             # print(self.array)
             if self.amount > 1 and steps%random_steps == 0:
                 self.array[1] = list(self.array[1])
@@ -213,7 +213,8 @@ class Zombie:
 
             # Generate children
             children = []
-            for new_position in [(0, -1), (0, 1), (-1, 0), (1, 0)]: # Adjacent squares
+            for new_position in [(0, -1), (0, 1), (-1, 0), (1, 0), (0, 0), (1, 1), (-1, 1), (1, -1)]: # Adjacent squares
+            # for new_position in [(0, -1), (0, 1), (-1, 0), (1, 0)]: # Adjacent squares
 
                 # Get node position
                 node_position = (current_node.position[0] + new_position[0], current_node.position[1] + new_position[1])

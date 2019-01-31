@@ -29,6 +29,8 @@ class Food:
     def reset(self, grid, disallowed):
         self.array.clear()
 
+        self.amount = 5  #hard coded for now
+
         # Make a copy of the grid
         allowed = grid[:]
 
@@ -70,7 +72,11 @@ class Food:
             # allowed = [(2*20,6*20),(5*20,5*20),(6*20,1*20)]
 
         # Choose a random allowed position to be the new food position
-        self.array[index] = allowed[np.random.choice(len(allowed))]
+        # self.array[index] = allowed[np.random.choice(len(allowed))]
+
+        # No respawning of food for compatibilty with malmo
+        del self.array[index]
+        self.amount = self.amount-1
 
         # To add backwards compatibility to my old functions and algorithms
         if self.amount == 1:

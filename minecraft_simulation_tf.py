@@ -176,7 +176,7 @@ def trainDeepModel(load = False):
 
 	# Decide whether or not to render to the screen or not
 	RENDER_TO_SCREEN = False
-	# RENDER_TO_SCREEN = True
+	RENDER_TO_SCREEN = True
 
 	# True - Load model from modelpath_load; False - Initialise random weights
 	USE_SAVED_MODEL_FILE = False
@@ -187,9 +187,9 @@ def trainDeepModel(load = False):
 					  grid_size = GRID_SIZE, 
 					  rate = 80, 
 					  max_time = 60,
-					  food_count = FOOD_COUNT,
-					  obstacle_count = OBSTACLE_COUNT,
-					  zombie_count = 3, 
+					  food_count = 5,
+					  obstacle_count = 0,
+					  zombie_count = 0, 
 					  action_space = 5,
 					  map_path = None)
 	
@@ -201,9 +201,9 @@ def trainDeepModel(load = False):
 	gamma = 0.99  # Discount factor, i.e. to which extent the algorithm considers possible future rewards
 	epsilon = 0.01  # Probability to choose random action instead of best action
 
-	epsilon_function = True
-	epsilon_start = 0.5
-	epsilon_end = 0.05
+	epsilon_function = False
+	epsilon_start = 0.3
+	epsilon_end = 0.1
 	epsilon_percentage = 0.5 # in decimal
 
 	alpha_function = False
@@ -589,9 +589,9 @@ def play():
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE, 
 					  rate = 100,
-					  food_count = 0,
+					  food_count = 3,
 					  obstacle_count = 0,
-					  zombie_count = 3,
+					  zombie_count = 0,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
@@ -602,7 +602,7 @@ def play():
 if __name__ == '__main__':
 
 	# --- Deep Neural Network with CNN --- #
-	trainDeepModel(load = False)
+	trainDeepModel(load = True)
 	# runDeepModel()
   
 	# --- Just for fun --- #
