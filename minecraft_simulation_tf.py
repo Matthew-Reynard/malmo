@@ -56,7 +56,7 @@ b_out_textfile_path_save = "./Data/b_out.npy"
 LOGDIR = "./Logs/log0"
 
 # Parameters
-GRID_SIZE = 5
+GRID_SIZE = 8
 LOCAL_GRID_SIZE = 7 # Has to be an odd number (I think...)
 SEED = 1
 WRAP = False
@@ -175,6 +175,7 @@ def trainDeepModel(load = False):
 	print("\n ---- Training the Deep Neural Network ----- \n")
 
 	# Decide whether or not to render to the screen or not
+	RENDER_TO_SCREEN = False
 	RENDER_TO_SCREEN = True
 
 	# True - Load model from modelpath_load; False - Initialise random weights
@@ -186,9 +187,9 @@ def trainDeepModel(load = False):
 					  grid_size = GRID_SIZE, 
 					  rate = 80, 
 					  max_time = 60,
-					  food_count = FOOD_COUNT,
-					  obstacle_count = OBSTACLE_COUNT,
-					  zombie_count = 1, 
+					  food_count = 5,
+					  obstacle_count = 0,
+					  zombie_count = 0, 
 					  action_space = 5,
 					  map_path = None)
 	
@@ -200,10 +201,10 @@ def trainDeepModel(load = False):
 	gamma = 0.99  # Discount factor, i.e. to which extent the algorithm considers possible future rewards
 	epsilon = 0.01  # Probability to choose random action instead of best action
 
-	epsilon_function = True
-	epsilon_start = 0.1
-	epsilon_end = 0.01
-	epsilon_percentage = 0.3 # in decimal
+	epsilon_function = False
+	epsilon_start = 0.3
+	epsilon_end = 0.1
+	epsilon_percentage = 0.5 # in decimal
 
 	alpha_function = False
 	alpha_start = 0.01
@@ -580,9 +581,9 @@ def runDeepModel():
 def play():
 	print("\n ----- Playing the game -----\n")
 
-	GRID_SIZE = 5
+	GRID_SIZE = 8
 
-	# MAP_PATH = "./Maps/Grid{}/map4.txt".format(GRID_SIZE)
+	# MAP_PATH = "./Maps/Grid{}/map2.txt".format(GRID_SIZE)
 	MAP_PATH = None
 
 	env = Environment(wrap = False, 
@@ -590,7 +591,7 @@ def play():
 					  rate = 100,
 					  food_count = 3,
 					  obstacle_count = 0,
-					  zombie_count = 1,
+					  zombie_count = 0,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 

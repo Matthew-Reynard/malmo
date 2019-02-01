@@ -121,27 +121,49 @@ class Zombie:
 
 
     def move(self, maze, steve, steps):
-        start = tuple([int(x/20) for x in self.array[0]])
-        end = tuple([int(y/20) for y in steve.pos])
+        """After a certain amount of charater steps, the zombie takes a step"""
+        if self.amount > 0:
+            start = tuple([int(x/20) for x in self.array[0]])
+            end = tuple([int(y/20) for y in steve.pos])
 
-        path = self.astar(maze, start, end)
-        # print(path)
+            path = self.astar(maze, start, end)
+            # print(path)
 
-        if len(path) > 1 and steps%3 == 0:
-            # print("move")
-            self.x += (path[1][0] - path[0][0])*20
-            self.y += (path[1][1] - path[0][1])*20
+            # 1st zombie moves according to the a* algorithm
+            star_steps = 7
+            self.array[0] = list(self.array[0])
+            if path != None:
+                if len(path) > 1 and steps%star_steps == 0:
+                    # print("move")
+                    self.array[0][0] += (path[1][0] - path[0][0])*20
+                    self.array[0][1] += (path[1][1] - path[0][1])*20
 
-            self.pos = (self.x, self.y)
+                    # self.pos = (self.x, self.y)
 
-            self.array = [self.pos]
-        else:
-            pass
+                    # self.array[0] = self.pos
+            self.array[0] = tuple(self.array[0])
 
+            # 2nd zombie moves randomly
+            random_steps = 3
+            # print(self.array)
+            if self.amount > 1 and steps%random_steps == 0:
+                self.array[1] = list(self.array[1])
+                random_move = np.random.randint(0,4)
+                if random_move == 0 and maze[int(self.array[1][0]/20)+1][int(self.array[1][1]/20)] == 0:
+                    self.array[1][0] += 1*20
+                if random_move == 1 and maze[int(self.array[1][0]/20)-1][int(self.array[1][1]/20)] == 0:
+                    self.array[1][0] -= 1*20
+                if random_move == 2 and maze[int(self.array[1][0]/20)][int(self.array[1][1]/20)+1] == 0:
+                    self.array[1][1] += 1*20
+                if random_move == 3 and maze[int(self.array[1][0]/20)][int(self.array[1][1]/20)-1] == 0:
+                    self.array[1][1] -= 1*20
+
+                self.array[1] = tuple(self.array[1])
 
 
     #Draw the food
     def draw(self, display):
+        """Draw the zombies on the display"""
         for i in range(self.amount):
             display.blit(self.zombie_img, self.array[i])
 
@@ -191,7 +213,8 @@ class Zombie:
 
             # Generate children
             children = []
-            for new_position in [(0, -1), (0, 1), (-1, 0), (1, 0)]: # Adjacent squares
+            for new_position in [(0, -1), (0, 1), (-1, 0), (1, 0), (0, 0), (1, 1), (-1, 1), (1, -1)]: # Adjacent squares
+            # for new_position in [(0, -1), (0, 1), (-1, 0), (1, 0)]: # Adjacent squares
 
                 # Get node position
                 node_position = (current_node.position[0] + new_position[0], current_node.position[1] + new_position[1])
@@ -232,5 +255,5 @@ class Zombie:
                 open_list.append(child)
 
             if count > 100:
-                print(count)
+                # print(count)
                 break

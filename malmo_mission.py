@@ -103,14 +103,18 @@ if agent_host.receivedArgument("help"):
     exit(0)
 
 # -- set up the mission -- #
-mission_file = './find_the_goal.xml'
+mission_file = './mission.xml'
 with open(mission_file, 'r') as f:
     print("Loading mission from %s" % mission_file)
     mission_xml = f.read()
     my_mission = MalmoPython.MissionSpec(mission_xml, True)
 
 # Python code alterations to the environment
-# my_mission.drawBlock(0, 110, 0, "stone")
+# my_mission.drawBlock(0, 110, 0, "air")
+
+my_mission.drawItem(7, 109, 8, "diamond")
+my_mission.drawItem(5, 109, 1, "diamond")
+my_mission.drawItem(1, 109, 6, "diamond")
 
 my_mission_record = MalmoPython.MissionRecordSpec()
 
@@ -150,36 +154,46 @@ while brain.memCntr < brain.memSize:
 
         # action based on current state
         # print(state)
-        action_taken = np.random.choice(len(action_space))
-        agent_host.sendCommand(action_space[action_taken])
+        # action_taken = np.random.choice(len(action_space))
+        # agent_host.sendCommand(action_space[action_taken])
+        agent_host.sendCommand("move 0") # Send a nothing command for testing
 
-        world_state = agent_host.getWorldState()
+        # world_state = agent_host.getWorldState()
+        world_state = agent_host.peekWorldState()
 
         for error in world_state.errors:
             print("Error:", error.text)
 
         # Have we received any observations
-        if world_state.number_of_observations_since_last_state > 0 and world_state.number_of_rewards_since_last_state > 0:
+        if world_state.number_of_observations_since_last_state > 0:
+        # if world_state.number_of_observations_since_last_state > 0 and world_state.number_of_rewards_since_last_state > 0:
 
             msg = world_state.observations[-1].text
             observations = json.loads(msg)
             grid = observations.get(u'floor9x9', 0)
 
-            print("\n\n\n", grid, "\n\n\n")
+            print("\n\n\n", observations, "\n\n\n")
 
-            for i in range(9):
-                for j in range(9): 
-                    print(grid[j+(i*9)], end=" ")
+            # Print normally
+            # for i in range(9):
+            #     for j in range(9): 
+            #         print("{0:12s}".format(grid[j+(i*9)]), end=" ")
+            #     print("\n")
+
+            # Print in easier to see direction
+            for i in range(8, -1, -1):
+                for j in range(8, -1, -1): 
+                    print("{0:12s}".format(grid[j+(i*9)]), end=" ")
                 print("\n")
 
             # Get new_state & reward
             new_state = get_state(grid)
-            reward = world_state.rewards[-1].getValue()
+            # reward = world_state.rewards[-1].getValue()
             
             # Store the transitions
             # device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
             # brain.storeTransition(state, torch.Tensor(action_taken, dtype=torch.int32).to(device), torch.Tensor(reward,dtype=torch.float32).to(device), new_state)
-            brain.storeTransition(state, action_taken, reward, False, new_state)
+            # brain.storeTransition(state, action_taken, reward, False, new_state)
 
             # Not neccesrily true, might be a few observations after
             state = new_state

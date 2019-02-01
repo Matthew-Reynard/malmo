@@ -29,6 +29,19 @@ class Trajectory():
         self.done = done
 
 
+class myThread(threading.Thread):
+	def __init__(self, threadID, name, counter):
+		threading.Thread.__init__(self)
+		self.threadID = threadID
+		self.name = name
+		self.counter = counter
+
+	def run(self):
+		print("Starting " + self.name)
+		print_time(self.name, 5, self.counter)
+		print("Exiting " + self.name)
+
+
 def plot_loss():
 	pass
 
@@ -49,19 +62,6 @@ def print_rotation():
 		time.sleep(0.1)
 
 
-class myThread (threading.Thread):
-	def __init__(self, threadID, name, counter):
-		threading.Thread.__init__(self)
-		self.threadID = threadID
-		self.name = name
-		self.counter = counter
-
-	def run(self):
-		print("Starting " + self.name)
-		print_time(self.name, 5, self.counter)
-		print("Exiting " + self.name)
-
-
 def print_time(threadName, counter, delay):
 	while counter:
 		if False:
@@ -77,7 +77,7 @@ def print_time(threadName, counter, delay):
 		counter -= 1
 
 
-def plotLearning(x, scores, epsilons, filename):   
+def plotLearning(x, scores, epsilons, filename):
 	fig=plt.figure()
 	ax=fig.add_subplot(111, label="1")
 	ax2=fig.add_subplot(111, label="2", frame_on=False)
@@ -105,3 +105,22 @@ def plotLearning(x, scores, epsilons, filename):
 	ax2.tick_params(axis='y', colors="C1")
 
 	plt.savefig(filename)
+
+
+def createGrid(grid_size, obstacles_array, scale):
+
+	row = []
+	grid = []
+
+	for i in range(grid_size):
+		row.append(0)
+
+	for i in range(grid_size):
+		grid.append(row)
+
+	a = np.array(grid)
+
+	for i in range(len(obstacles_array)):
+		a[int(obstacles_array[i][0]/scale)][int(obstacles_array[i][1]/scale)] = 1
+
+	return a
