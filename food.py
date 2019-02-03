@@ -26,10 +26,10 @@ class Food:
         # If the image isn't 20x20 pixels
         self.food_img = pygame.transform.scale(self.food_img, (20, 20))
 
-    def reset(self, grid, disallowed):
+    def reset(self, amount, grid, disallowed):
         self.array.clear()
 
-        self.amount = 5  #hard coded for now
+        self.amount = amount # for new game
 
         # Make a copy of the grid
         allowed = grid[:]

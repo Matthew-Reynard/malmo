@@ -182,7 +182,7 @@ class Environment:
         disallowed.append(self.steve.pos)
 
         # Create a piece of food
-        self.food.reset(self.grid, disallowed)
+        self.food.reset(self.NUM_OF_FOOD, self.grid, disallowed)
         # self.food.make_within_range(self.GRID_SIZE, self.SCALE, self.steve)
 
         [disallowed.append(grid_pos) for grid_pos in self.food.array]
