@@ -1,3 +1,5 @@
+import sys, termios, tty, os, time
+
 import matplotlib.pyplot as plt 
 import numpy as np
 import time
@@ -124,3 +126,15 @@ def createGrid(grid_size, obstacles_array, scale):
 		a[int(obstacles_array[i][0]/scale)][int(obstacles_array[i][1]/scale)] = 1
 
 	return a
+
+
+def getch():
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+    try:
+        tty.setraw(sys.stdin.fileno())
+        ch = sys.stdin.read(1)
+ 
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+    return ch

@@ -53,7 +53,7 @@ class Environment:
         self.UPDATE_RATE = rate
         self.SCALE = 20 # Scale of each block 20x20 pixels
         self.GRID_SIZE = grid_size
-        self.LOCAL_GRID_SIZE = 7 # Has to be an odd number
+        self.LOCAL_GRID_SIZE = 9 # Has to be an odd number
         self.ENABLE_WRAP = wrap
         if not self.ENABLE_WRAP: 
             self.GRID_SIZE += 2
@@ -699,7 +699,7 @@ class Environment:
             # print("\n\n\n") # DEBUGGING
             # if r != -0.05:
             #     print("Reward: ",r) # DEBUGGING
-            print(self.local_state_vector_3D()) # DEBUGGING
+            # print(self.local_state_vector_3D()) # DEBUGGING
             # print(r)
             # For the steve to look like it ate the food, render needs to be last
             # Next piece of code if very BAD programming

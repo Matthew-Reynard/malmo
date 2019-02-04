@@ -22,8 +22,8 @@
        </ServerInitialConditions>
     <ServerHandlers>
       <FlatWorldGenerator generatorString="3;7,220*1,5*3,2;3;,biome_1" />
-      <!-- <ClassroomDecorator seed="0" palette="pyramid"> -->
-      <ClassroomDecorator seed="random">
+      <ClassroomDecorator seed="0" palette="pyramid">
+      <!-- <ClassroomDecorator seed="random"> -->
         <specification>
           <width>7</width>
           <height>7</height>
@@ -74,8 +74,8 @@
       <ObservationFromFullStats/>
       <ObservationFromGrid>
         <Grid name="floor9x9">
-          <min x="-4" y="0" z="-4"/>
-          <max x="4" y="0" z="4"/>
+          <min x="-3" y="0" z="-3"/>
+          <max x="3" y="0" z="3"/>
         </Grid>
       </ObservationFromGrid>
       <ObservationFromNearbyEntities>

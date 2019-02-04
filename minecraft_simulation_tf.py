@@ -57,7 +57,7 @@ LOGDIR = "./Logs/log0"
 
 # Parameters
 GRID_SIZE = 8
-LOCAL_GRID_SIZE = 7 # Has to be an odd number (I think...)
+LOCAL_GRID_SIZE = 9 # Has to be an odd number (I think...)
 SEED = 1
 WRAP = False
 FOOD_COUNT = 0
@@ -140,7 +140,7 @@ def createDeepModel(data, load_variables = False):
 		
 		weights = {'W_conv1':tf.Variable(tf.truncated_normal([3, 3, n_input_channels, n_out_channels_conv1], mean=0, stddev=1.0, seed=0), name = 'W_conv1'),
 			   	   'W_conv2':tf.Variable(tf.truncated_normal([3, 3, n_out_channels_conv1, n_out_channels_conv2], mean=0, stddev=1.0, seed=1), name = 'W_conv2'),
-			   	   'W_fc':tf.Variable(tf.truncated_normal([2*2*n_out_channels_conv2, n_out_fc], mean=0, stddev=1.0, seed=2), name = 'W_fc'),
+			   	   'W_fc':tf.Variable(tf.truncated_normal([4*4*n_out_channels_conv2, n_out_fc], mean=0, stddev=1.0, seed=2), name = 'W_fc'),
 			   	   'W_out':tf.Variable(tf.truncated_normal([n_out_fc, n_actions], mean=0, stddev=1.0, seed=3), name = 'W_out')}
 
 		biases = {'b_conv1':tf.Variable(tf.constant(0.1, shape=[n_out_channels_conv1]), name = 'b_conv1'),
@@ -157,7 +157,7 @@ def createDeepModel(data, load_variables = False):
 	conv2 = conv2d(conv1, weights['W_conv2'], name = 'conv2')
 	conv2 = maxpool2d(conv2, name = 'max_pool2')
 
-	fc = tf.reshape(conv2,[-1, 2*2*n_out_channels_conv2])
+	fc = tf.reshape(conv2,[-1, 4*4*n_out_channels_conv2])
 	fc = tf.nn.relu(tf.matmul(fc, weights['W_fc']) + biases['b_fc'])
 
 	output = tf.matmul(fc, weights['W_out']) + biases['b_out']
@@ -202,8 +202,8 @@ def trainDeepModel(load = False):
 	epsilon = 0.01  # Probability to choose random action instead of best action
 
 	epsilon_function = False
-	epsilon_start = 0.3
-	epsilon_end = 0.1
+	epsilon_start = 0.6
+	epsilon_end = 0.05
 	epsilon_percentage = 0.5 # in decimal
 
 	alpha_function = False
@@ -602,8 +602,8 @@ def play():
 if __name__ == '__main__':
 
 	# --- Deep Neural Network with CNN --- #
-	# trainDeepModel(load = True)
+	trainDeepModel(load = True)
 	# runDeepModel()
   
 	# --- Just for fun --- #
-	play()
+	# play()

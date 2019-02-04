@@ -16,7 +16,7 @@
           <AllowPassageOfTime>true</AllowPassageOfTime>
         </Time>
         <Weather>clear</Weather>
-        <!-- <AllowSpawning>false</AllowSpawning> -->
+        <AllowSpawning>false</AllowSpawning>
     </ServerInitialConditions>
     <ServerHandlers>
       <FlatWorldGenerator generatorString="3;7,100*1,5*3,2;3;,biome_1"/>
@@ -60,12 +60,13 @@
         <!-- <DrawBlock x="4"  y="45" z="1" type="cobblestone" />     -->
         <!-- <DrawBlock x="4"  y="45" z="7" type="lapis_block" />      -->
         <!-- <DrawLine x1="5" y1="110" z1="0" x2="2" y2="230" z2="0" type="air"/> -->
-        <DrawCuboid x1="-2" y1="106" z1="-2" x2="21" y2="106" z2="21" type="lava" />
+        <DrawCuboid x1="-4" y1="106" z1="-4" x2="19" y2="106" z2="19" type="lava" />
         <DrawCuboid x1="0" y1="107" z1="0" x2="15" y2="107" z2="15" type="stone" />
-        <DrawCuboid x1="-2" y1="108" z1="-2" x2="11" y2="110" z2="11" type="air" />
-        <DrawBlock x="5" y="107" z="5" type="redstone_block"/>
+        <DrawCuboid x1="-1" y1="108" z1="-1" x2="16" y2="108" z2="16" type="stone" />
+        <DrawCuboid x1="0" y1="108" z1="0" x2="15" y2="110" z2="15" type="air" />
+        <!-- <DrawBlock x="5" y="107" z="5" type="redstone_block"/> -->
 
-        <DrawEntity x="7.5" y="108.0" z="7.5" type="Zombie" yaw="0" pitch="0" xVel="0" yVel="0" zVel="0"/>
+        <!-- <DrawEntity x="7.5" y="108.0" z="7.5" type="Zombie" yaw="0" pitch="0" xVel="0" yVel="0" zVel="0"/> -->
       </DrawingDecorator>
 
       <!--
@@ -102,10 +103,10 @@
   </ServerSection>
 
 <!-- Can be Survival, Creative, Spectator -->
-  <AgentSection mode="Creative"> 
+  <AgentSection mode="Survival"> 
     <Name>Steve</Name>
     <AgentStart>
-      <Placement x="1" y="108.0" z="1" pitch="0" yaw="0"/>
+      <Placement x="0.5" y="108.0" z="0.5" pitch="0" yaw="0"/>
       <Inventory>
         <InventoryItem slot="0" type="diamond_sword"/>
         <InventoryItem slot="1" type="diamond_pickaxe"/>
@@ -121,22 +122,31 @@
         <ModifierList type="allow-list">
           <command>move</command>
           <command>strafe</command>
+          <command>turn</command>
+          <command>look</command>
+          <command>jump</command>
         </ModifierList>
       </DiscreteMovementCommands>
 
       <!-- <ContinuousMovementCommands turnSpeedDegs="180"> -->
+      <!-- <ContinuousMovementCommands> -->
         <!-- <ModifierList type="deny-list">
-          <command>attack</command>
+          <command>turn</command>
         </ModifierList> -->
         <!-- <ModifierList type="allow-list">
+          <command>jump</command>
           <command>move</command>
+          <command>strafe</command>
           <command>turn</command>
-        </ModifierList>
-      </ContinuousMovementCommands> -->
+          <command>pitch</command>
+        </ModifierList> -->
+      <!-- </ContinuousMovementCommands> -->
       
-      <ObservationFromFullStats/>
+      <!-- <ObservationFromFullStats/> -->
 
-      <ObservationFromHotBar/>
+      <!-- <ObservationFromHotBar/> -->
+
+      <!-- <ObservationFromRecentCommands/>  -->
 
       <!-- A little overkill -->
       <!-- <ObservationFromFullInventory/>  -->
@@ -153,6 +163,10 @@
       </ObservationFromNearbyEntities>
 
       <InventoryCommands/>
+
+      <MissionQuitCommands/>
+
+      <RewardForSendingCommand reward="-0.05" />
       
       <RewardForMissionEnd rewardForDeath="-1.0">
         <Reward description="found_goal" reward="1" />
@@ -163,8 +177,6 @@
         <Block reward="-1.0" type="lava" behaviour="onceOnly"/>
         <Block reward="1.0" type="lapis_block" behaviour="onceOnly"/>
       </RewardForTouchingBlockType>
-
-      <RewardForSendingCommand reward="-0.05" />
 
       <!-- 
       <VideoProducer want_depth="true">
