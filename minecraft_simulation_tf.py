@@ -202,9 +202,9 @@ def trainDeepModel(load = False):
 	epsilon = 0.01  # Probability to choose random action instead of best action
 
 	epsilon_function = False
-	epsilon_start = 0.6
+	epsilon_start = 0.5
 	epsilon_end = 0.05
-	epsilon_percentage = 0.5 # in decimal
+	epsilon_percentage = 0.8 # in decimal
 
 	alpha_function = False
 	alpha_start = 0.01
@@ -581,7 +581,7 @@ def runDeepModel():
 def play():
 	print("\n ----- Playing the game -----\n")
 
-	GRID_SIZE = 8
+	GRID_SIZE = 16
 
 	# MAP_PATH = "./Maps/Grid{}/map2.txt".format(GRID_SIZE)
 	MAP_PATH = None
@@ -590,8 +590,9 @@ def play():
 					  grid_size = GRID_SIZE, 
 					  rate = 100,
 					  food_count = 3,
-					  obstacle_count = 0,
-					  zombie_count = 0,
+					  obstacle_count = 10,
+					  lava_count = 20,
+					  zombie_count = 3,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 

@@ -127,7 +127,7 @@ class Zombie:
             end = tuple([int(y/20) for y in steve.pos])
 
             path = self.astar(maze, start, end)
-            # print(path)
+            # print(maze)
 
             # 1st zombie moves according to the a* algorithm
             star_steps = 7
@@ -142,6 +142,8 @@ class Zombie:
 
                     # self.array[0] = self.pos
             self.array[0] = tuple(self.array[0])
+
+            maze = self.updateMaze(maze, 0)
 
             # 2nd zombie moves randomly
             random_steps = 3
@@ -159,6 +161,30 @@ class Zombie:
                     self.array[1][1] -= 1*20
 
                 self.array[1] = tuple(self.array[1])
+
+                maze = self.updateMaze(maze, 1)
+
+
+            # 2nd zombie moves randomly
+            star_steps_2 = 2
+            # print(self.array)
+            if self.amount > 2 and steps%star_steps_2 == 0:
+                start = tuple([int(x/20) for x in self.array[2]])
+                path = self.astar(maze, start, end)
+
+                self.array[2] = list(self.array[2])
+                
+                if path != None:
+                    if len(path) > 1 and steps%star_steps == 0:
+                        # print("move")
+                        self.array[2][0] += (path[1][0] - path[0][0])*20
+                        self.array[2][1] += (path[1][1] - path[0][1])*20
+
+                self.array[2] = tuple(self.array[2])
+
+                maze = self.updateMaze(maze, 2)
+
+
 
 
     #Draw the food
@@ -213,7 +239,7 @@ class Zombie:
 
             # Generate children
             children = []
-            for new_position in [(0, -1), (0, 1), (-1, 0), (1, 0), (0, 0), (1, 1), (-1, 1), (1, -1)]: # Adjacent squares
+            for new_position in [(0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (1, 1), (-1, 1), (1, -1)]: # Adjacent squares
             # for new_position in [(0, -1), (0, 1), (-1, 0), (1, 0)]: # Adjacent squares
 
                 # Get node position
@@ -257,3 +283,12 @@ class Zombie:
             if count > 100:
                 # print(count)
                 break
+
+
+    def updateMaze(self, maze, zombie_index):
+
+        new_maze = maze.copy() # copy it, dont make it equal to each other
+
+        new_maze[int(self.array[zombie_index][0]/20)][int(self.array[zombie_index][1]/20)] = 1
+
+        return new_maze

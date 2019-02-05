@@ -10,6 +10,7 @@ class Steve:
         self.dy = 0
 
         self.pos = (self.x, self.y)
+        self.prev_pos = (self.x, self.y)
         
         self.steve_img = None
 
@@ -66,21 +67,25 @@ class Steve:
             elif action == 1:
                 self.dy = -1 # move up
                 self.dx = 0
+                self.prev_pos = (self.x, self.y)
 
             # Down
             elif action == 2:
                 self.dy = 1 # move down
                 self.dx = 0
+                self.prev_pos = (self.x, self.y)
 
             # Left
             elif action == 3:
                 self.dx = -1 # move left
                 self.dy = 0
+                self.prev_pos = (self.x, self.y)
 
             # Right
             elif action == 4:
                 self.dx = 1 # move right
                 self.dy = 0
+                self.prev_pos = (self.x, self.y)
 
             
         # Updating positions using velocity

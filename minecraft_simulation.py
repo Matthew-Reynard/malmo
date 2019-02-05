@@ -143,7 +143,7 @@ def train():
 
 	fileName = str(numGames) + 'Games' + 'Gamma' + str(brain.GAMMA) + 'Alpha' + str(brain.ALPHA) + 'Memory' + str(brain.memSize) + '.png'
 
-	plotLearning(x, scores, epsHistory, fileName)
+	# plotLearning(x, scores, epsHistory, fileName)
 
 # Just play the game. (for debugging)
 def play():
@@ -152,21 +152,21 @@ def play():
 	print("PLAYING THE MINECRAFT SIMULATION")
 	print()
 
-	GRID_SIZE = 5
+	GRID_SIZE = 8
 	LOCAL_GRID_SIZE = 9 # Has to be an odd number (I think...)
 	SEED = 1
 	WRAP = False
-	FOOD_COUNT = 1
+	FOOD_COUNT = 3
 	OBSTACLE_COUNT = 0
 	# MAP_PATH = "./Maps/Grid{}/map2.txt".format(GRID_SIZE)
 	MAP_PATH = None
 	
 	env = Environment(wrap = WRAP, 
 					  grid_size = GRID_SIZE, 
-					  rate = 250, 
+					  rate = 100, 
 					  food_count = FOOD_COUNT,
 					  obstacle_count = OBSTACLE_COUNT,
-					  zombie_count = 0,
+					  zombie_count = 2,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
@@ -175,6 +175,6 @@ def play():
 
 if __name__ == '__main__':
 	
-	train()
+	# train()
 
-	# play()
+	play()

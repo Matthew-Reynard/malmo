@@ -97,7 +97,7 @@
       </ClassroomDecorator>
       -->
 
-      <ServerQuitFromTimeUp timeLimitMs="30000" description="out_of_time"/>
+      <ServerQuitFromTimeUp timeLimitMs="300000" description="out_of_time"/>
       <ServerQuitWhenAnyAgentFinishes/>
     </ServerHandlers>
   </ServerSection>
@@ -108,25 +108,30 @@
     <AgentStart>
       <Placement x="0.5" y="108.0" z="0.5" pitch="0" yaw="0"/>
       <Inventory>
-        <InventoryItem slot="0" type="diamond_sword"/>
+        <!-- <InventoryItem slot="0" type="diamond_sword"/> -->
+        <InventoryItem slot="0" type="stone" quantity="64"/>
         <InventoryItem slot="1" type="diamond_pickaxe"/>
+        <InventoryItem slot="4" type="stick" quantity="2"/>
       </Inventory>
     </AgentStart>
     
     <AgentHandlers>
       
-      <!-- <DiscreteMovementCommands/> -->
+      <DiscreteMovementCommands/>
 
-      <DiscreteMovementCommands>
+      <SimpleCraftCommands/>
+
+      <!-- <DiscreteMovementCommands> -->
         <!-- Can also have a deny-list -->
-        <ModifierList type="allow-list">
+        <!-- <ModifierList type="allow-list">
           <command>move</command>
           <command>strafe</command>
           <command>turn</command>
           <command>look</command>
-          <command>jump</command>
+          <command>jumpmove</command>
+          <command>attack</command>
         </ModifierList>
-      </DiscreteMovementCommands>
+      </DiscreteMovementCommands> -->
 
       <!-- <ContinuousMovementCommands turnSpeedDegs="180"> -->
       <!-- <ContinuousMovementCommands> -->

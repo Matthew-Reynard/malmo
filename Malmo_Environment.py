@@ -33,6 +33,7 @@ with contextlib.redirect_stdout(None):
 from steve import Steve
 from food import Food
 from obstacle import Obstacle
+from lava import Lava
 from zombie import Zombie
 import sys
 import math # Used for infinity game time
@@ -44,7 +45,7 @@ from utils import createGrid
 
 class Environment:
 
-    def __init__(self, wrap = False, grid_size = 10, rate = 100, max_time = math.inf, action_space = 5, food_count = 1, obstacle_count = 0, zombie_count = 0, map_path = None):
+    def __init__(self, wrap = False, grid_size = 10, rate = 100, max_time = math.inf, action_space = 5, food_count = 1, obstacle_count = 0, lava_count = 0, zombie_count = 0, map_path = None):
         """
         Initialise the Game Environment with default values
         """
@@ -76,6 +77,10 @@ class Environment:
         # Create Obstacles
         self.NUM_OF_OBSTACLES = obstacle_count
         self.obstacle = Obstacle(self.NUM_OF_OBSTACLES)
+
+        # Create Lava
+        self.NUM_OF_LAVA = lava_count
+        self.lava = Lava(self.NUM_OF_LAVA)
 
         # Create Zombies
         self.NUM_OF_ZOMBIES = zombie_count
@@ -129,6 +134,9 @@ class Environment:
         # Creates visual Obstacles 
         self.obstacle.create(pygame)
 
+        # Creates visual Lava 
+        self.lava.create(pygame)
+
         # Creates visual Multipliers 
         self.zombie.create(pygame)
 
@@ -165,6 +173,9 @@ class Environment:
 
         disallowed = []
         [disallowed.append(grid_pos) for grid_pos in self.obstacle.array]
+
+        self.lava.reset(self.grid, disallowed)
+        [disallowed.append(grid_pos) for grid_pos in self.lava.array]
 
         self.maze = createGrid(self.GRID_SIZE, self.obstacle.array, self.SCALE)
         # print(self.obstacle.array)
@@ -215,6 +226,7 @@ class Environment:
         # Draw the background, steve and the food
         self.display.blit(self.bg, (0, 0))
         self.obstacle.draw(self.display)
+        self.lava.draw(self.display)
         self.food.draw(self.display)
         self.zombie.draw(self.display)
         self.steve.draw(self.display)
@@ -293,6 +305,8 @@ class Environment:
 
         hit_obstacle = False
 
+        in_lava = False
+
         # If the episode is finished - after a certain amount of timesteps or it crashed
         done = False
 
@@ -333,6 +347,17 @@ class Environment:
             hit_obstacle = (self.steve.pos == self.obstacle.array[i])
 
             if hit_obstacle:
+                # self.steve.x = self.steve.prev_pos[0]
+                # self.steve.y = self.steve.prev_pos[1]
+                # self.steve.pos = self.steve.prev_pos
+                done = True
+                reward = -0.4
+
+        # Check for lava collision
+        for i in range(self.lava.array_length):
+            in_lava = (self.steve.pos == self.lava.array[i])
+
+            if in_lava:
                 done = True
                 reward = -0.8
 

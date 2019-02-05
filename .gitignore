@@ -2,6 +2,7 @@
 MalmoPlatform/
 tmp/
 Models/
+tests/
 
 # PYTHON STUFF
 

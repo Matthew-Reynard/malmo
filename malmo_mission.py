@@ -182,6 +182,8 @@ def setupMinecraft():
     # Python code alterations to the environment
     # my_mission.drawBlock(0, 110, 0, "air")
 
+    my_mission.drawLine(0, 107, 8, 15, 107, 8, "netherrack")
+
     my_mission.drawItem(7, 109, 8, "diamond")
     my_mission.drawItem(5, 109, 1, "diamond")
     my_mission.drawItem(1, 109, 6, "diamond")
@@ -190,6 +192,11 @@ def setupMinecraft():
     my_mission.drawBlock(16, 109, 16, "torch")
     my_mission.drawBlock(-1, 109, -1, "torch")
     my_mission.drawBlock(16, 109, -1, "torch")
+
+    my_mission.drawBlock(8, 108, 8, "fire")
+
+    my_mission.drawBlock(11, 108, 6, "wooden_door")
+    my_mission.drawBlock(11, 109, 6, "wooden_door")
 
     my_mission_record = MalmoPython.MissionRecordSpec()
 
@@ -641,8 +648,10 @@ def play():
 
     button_delay = 0.01
 
+    # done = False
+
     world_state = agent_host.getWorldState()
-    while world_state.is_mission_running: 
+    while world_state.is_mission_running:# and not done: 
         print("-", end="")
         time.sleep(0.05)
 
@@ -675,19 +684,19 @@ def play():
         elif (char == " "):
             print("Jump pressed")
             time.sleep(button_delay)
-            agent_host.sendCommand("jump 1")
-            time.sleep(0.05)
-            agent_host.sendCommand("jump 0")
+            agent_host.sendCommand("jumpmove 1")
+            # time.sleep(0.05)
+            # agent_host.sendCommand("jump 0")
 
         elif (char == "i"):
             print("Look Up pressed")
             time.sleep(button_delay)
-            agent_host.sendCommand("look 1")
+            agent_host.sendCommand("look -1")
 
         elif (char == "k"):
             print("Look Down pressed")
             time.sleep(button_delay)
-            agent_host.sendCommand("look -1")
+            agent_host.sendCommand("look 1")
 
         elif (char == "j"):
             print("Look Left pressed")
@@ -698,6 +707,16 @@ def play():
             print("Look Right pressed")
             time.sleep(button_delay)
             agent_host.sendCommand("turn 1")
+
+        elif (char == "e"):
+            print("Use pressed")
+            time.sleep(button_delay)
+            agent_host.sendCommand("use 1")
+
+        elif (char == "r"):
+            print("Break pressed")
+            time.sleep(button_delay)
+            agent_host.sendCommand("craft diamond_pickaxe")
 
         
 

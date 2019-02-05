@@ -1,18 +1,18 @@
 import random
 import csv
 
-class Obstacle:
+class Lava:
 
     def __init__(self, size):
         
-        self.obstacle_img = None
+        self.lava_img = None
 
         # Positions array
         self.array = []
 
         self.array_length = 0
 
-        self.num_of_random_obstacles = size
+        self.num_of_random_lava = size
 
         self.random_objects = []
     
@@ -20,10 +20,10 @@ class Obstacle:
         """Set the image for the obstacles"""
 
         white = (255,255,255)
-        self.obstacle_img = pygame.image.load("./Images/stone.png").convert()
-        self.obstacle_img.set_colorkey(white)
-        self.obstacle_img = pygame.transform.scale(self.obstacle_img, (20, 20))
-        
+        self.lava_img = pygame.image.load("./Images/lava.png").convert()
+        self.lava_img.set_colorkey(white)
+        self.lava_img = pygame.transform.scale(self.lava_img, (20, 20))
+
         for i in range(8):
             self.random_objects.append(pygame.image.load("./Images/Object{}.png".format(i+1)).convert())
             # self.random_objects[i].set_colorkey(white)
@@ -41,7 +41,7 @@ class Obstacle:
 
         [allowed.remove(pos) for pos in disallowed]
 
-        for i in range(self.num_of_random_obstacles):
+        for i in range(self.num_of_random_lava):
             new_pos = random.choice((allowed))
             self.array.append(new_pos)
             self.array_length += 1
@@ -104,5 +104,5 @@ class Obstacle:
         for i in range(self.array_length):
             # random.seed(0)
             # n = random.randint(0,7)
-            display.blit(self.obstacle_img, self.array[i])
+            display.blit(self.lava_img, self.array[i])
             # display.blit(self.random_objects[n], self.array[i])
