@@ -212,6 +212,7 @@ class Environment:
         # Create a piece of food
         self.food.reset(self.NUM_OF_FOOD, self.grid, disallowed)
         # self.food.make_within_range(self.GRID_SIZE, self.SCALE, self.steve)
+        self.spawn_new_food = False
 
         [disallowed.append(grid_pos) for grid_pos in self.food.array]
 
@@ -220,7 +221,7 @@ class Environment:
 
         # Fill the state array with the appropriate state representation
         # self.state = self.state_array()
-        self.state = self.local_state_vector_3D()
+        self.state = self.state_vector_3D()
 
         # Reset the time
         self.time = 0
@@ -329,7 +330,7 @@ class Environment:
 
         # Initialze to -1 for every time step - to find the fastest route (can be a more negative reward)
         # reward = -1
-        reward = 0.0
+        reward = -0.1
         # reward = 0.3
 
         # Test: if moving, give a reward
@@ -451,7 +452,7 @@ class Environment:
             # done = True
 
             # Reward functions
-            reward = 2
+            reward = 10
             # reward = 100 / (np.sqrt((self.steve.x-self.food.x)**2 + (self.steve.y-self.food.y)**2) + 1) # Including the distance between them
             # reward = 1000 * self.score
             # reward = 1000 / self.time # Including the time in the reward function
@@ -460,18 +461,18 @@ class Environment:
 
         # To make it compatible with malmo
         if self.score == self.NUM_OF_FOOD:
-            reward = 10
+            reward = 100
             if self.NUM_OF_FOOD != 0:
                 done = True
 
         # If the episode takes longer than the max time, it ends
         if self.time == self.MAX_TIME_PER_EPISODE:
-            reward = 10
+            # reward = 10
             done = True
 
         # Get the new_state
         # new_state = self.state_array()
-        new_state = self.local_state_vector_3D()
+        new_state = self.state_vector_3D()
 
         # A dictionary of information that may be useful
         info = {"time": self.time, "score": self.score}
@@ -574,11 +575,14 @@ class Environment:
         """
         # print(int(self.steve.y/self.SCALE), int(self.steve.x/self.SCALE))
 
-        state = np.zeros((2, self.GRID_SIZE, self.GRID_SIZE))
+        state = np.zeros((3, self.GRID_SIZE, self.GRID_SIZE))
 
         state[0, int(self.steve.y/self.SCALE), int(self.steve.x/self.SCALE)] = 1
 
         state[1, int(self.food.y/self.SCALE), int(self.food.x/self.SCALE)] = 1
+
+        for i in range(self.obstacle.array_length):
+            state[2, int(self.obstacle.array[i][0]/self.SCALE), int(self.obstacle.array[i][1]/self.SCALE)] = 1
 
         return state
 
@@ -737,35 +741,43 @@ class Environment:
 
         self.prerender()
 
-        self.reset()
+        # self.reset()
 
-        while not GAME_OVER:
+        for i in range(10):
 
-            # print(self.steve.history)
+            self.reset()
 
-            action = self.render()
+            GAME_OVER = False
 
-            # print(self.pixels().shape)
+            while not GAME_OVER:
 
-            # When the steve touches the food, game ends
-            # action_space has to be 3 for the players controls, 
-            # because they know that the steve can't go backwards
-            s, r, GAME_OVER, i = self.step(action)
-            # print("\n\n\n") # DEBUGGING
-            # if r != -0.05:
-            #     print("Reward: ",r) # DEBUGGING
-            # print(self.local_state_vector_3D()) # DEBUGGING
-            # print(r)
-            # For the steve to look like it ate the food, render needs to be last
-            # Next piece of code if very BAD programming
+                # print(self.steve.history)
 
-            # self.zombie.move(self.maze, self.steve, self.steps)
+                action = self.render()
 
-            # print("")
+                # print(self.pixels().shape)
 
-            if GAME_OVER:
-                print("Game Over")
-                # self.render()
+                # When the steve touches the food, game ends
+                # action_space has to be 3 for the players controls, 
+                # because they know that the steve can't go backwards
+                s, r, GAME_OVER, i = self.step(action)
+                # print("\n\n\n") # DEBUGGING
+                # if r != -0.05:
+                #     print("Reward: ",r) # DEBUGGING
+                # print(self.local_state_vector_3D()) # DEBUGGING
+                # print(self.state_vector_3D()) # DEBUGGING
+                
+                # print(r)
+                # For the steve to look like it ate the food, render needs to be last
+                # Next piece of code if very BAD programming
+
+                # self.zombie.move(self.maze, self.steve, self.steps)
+
+                # print("")
+
+                if GAME_OVER:
+                    print("Game Over")
+                    # self.render()
 
         self.end()
 

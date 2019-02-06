@@ -60,9 +60,9 @@
         <!-- <DrawBlock x="4"  y="45" z="1" type="cobblestone" />     -->
         <!-- <DrawBlock x="4"  y="45" z="7" type="lapis_block" />      -->
         <!-- <DrawLine x1="5" y1="110" z1="0" x2="2" y2="230" z2="0" type="air"/> -->
-        <DrawCuboid x1="-4" y1="106" z1="-4" x2="19" y2="106" z2="19" type="lava" />
-        <DrawCuboid x1="0" y1="107" z1="0" x2="15" y2="107" z2="15" type="stone" />
-        <DrawCuboid x1="-1" y1="108" z1="-1" x2="16" y2="108" z2="16" type="stone" />
+        <!-- <DrawCuboid x1="-4" y1="106" z1="-4" x2="19" y2="106" z2="19" type="lava" /> -->
+        <!-- <DrawCuboid x1="0" y1="107" z1="0" x2="15" y2="107" z2="15" type="stone" /> -->
+        <!-- <DrawCuboid x1="-1" y1="108" z1="-1" x2="16" y2="108" z2="16" type="stone" /> -->
         <DrawCuboid x1="0" y1="108" z1="0" x2="15" y2="110" z2="15" type="air" />
         <!-- <DrawBlock x="5" y="107" z="5" type="redstone_block"/> -->
 
@@ -103,10 +103,10 @@
   </ServerSection>
 
 <!-- Can be Survival, Creative, Spectator -->
-  <AgentSection mode="Survival"> 
+  <AgentSection mode="Creative"> 
     <Name>Steve</Name>
     <AgentStart>
-      <Placement x="0.5" y="108.0" z="0.5" pitch="0" yaw="0"/>
+      <Placement x="1.5" y="108.0" z="1.5" pitch="0" yaw="0"/>
       <Inventory>
         <!-- <InventoryItem slot="0" type="diamond_sword"/> -->
         <InventoryItem slot="0" type="stone" quantity="64"/>

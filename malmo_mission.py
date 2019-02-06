@@ -14,6 +14,7 @@ import time
 import json
 import random
 import math
+import csv
 # import torch
 # # from model import DeepQNetwork, Agent
 from utils import getch
@@ -59,13 +60,13 @@ b_out_textfile_path_save = "./Data/b_out.npy"
 LOGDIR = "./Logs/log0"
 
 # Parameters
-GRID_SIZE = 8
+GRID_SIZE = 50
 LOCAL_GRID_SIZE = 9 # Has to be an odd number (I think...)
 SEED = 1
 WRAP = False
 FOOD_COUNT = 0
 OBSTACLE_COUNT = 0
-MAP_PATH = "./Maps/Grid{}/map4.txt".format(GRID_SIZE)
+MAP_PATH = "./Maps/Grid{}/map5.txt".format(GRID_SIZE)
 
 REPLAY_MEMORY = 25000
 
@@ -182,21 +183,39 @@ def setupMinecraft():
     # Python code alterations to the environment
     # my_mission.drawBlock(0, 110, 0, "air")
 
-    my_mission.drawLine(0, 107, 8, 15, 107, 8, "netherrack")
+    gridmap = reset_map(GRID_SIZE, MAP_PATH)
 
-    my_mission.drawItem(7, 109, 8, "diamond")
-    my_mission.drawItem(5, 109, 1, "diamond")
-    my_mission.drawItem(1, 109, 6, "diamond")
+    my_mission.drawCuboid(-4, 106, -4, GRID_SIZE+3, 106, GRID_SIZE+3, "lava")
+    my_mission.drawCuboid(0, 107, 0, GRID_SIZE-1, 107, GRID_SIZE-1, "stone")
+    my_mission.drawCuboid(0, 108, 0, GRID_SIZE-1, 110, GRID_SIZE-1, "air")
 
-    my_mission.drawBlock(-1, 109, 16, "torch")
-    my_mission.drawBlock(16, 109, 16, "torch")
+
+    for j in range(GRID_SIZE):
+        for i in range(GRID_SIZE):
+            if gridmap[j][i] == '1':
+                my_mission.drawBlock(i, 108, j, "stone")
+                my_mission.drawBlock(i, 109, j, "stone")
+
+    for j in range(GRID_SIZE):
+        for i in range(GRID_SIZE):
+            if gridmap[j][i] == '2':
+                my_mission.drawBlock(i, 107, j, "air")
+
+    # my_mission.drawLine(0, 107, 8, 15, 107, 8, "netherrack")
+
+    # my_mission.drawItem(7, 109, 8, "diamond")
+    # my_mission.drawItem(5, 109, 1, "diamond")
+    # my_mission.drawItem(1, 109, 6, "diamond")
+
+    my_mission.drawBlock(-1, 109, GRID_SIZE, "torch")
+    my_mission.drawBlock(GRID_SIZE, 109, GRID_SIZE, "torch")
     my_mission.drawBlock(-1, 109, -1, "torch")
-    my_mission.drawBlock(16, 109, -1, "torch")
+    my_mission.drawBlock(GRID_SIZE, 109, -1, "torch")
 
-    my_mission.drawBlock(8, 108, 8, "fire")
+    # my_mission.drawBlock(8, 108, 8, "fire")
 
-    my_mission.drawBlock(11, 108, 6, "wooden_door")
-    my_mission.drawBlock(11, 109, 6, "wooden_door")
+    # my_mission.drawBlock(11, 108, 6, "wooden_door")
+    # my_mission.drawBlock(11, 109, 6, "wooden_door")
 
     my_mission_record = MalmoPython.MissionRecordSpec()
 
@@ -716,7 +735,8 @@ def play():
         elif (char == "r"):
             print("Break pressed")
             time.sleep(button_delay)
-            agent_host.sendCommand("craft diamond_pickaxe")
+            # agent_host.sendCommand("craft diamond_pickaxe")
+            agent_host.sendCommand("attack 1")
 
         
 
@@ -752,6 +772,25 @@ def play():
 
             state = new_state
 
+
+def reset_map(grid_size, map_path):
+    # self.array.clear()
+
+    map1 = []
+    
+    # Read the map in from the text file
+    with open(map_path, 'r') as csvfile:
+        matrixreader = csv.reader(csvfile, delimiter=' ')
+        
+        for row in matrixreader:
+            map1.append(row)
+
+    # for j in range(grid_size):
+    #     for i in range(grid_size):
+    #         print(map1[j][i],end=" ")
+    #     print()
+
+    return map1
 
 # # Load model
 # try:
@@ -925,3 +964,5 @@ if __name__ == '__main__':
     # runMission(train = False, load = False)
     
     play()
+
+    # reset_map(16, "./Maps/Grid16/map3.txt")

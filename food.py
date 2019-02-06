@@ -77,7 +77,7 @@ class Food:
             # allowed = [(2*20,6*20),(5*20,5*20),(6*20,1*20)]
 
         # Choose a random allowed position to be the new food position
-        # self.array[index] = allowed[np.random.choice(len(allowed))]
+        self.array[index] = allowed[np.random.choice(len(allowed))]
 
         # No respawning of food for compatibilty with malmo
         del self.array[index]

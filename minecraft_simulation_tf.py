@@ -57,7 +57,7 @@ LOGDIR = "./Logs/log0"
 
 # Parameters
 GRID_SIZE = 10
-LOCAL_GRID_SIZE = 9 # Has to be an odd number (I think...)
+LOCAL_GRID_SIZE = 7 # Has to be an odd number (I think...)
 SEED = 1
 WRAP = False
 FOOD_COUNT = 0
@@ -68,7 +68,7 @@ REPLAY_MEMORY = 25000
 
 # Number of hidden layers, nodes, channels, etc. 
 
-n_input_channels = 4 # Using history
+n_input_channels = 3
 
 # these still need to be added to the code
 n_out_channels_conv1 = 16
@@ -139,7 +139,7 @@ def createDeepModel(data, load_variables = False):
 		
 		weights = {'W_conv1':tf.Variable(tf.truncated_normal([3, 3, n_input_channels, n_out_channels_conv1], mean=0, stddev=1.0, seed=0), name = 'W_conv1'),
 			   	   'W_conv2':tf.Variable(tf.truncated_normal([3, 3, n_out_channels_conv1, n_out_channels_conv2], mean=0, stddev=1.0, seed=1), name = 'W_conv2'),
-			   	   'W_fc':tf.Variable(tf.truncated_normal([3*3*n_out_channels_conv2, n_out_fc], mean=0, stddev=1.0, seed=2), name = 'W_fc'),
+			   	   'W_fc':tf.Variable(tf.truncated_normal([2*2*n_out_channels_conv2, n_out_fc], mean=0, stddev=1.0, seed=2), name = 'W_fc'),
 			   	   'W_out':tf.Variable(tf.truncated_normal([n_out_fc, n_actions], mean=0, stddev=1.0, seed=3), name = 'W_out')}
 
 		biases = {'b_conv1':tf.Variable(tf.constant(0.1, shape=[n_out_channels_conv1]), name = 'b_conv1'),
@@ -151,12 +151,12 @@ def createDeepModel(data, load_variables = False):
 	x = tf.reshape(data, shape=[-1, LOCAL_GRID_SIZE, LOCAL_GRID_SIZE, n_input_channels])
 
 	conv1 = conv2d(x, weights['W_conv1'], name = 'conv1')
-	conv1 = maxpool2d(conv1, name = 'max_pool1')
+	# conv1 = maxpool2d(conv1, name = 'max_pool1')
 
 	conv2 = conv2d(conv1, weights['W_conv2'], name = 'conv2')
 	conv2 = maxpool2d(conv2, name = 'max_pool2')
 
-	fc = tf.reshape(conv2,[-1, 3*3*n_out_channels_conv2])
+	fc = tf.reshape(conv2,[-1, 2*2*n_out_channels_conv2])
 	fc = tf.nn.relu(tf.matmul(fc, weights['W_fc']) + biases['b_fc'])
 
 	output = tf.matmul(fc, weights['W_out']) + biases['b_out']
@@ -175,7 +175,7 @@ def trainDeepModel(load = False):
 
 	# Decide whether or not to render to the screen or not
 	RENDER_TO_SCREEN = False
-	RENDER_TO_SCREEN = True
+	# RENDER_TO_SCREEN = True
 
 	# True - Load model from modelpath_load; False - Initialise random weights
 	USE_SAVED_MODEL_FILE = False
@@ -183,13 +183,13 @@ def trainDeepModel(load = False):
 	# First we need our environment form Environment_for_DQN.py
 	# has to have a grid_size of 10 for this current NN
 	env = Environment(wrap = WRAP, 
-					  grid_size = GRID_SIZE, 
+					  grid_size = 5, 
 					  rate = 80, 
-					  max_time = 60,
-					  food_count = 0,
+					  max_time = 30,
+					  food_count = 3,
 					  obstacle_count = 0,
-					  lava_count = 5,
-					  zombie_count = 3, 
+					  lava_count = 0,
+					  zombie_count = 0, 
 					  action_space = 5,
 					  map_path = None)
 	
@@ -251,7 +251,7 @@ def trainDeepModel(load = False):
 	# errors = []
 
 	print_episode = 1000
-	total_episodes = 100000
+	total_episodes = 50000
 
 	# Saving model capabilities
 	saver = tf.train.Saver()
@@ -319,7 +319,6 @@ def trainDeepModel(load = False):
 
 				# Update environment with by performing action
 				new_state, reward, done, info = env.step(action)
-
 				
 				#'''
 				## Standard training with learning after every step
@@ -581,18 +580,18 @@ def runDeepModel():
 def play():
 	print("\n ----- Playing the game -----\n")
 
-	GRID_SIZE = 16
+	GRID_SIZE = 5
 
-	MAP_PATH = "./Maps/Grid{}/map3.txt".format(GRID_SIZE)
-	# MAP_PATH = None
+	# MAP_PATH = "./Maps/Grid{}/map3.txt".format(GRID_SIZE)
+	MAP_PATH = None
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE, 
 					  rate = 200,
-					  food_count = 0,
+					  food_count = 3,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 3,
+					  zombie_count = 0,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
