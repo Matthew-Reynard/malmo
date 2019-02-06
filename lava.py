@@ -78,7 +78,7 @@ class Lava:
 
         for j in range(grid_size):
             for i in range(grid_size):
-                if map1[j][i] == '1':
+                if map1[j][i] == '2':
                     self.array.append((i*20,j*20))
                     num = num + 1
 

@@ -15,10 +15,10 @@ def train():
 	start_eps = 0.8
 
 	WRAP = False
-	GRID_SIZE = 5
-	LOCAL_GRID_SIZE = 7 # Has to be an odd number (I think...)
+	GRID_SIZE = 8
+	LOCAL_GRID_SIZE = 9 # Has to be an odd number (I think...)
 	SEED = 1
-	FOOD_COUNT = 6
+	FOOD_COUNT = 5
 	OBSTACLE_COUNT = 0
 	# MAP_PATH = "./Maps/Grid{}/map2.txt".format(GRID_SIZE)
 	MAP_PATH = None
@@ -29,6 +29,7 @@ def train():
 					  max_time = 60,
 					  food_count = FOOD_COUNT,
 					  obstacle_count = OBSTACLE_COUNT,
+					  lava_count = 5,
 					  zombie_count = 0,
 					  action_space = 5,
 					  map_path = MAP_PATH)
@@ -81,7 +82,7 @@ def train():
 	scores = []
 	epsHistory = []
 	numGames = 100000
-	print_episode = 1000
+	print_episode = 10
 	batch_size = 8
 
 	avg_score = 0
@@ -166,7 +167,8 @@ def play():
 					  rate = 100, 
 					  food_count = FOOD_COUNT,
 					  obstacle_count = OBSTACLE_COUNT,
-					  zombie_count = 2,
+					  lava_count = 10,
+					  zombie_count = 0,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
@@ -175,6 +177,6 @@ def play():
 
 if __name__ == '__main__':
 	
-	# train()
+	train()
 
-	play()
+	# play()

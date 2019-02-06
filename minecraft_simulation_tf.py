@@ -56,7 +56,7 @@ b_out_textfile_path_save = "./Data/b_out.npy"
 LOGDIR = "./Logs/log0"
 
 # Parameters
-GRID_SIZE = 8
+GRID_SIZE = 10
 LOCAL_GRID_SIZE = 9 # Has to be an odd number (I think...)
 SEED = 1
 WRAP = False
@@ -68,8 +68,7 @@ REPLAY_MEMORY = 25000
 
 # Number of hidden layers, nodes, channels, etc. 
 
-n_input_channels = 3 # Using history
-# n_input_channels = 4 # Using history
+n_input_channels = 4 # Using history
 
 # these still need to be added to the code
 n_out_channels_conv1 = 16
@@ -140,7 +139,7 @@ def createDeepModel(data, load_variables = False):
 		
 		weights = {'W_conv1':tf.Variable(tf.truncated_normal([3, 3, n_input_channels, n_out_channels_conv1], mean=0, stddev=1.0, seed=0), name = 'W_conv1'),
 			   	   'W_conv2':tf.Variable(tf.truncated_normal([3, 3, n_out_channels_conv1, n_out_channels_conv2], mean=0, stddev=1.0, seed=1), name = 'W_conv2'),
-			   	   'W_fc':tf.Variable(tf.truncated_normal([4*4*n_out_channels_conv2, n_out_fc], mean=0, stddev=1.0, seed=2), name = 'W_fc'),
+			   	   'W_fc':tf.Variable(tf.truncated_normal([3*3*n_out_channels_conv2, n_out_fc], mean=0, stddev=1.0, seed=2), name = 'W_fc'),
 			   	   'W_out':tf.Variable(tf.truncated_normal([n_out_fc, n_actions], mean=0, stddev=1.0, seed=3), name = 'W_out')}
 
 		biases = {'b_conv1':tf.Variable(tf.constant(0.1, shape=[n_out_channels_conv1]), name = 'b_conv1'),
@@ -152,12 +151,12 @@ def createDeepModel(data, load_variables = False):
 	x = tf.reshape(data, shape=[-1, LOCAL_GRID_SIZE, LOCAL_GRID_SIZE, n_input_channels])
 
 	conv1 = conv2d(x, weights['W_conv1'], name = 'conv1')
-	# conv1 = maxpool2d(conv1, name = 'max_pool1')
+	conv1 = maxpool2d(conv1, name = 'max_pool1')
 
 	conv2 = conv2d(conv1, weights['W_conv2'], name = 'conv2')
 	conv2 = maxpool2d(conv2, name = 'max_pool2')
 
-	fc = tf.reshape(conv2,[-1, 4*4*n_out_channels_conv2])
+	fc = tf.reshape(conv2,[-1, 3*3*n_out_channels_conv2])
 	fc = tf.nn.relu(tf.matmul(fc, weights['W_fc']) + biases['b_fc'])
 
 	output = tf.matmul(fc, weights['W_out']) + biases['b_out']
@@ -187,9 +186,10 @@ def trainDeepModel(load = False):
 					  grid_size = GRID_SIZE, 
 					  rate = 80, 
 					  max_time = 60,
-					  food_count = 5,
+					  food_count = 0,
 					  obstacle_count = 0,
-					  zombie_count = 0, 
+					  lava_count = 5,
+					  zombie_count = 3, 
 					  action_space = 5,
 					  map_path = None)
 	
@@ -201,10 +201,10 @@ def trainDeepModel(load = False):
 	gamma = 0.99  # Discount factor, i.e. to which extent the algorithm considers possible future rewards
 	epsilon = 0.01  # Probability to choose random action instead of best action
 
-	epsilon_function = False
+	epsilon_function = True
 	epsilon_start = 0.5
 	epsilon_end = 0.05
-	epsilon_percentage = 0.8 # in decimal
+	epsilon_percentage = 0.5 # in decimal
 
 	alpha_function = False
 	alpha_start = 0.01
@@ -583,15 +583,15 @@ def play():
 
 	GRID_SIZE = 16
 
-	# MAP_PATH = "./Maps/Grid{}/map2.txt".format(GRID_SIZE)
-	MAP_PATH = None
+	MAP_PATH = "./Maps/Grid{}/map3.txt".format(GRID_SIZE)
+	# MAP_PATH = None
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE, 
-					  rate = 100,
-					  food_count = 3,
-					  obstacle_count = 10,
-					  lava_count = 20,
+					  rate = 200,
+					  food_count = 0,
+					  obstacle_count = 0,
+					  lava_count = 0,
 					  zombie_count = 3,
 					  action_space = 5,
 					  map_path = MAP_PATH)

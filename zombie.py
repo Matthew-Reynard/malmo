@@ -36,7 +36,12 @@ class Zombie:
         allowed = grid[:]
 
         # Remove all the disallowed positions from the allowed list
-        [allowed.remove(pos) for pos in disallowed]
+        for pos in disallowed:
+            try:
+                allowed.remove(pos)
+            except:
+                print("ERROR CAUGHT => ValueError: list.remove(x): x not in list (z)")
+        # [allowed.remove(pos) for pos in disallowed]
 
         # If you want the food to only spawn in 3 different locations
         # if self.amount == 1:
@@ -66,7 +71,12 @@ class Zombie:
         # print(set([x for x in disallowed if disallowed.count(x) > 1])) # DEBUGGING
 
         # Remove the disallowed positions from the allowed grid positions
-        [allowed.remove(pos) for pos in disallowed]
+        for pos in disallowed:
+            try:
+                allowed.remove(pos)
+            except:
+                print("ERROR CAUGHT => ValueError: list.remove(x): x not in list")
+        # [allowed.remove(pos) for pos in disallowed]
 
         # If you want the food to only spawn in 3 different locations
         # if self.amount == 1:
@@ -125,6 +135,9 @@ class Zombie:
         if self.amount > 0:
             start = tuple([int(x/20) for x in self.array[0]])
             end = tuple([int(y/20) for y in steve.pos])
+
+            if self.amount > 2:
+                maze = self.updateMaze(maze, 2)
 
             path = self.astar(maze, start, end)
             # print(maze)
@@ -280,7 +293,8 @@ class Zombie:
                 # Add the child to the open list
                 open_list.append(child)
 
-            if count > 100:
+            # This count might influence performance a bit
+            if count > 200:
                 # print(count)
                 break
 

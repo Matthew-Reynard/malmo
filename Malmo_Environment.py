@@ -155,29 +155,46 @@ class Environment:
         # Positions on the grid that are not allowed to spawn things
         disallowed = []
 
-        # Create obstacles in the environment
+        # Create obstacles and lava in the environment
         self.obstacle.array.clear()
         self.obstacle.array_length = 0
+        self.lava.array.clear()
+        self.lava.array_length = 0
+
         if self.MAP_PATH != None:
             self.obstacle.reset_map(self.GRID_SIZE, self.MAP_PATH, self.ENABLE_WRAP)
-            if not self.ENABLE_WRAP:
-                self.obstacle.create_border(self.GRID_SIZE, self.SCALE)
-        else:
-            # Create obstacles at random positions
-            if not self.ENABLE_WRAP:
-                self.obstacle.create_border(self.GRID_SIZE, self.SCALE)
+            self.lava.reset_map(self.GRID_SIZE, self.MAP_PATH, self.ENABLE_WRAP)
 
+        if not self.ENABLE_WRAP:
+            self.obstacle.create_border(self.GRID_SIZE, self.SCALE)
+
+        # Add all obstacle positions to the disallowed list
         [disallowed.append(grid_pos) for grid_pos in self.obstacle.array]
+        [disallowed.append(grid_pos) for grid_pos in self.lava.array]
         
+        # Add random obstacles not already on the map
         self.obstacle.reset(self.grid, disallowed)
 
+        # Add all obstacle positions to the disallowed list
         disallowed = []
         [disallowed.append(grid_pos) for grid_pos in self.obstacle.array]
-
-        self.lava.reset(self.grid, disallowed)
         [disallowed.append(grid_pos) for grid_pos in self.lava.array]
 
-        self.maze = createGrid(self.GRID_SIZE, self.obstacle.array, self.SCALE)
+        # Create lava in the environment
+        # self.lava.array.clear()
+        # self.lava.array_length = 0
+        # if self.MAP_PATH != None:
+        #     self.lava.reset_map(self.GRID_SIZE, self.MAP_PATH, self.ENABLE_WRAP)
+
+        # [disallowed.append(grid_pos) for grid_pos in self.lava.array]
+
+        # Add random lava not already on the map
+        self.lava.reset(self.grid, disallowed)
+        disallowed = []
+        [disallowed.append(grid_pos) for grid_pos in self.obstacle.array]
+        [disallowed.append(grid_pos) for grid_pos in self.lava.array]
+
+        self.maze = createGrid(self.GRID_SIZE, disallowed, self.SCALE)
         # print(self.obstacle.array)
         # print("\n")
         # print(self.maze)
@@ -312,7 +329,7 @@ class Environment:
 
         # Initialze to -1 for every time step - to find the fastest route (can be a more negative reward)
         # reward = -1
-        reward = -0.1
+        reward = 0.0
         # reward = 0.3
 
         # Test: if moving, give a reward
@@ -322,9 +339,6 @@ class Environment:
 
         # Update the position of steve 
         self.steve.update(self.SCALE, action, self.ACTION_SPACE)
-
-        # Update the position of the zombie 
-        self.zombie.move(self.maze, self.steve, self.steps)
 
         if self.ENABLE_WRAP:
             self.wrap()
@@ -347,11 +361,11 @@ class Environment:
             hit_obstacle = (self.steve.pos == self.obstacle.array[i])
 
             if hit_obstacle:
-                # self.steve.x = self.steve.prev_pos[0]
-                # self.steve.y = self.steve.prev_pos[1]
-                # self.steve.pos = self.steve.prev_pos
-                done = True
-                reward = -0.4
+                self.steve.x = self.steve.prev_pos[0]
+                self.steve.y = self.steve.prev_pos[1]
+                self.steve.pos = self.steve.prev_pos
+                # done = True
+                reward = -0.2
 
         # Check for lava collision
         for i in range(self.lava.array_length):
@@ -360,6 +374,9 @@ class Environment:
             if in_lava:
                 done = True
                 reward = -0.8
+
+        # Update the position of the zombie 
+        self.zombie.move(self.maze, self.steve, self.steps)
 
         # Check if zombie gets steve
         for i in range(self.zombie.amount):
@@ -434,7 +451,7 @@ class Environment:
             # done = True
 
             # Reward functions
-            reward = 5
+            reward = 2
             # reward = 100 / (np.sqrt((self.steve.x-self.food.x)**2 + (self.steve.y-self.food.y)**2) + 1) # Including the distance between them
             # reward = 1000 * self.score
             # reward = 1000 / self.time # Including the time in the reward function
@@ -443,11 +460,13 @@ class Environment:
 
         # To make it compatible with malmo
         if self.score == self.NUM_OF_FOOD:
-            reward = 100
-            done = True
+            reward = 10
+            if self.NUM_OF_FOOD != 0:
+                done = True
 
         # If the episode takes longer than the max time, it ends
         if self.time == self.MAX_TIME_PER_EPISODE:
+            reward = 10
             done = True
 
         # Get the new_state
@@ -576,8 +595,8 @@ class Environment:
         sx = int(self.steve.x/self.SCALE)
         sy = int(self.steve.y/self.SCALE)
 
-        state = np.zeros((3, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE))
-        # state = np.zeros((4, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE)) # When using history
+        # state = np.zeros((3, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE))
+        state = np.zeros((4, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE)) 
 
         # Agent
         local_pos = int((self.LOCAL_GRID_SIZE-1)/2)
@@ -602,7 +621,9 @@ class Environment:
             y_prime_food = local_pos+int(self.food.array[i][1]/self.SCALE)-int(self.steve.y/self.SCALE)
 
             if x_prime_food < self.LOCAL_GRID_SIZE and x_prime_food >= 0 and y_prime_food < self.LOCAL_GRID_SIZE and y_prime_food >= 0:
-                state[1, y_prime_food, x_prime_food] = 1
+                # state[1, y_prime_food, x_prime_food] = 1
+                pass
+
 
         # Obstacles
         for i in range(self.obstacle.array_length):
@@ -628,13 +649,22 @@ class Environment:
                 if i > x_prime_wall or j > y_prime_wall:
                     state[2, j, i] = 1
 
-        # Need to add Zombies
+        # Zombies
         for i in range(len(self.zombie.array)):
-            x_prime_obs = local_pos+int(self.zombie.array[i][0]/self.SCALE)-int(self.steve.x/self.SCALE)
-            y_prime_obs = local_pos+int(self.zombie.array[i][1]/self.SCALE)-int(self.steve.y/self.SCALE)
+            x_prime_zom = local_pos+int(self.zombie.array[i][0]/self.SCALE)-int(self.steve.x/self.SCALE)
+            y_prime_zom = local_pos+int(self.zombie.array[i][1]/self.SCALE)-int(self.steve.y/self.SCALE)
 
-            if x_prime_obs < self.LOCAL_GRID_SIZE and x_prime_obs >= 0 and y_prime_obs < self.LOCAL_GRID_SIZE and y_prime_obs >= 0:
-                state[2, y_prime_obs, x_prime_obs] = 1
+            if x_prime_zom < self.LOCAL_GRID_SIZE and x_prime_zom >= 0 and y_prime_zom < self.LOCAL_GRID_SIZE and y_prime_zom >= 0:
+                state[1, y_prime_zom, x_prime_zom] = 1
+                pass
+
+        # Lava
+        for i in range(self.lava.array_length):
+            x_prime_lava = local_pos+int(self.lava.array[i][0]/self.SCALE)-int(self.steve.x/self.SCALE)
+            y_prime_lava = local_pos+int(self.lava.array[i][1]/self.SCALE)-int(self.steve.y/self.SCALE)
+
+            if x_prime_lava < self.LOCAL_GRID_SIZE and x_prime_lava >= 0 and y_prime_lava < self.LOCAL_GRID_SIZE and y_prime_lava >= 0:
+                state[3, y_prime_lava, x_prime_lava] = 1
 
         return state
 

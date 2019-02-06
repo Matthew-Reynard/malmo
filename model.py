@@ -9,7 +9,7 @@ class DeepQNetwork(nn.Module):
 	def __init__(self, ALPHA):
 		super(DeepQNetwork, self).__init__()
 		self.conv1 = nn.Conv2d(4, 16, 3, stride=1, padding=0)
-		# self.maxp1 = nn.MaxPool2d(3, stride=2)
+		self.maxp1 = nn.MaxPool2d(3, stride=2)
 		self.conv2 = nn.Conv2d(16, 32, 3, stride=1, padding=0)
 		self.maxp2 = nn.MaxPool2d(2, stride=1)
 		# self.conv3 = nn.Conv2d(64, 128, 3)
@@ -23,7 +23,7 @@ class DeepQNetwork(nn.Module):
 
 	def forward(self, observation):
 		observation = T.Tensor(observation)#.to(self.device)
-		observation = observation.view(-1, 4, 7, 7) # size of input
+		observation = observation.view(-1, 4, 9, 9) # size of input
 		observation = self.conv1(observation)
 		# observation = F.relu(self.maxp1(observation))
 		observation = self.conv2(observation)

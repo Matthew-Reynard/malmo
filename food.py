@@ -35,7 +35,12 @@ class Food:
         allowed = grid[:]
 
         # Remove all the disallowed positions from the allowed list
-        [allowed.remove(pos) for pos in disallowed]
+        for pos in disallowed:
+            try:
+                allowed.remove(pos)
+            except:
+                print("ERROR CAUGHT => ValueError: list.remove(x): x not in list (f)")
+        # [allowed.remove(pos) for pos in disallowed]
 
         # If you want the food to only spawn in 3 different locations
         # if self.amount == 1:

@@ -41,7 +41,12 @@ class Steve:
 
         allowed = grid[:]
 
-        [allowed.remove(pos) for pos in disallowed]
+        for pos in disallowed:
+            try:
+                allowed.remove(pos)
+            except:
+                print("ERROR CAUGHT => ValueError: list.remove(x): x not in list (s)")
+        # [allowed.remove(pos) for pos in disallowed]
 
         self.pos = allowed[np.random.choice(len(allowed))]
 
