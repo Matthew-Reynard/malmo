@@ -14,7 +14,6 @@ TO DO LIST:
 - Optimize hyper-parameters
 - Optimise the random initialisations of the weights and biases
 
-
 NOTES:
 - Random weights and biases are used for the baseline
 
@@ -251,7 +250,7 @@ def trainDeepModel(load = False):
 	# errors = []
 
 	print_episode = 1000
-	total_episodes = 50000
+	total_episodes = 100000
 
 	# Saving model capabilities
 	saver = tf.train.Saver()
@@ -580,15 +579,15 @@ def runDeepModel():
 def play():
 	print("\n ----- Playing the game -----\n")
 
-	GRID_SIZE = 5
+	GRID_SIZE = 16
 
-	# MAP_PATH = "./Maps/Grid{}/map3.txt".format(GRID_SIZE)
-	MAP_PATH = None
+	MAP_PATH = "./Maps/Grid{}/map4.txt".format(GRID_SIZE)
+	# MAP_PATH = None
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE, 
-					  rate = 200,
-					  food_count = 3,
+					  rate = 100,
+					  food_count = 13,
 					  obstacle_count = 0,
 					  lava_count = 0,
 					  zombie_count = 0,

@@ -3,6 +3,7 @@ MalmoPlatform/
 tmp/
 Models/
 tests/
+mnist/
 
 # PYTHON STUFF
 

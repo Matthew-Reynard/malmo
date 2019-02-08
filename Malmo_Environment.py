@@ -222,6 +222,7 @@ class Environment:
         # Fill the state array with the appropriate state representation
         # self.state = self.state_array()
         self.state = self.state_vector_3D()
+        # self.state = self.local_state_vector_3D()
 
         # Reset the time
         self.time = 0
@@ -366,7 +367,7 @@ class Environment:
                 self.steve.y = self.steve.prev_pos[1]
                 self.steve.pos = self.steve.prev_pos
                 # done = True
-                reward = -0.2
+                reward = -0.15
 
         # Check for lava collision
         for i in range(self.lava.array_length):
@@ -473,6 +474,7 @@ class Environment:
         # Get the new_state
         # new_state = self.state_array()
         new_state = self.state_vector_3D()
+        # new_state = self.local_state_vector_3D()
 
         # A dictionary of information that may be useful
         info = {"time": self.time, "score": self.score}
