@@ -54,7 +54,7 @@ def train():
 	avg_score = 0
 	avg_error = 0
 
-
+	# Number of episodes
 	print_episode = 100
 	total_episodes = 10000
 
@@ -69,7 +69,7 @@ def train():
 	# Tensorboard capabilties
 	writer = tf.summary.FileWriter(LOGDIR)
 
-
+	# Begin session
 	with tf.Session() as sess:
 
 		sess.run(init)
