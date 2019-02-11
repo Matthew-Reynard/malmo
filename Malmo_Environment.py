@@ -449,7 +449,7 @@ class Environment:
             # [disallowed.append(grid_pos) for grid_pos in self.zombie.array]
             # self.food.make(self.grid, disallowed, index = eaten_food)
 
-            # Test for one food item at a time
+            # Only collect 1 food item at a time
             done = True
 
             # Reward functions

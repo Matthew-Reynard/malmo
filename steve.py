@@ -48,7 +48,8 @@ class Steve:
                 print("ERROR CAUGHT => ValueError: list.remove(x): x not in list (s)")
         # [allowed.remove(pos) for pos in disallowed]
 
-        allowed = [(2*20, 2*20)]
+        # Only spawn in one location
+        # allowed = [(2*20, 2*20)]
 
         self.pos = allowed[np.random.choice(len(allowed))]
 

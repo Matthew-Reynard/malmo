@@ -16,12 +16,14 @@ MODEL_PATH_SAVE = "./Models/Tensorflow/model_0.ckpt"
 
 LOGDIR = "./Logs/log0"
 
+# USE_SAVED_MODEL_FILE = True
+
 
 def train():
 
 	print("\n ---- Training the Deep Neural Network ----- \n")
 
-	RENDER_TO_SCREEN = False
+	RENDER_TO_SCREEN = True
 
 	env = Environment(wrap = False, 
 					  grid_size = 7, 
@@ -41,11 +43,6 @@ def train():
 
 	brain = Brain(action_space = env.number_of_actions())
 
-	# Hyper-parameters
-	# alpha = 0.001  # Learning rate, i.e. which fraction of the Q values should be updated
-	# gamma = 0.99  # Discount factor, i.e. to which extent the algorithm considers possible future rewards
-	# epsilon = 0.01  # Probability to choose random action instead of best action
-
 	model.setup(brain)
 
 	tf.summary.scalar('error', tf.squeeze(model.error))
@@ -56,7 +53,7 @@ def train():
 
 	# Number of episodes
 	print_episode = 100
-	total_episodes = 10000
+	total_episodes = 1000
 
 	saver = tf.train.Saver()
 
@@ -71,6 +68,10 @@ def train():
 
 	# Begin session
 	with tf.Session() as sess:
+
+		# if USE_SAVED_MODEL_FILE:
+		# 	saver.restore(sess, MODEL_PATH_SAVE)
+		# 	print("Model restored.")
 
 		sess.run(init)
 
@@ -137,15 +138,16 @@ def train():
 					avg_error += e
 
 			if (episode%print_episode == 0 and episode != 0) or (episode == total_episodes-1):
+				
 				current_time = math.floor(time.time()-start_time)
-				print("Ep:", episode, 
-					"\tavg t: {0:.3f}".format(avg_time/print_episode), 
-					"\tavg score: {0:.3f}".format(avg_score/print_episode), 
-					"\tErr {0:.3f}".format(avg_error/print_episode), 
-					"\tepsilon {0:.3f}".format(brain.EPSILON), 
-					#"\ttime {0:.0f}:{1:.0f}".format(current_time/60, current_time%60),
+				print("Ep:", episode,
+					"\tavg t: {0:.3f}".format(avg_time/print_episode),
+					"\tavg score: {0:.3f}".format(avg_score/print_episode),
+					"\tErr {0:.3f}".format(avg_error/print_episode),
+					"\tepsilon {0:.3f}".format(brain.EPSILON),
 					end="")
 				print_readable_time(current_time)
+
 				avg_time = 0
 				avg_score = 0
 				avg_error = 0
@@ -160,6 +162,11 @@ def train():
 
 		# save_path = saver.save(sess, MODEL_PATH_SAVE)
 		# print("Model saved in path: %s" % save_path)
+
+
+def run():
+
+	print("\n ---- Running the Deep Q Network ----- \n")
 
 
 # Play the game
@@ -187,5 +194,7 @@ def play():
 if __name__ == '__main__':
 
 	train()
+
+	run()
 
 	# play()
