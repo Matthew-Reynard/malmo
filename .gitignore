@@ -4,6 +4,7 @@ tmp/
 Models/
 tests/
 mnist/
+Logs/
 
 # PYTHON STUFF
 

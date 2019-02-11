@@ -450,7 +450,7 @@ class Environment:
             # self.food.make(self.grid, disallowed, index = eaten_food)
 
             # Test for one food item at a time
-            # done = True
+            done = True
 
             # Reward functions
             reward = 10
