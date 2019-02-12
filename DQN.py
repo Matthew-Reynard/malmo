@@ -61,9 +61,12 @@ class Network():
 
 		if self.load:
 
-			path = self.path + self.name + ".npz"
-
-			model = np.load(path)
+			try:
+				path = self.path + self.name + ".npz"
+				model = np.load(path)
+			except Exception as e:
+				print(e)
+				exit()
 
 			weights = {'W_conv1':tf.Variable(model["W_conv1"], name = 'W_conv1'),
 			   	       'W_conv2':tf.Variable(model["W_conv2"], name = 'W_conv2'),

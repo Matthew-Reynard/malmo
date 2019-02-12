@@ -18,28 +18,36 @@ LOGDIR = "./Logs/log0"
 
 # USE_SAVED_MODEL_FILE = True
 
+GRID_SIZE = 7
+
+MAP_NUMBER = 0
+
+# MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
+MAP_PATH = None
+
 
 def train():
 
 	print("\n ---- Training the Deep Neural Network ----- \n")
 
-	RENDER_TO_SCREEN = True
+	RENDER_TO_SCREEN = False
+	# RENDER_TO_SCREEN = True
 
 	env = Environment(wrap = False, 
 					  grid_size = 7, 
 					  rate = 80, 
 					  max_time = 30,
-					  food_count = 1,
+					  food_count = 0,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 0, 
+					  zombie_count = 1, 
 					  action_space = 5,
-					  map_path = None)
+					  map_path = MAP_PATH)
 
 	if RENDER_TO_SCREEN:
 		env.prerender()
 
-	model = Network(name="model_8x8", load=True)
+	model = Network(name="model_7x7_zombie", load=True)
 
 	brain = Brain(action_space = env.number_of_actions())
 
@@ -52,8 +60,8 @@ def train():
 	avg_error = 0
 
 	# Number of episodes
-	print_episode = 100
-	total_episodes = 1000
+	print_episode = 1000
+	total_episodes = 20000
 
 	saver = tf.train.Saver()
 
@@ -85,7 +93,7 @@ def train():
 			state, info = env.reset()
 			done = False
 
-			brain.linear_epsilon_decay(total_episodes, episode, start=0.4, end=0.05, percentage= 0.5)
+			brain.linear_epsilon_decay(total_episodes, episode, start=0.5, end=0.05, percentage= 0.5)
 
 			# brain.linear_alpha_decay(total_episodes, episode)
 
@@ -103,6 +111,8 @@ def train():
 
 				# Update environment with by performing action
 				new_state, reward, done, info = env.step(action)
+
+				# print(new_state)
 
 				brain.store_transition(state, action, reward, done, new_state)
 				
@@ -173,18 +183,20 @@ def run():
 def play():
 	print("\n ----- Playing the game -----\n")
 
-	GRID_SIZE = 5
+	GRID_SIZE = 7
 
-	# MAP_PATH = "./Maps/Grid{}/map4.txt".format(GRID_SIZE)
+	MAP_NUMBER = 2
+
+	# MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
 	MAP_PATH = None
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE, 
 					  rate = 100,
-					  food_count = 1,
+					  food_count = 0,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 0,
+					  zombie_count = 1,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
@@ -195,6 +207,6 @@ if __name__ == '__main__':
 
 	train()
 
-	run()
+	# run()
 
 	# play()

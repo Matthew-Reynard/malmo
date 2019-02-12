@@ -132,6 +132,7 @@ class Zombie:
 
     def move(self, maze, steve, steps):
         """After a certain amount of charater steps, the zombie takes a step"""
+
         if self.amount > 0:
             start = tuple([int(x/20) for x in self.array[0]])
             end = tuple([int(y/20) for y in steve.pos])
@@ -143,8 +144,9 @@ class Zombie:
             # print(maze)
 
             # 1st zombie moves according to the a* algorithm
-            star_steps = 7
+            star_steps = 5
             self.array[0] = list(self.array[0])
+            
             if path != None:
                 if len(path) > 1 and steps%star_steps == 0:
                     # print("move")
@@ -154,6 +156,18 @@ class Zombie:
                     # self.pos = (self.x, self.y)
 
                     # self.array[0] = self.pos
+            else:
+                print(maze,"\nNeed to implement taking a random action")
+                # random_move = np.random.randint(0,4)
+                # if random_move == 0 and maze[int(self.array[0][0]/20)+1][int(self.array[0][1]/20)] == 0:
+                #     self.array[0][0] += 1*20
+                # if random_move == 1 and maze[int(self.array[0][0]/20)-1][int(self.array[0][1]/20)] == 0:
+                #     self.array[0][0] -= 1*20
+                # if random_move == 2 and maze[int(self.array[0][0]/20)][int(self.array[0][1]/20)+1] == 0:
+                #     self.array[0][1] += 1*20
+                # if random_move == 3 and maze[int(self.array[0][0]/20)][int(self.array[0][1]/20)-1] == 0:
+                #     self.array[0][1] -= 1*20
+
             self.array[0] = tuple(self.array[0])
 
             maze = self.updateMaze(maze, 0)
@@ -276,9 +290,12 @@ class Zombie:
             for child in children:
 
                 # Child is on the closed list
-                for closed_child in closed_list:
-                    if child == closed_child:
-                        continue
+                # for closed_child in closed_list:
+                #     if child == closed_child:
+                #         continue
+
+                if child in closed_list:
+                    continue
 
                 # Create the f, g, and h values
                 child.g = current_node.g + 1
@@ -295,7 +312,8 @@ class Zombie:
 
             # This count might influence performance a bit
             if count > 200:
-                # print(count)
+                print(count)
+                # return None
                 break
 
 

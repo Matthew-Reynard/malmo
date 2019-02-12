@@ -331,7 +331,7 @@ class Environment:
 
         # Initialze to -1 for every time step - to find the fastest route (can be a more negative reward)
         # reward = -1
-        reward = -0.1
+        reward = 0.1
         # reward = 0.3
 
         # Test: if moving, give a reward
@@ -367,7 +367,7 @@ class Environment:
                 self.steve.y = self.steve.prev_pos[1]
                 self.steve.pos = self.steve.prev_pos
                 # done = True
-                reward = -0.15
+                reward = 0.0
 
         # Check for lava collision
         for i in range(self.lava.array_length):
@@ -468,7 +468,7 @@ class Environment:
 
         # If the episode takes longer than the max time, it ends
         if self.time == self.MAX_TIME_PER_EPISODE:
-            # reward = 10
+            reward = 10
             done = True
 
         # Get the new_state
@@ -581,10 +581,13 @@ class Environment:
 
         state[0, int(self.steve.y/self.SCALE), int(self.steve.x/self.SCALE)] = 1
 
-        state[1, int(self.food.y/self.SCALE), int(self.food.x/self.SCALE)] = 1
+        # state[1, int(self.food.y/self.SCALE), int(self.food.x/self.SCALE)] = 1
 
         for i in range(self.obstacle.array_length):
-            state[2, int(self.obstacle.array[i][0]/self.SCALE), int(self.obstacle.array[i][1]/self.SCALE)] = 1
+            state[2, int(self.obstacle.array[i][1]/self.SCALE), int(self.obstacle.array[i][0]/self.SCALE)] = 1
+
+        for i in range(len(self.zombie.array)):
+            state[1, int(self.zombie.array[i][1]/self.SCALE), int(self.zombie.array[i][0]/self.SCALE)] = 1
 
         return state
 
