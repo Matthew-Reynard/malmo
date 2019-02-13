@@ -603,7 +603,7 @@ def play():
 if __name__ == '__main__':
 
 	# --- Deep Neural Network with CNN --- #
-	trainDeepModel(load = True)
+	trainDeepModel(load = False)
 	# runDeepModel()
   
 	# --- Just for fun --- #

@@ -8,38 +8,39 @@ import os
 class DeepQNetwork(nn.Module):
 	def __init__(self, ALPHA):
 		super(DeepQNetwork, self).__init__()
-		self.conv1 = nn.Conv2d(4, 16, 3, stride=1, padding=0)
+		self.conv1 = nn.Conv2d(3, 16, 3, stride=1, padding=0)
 		self.maxp1 = nn.MaxPool2d(3, stride=2)
 		self.conv2 = nn.Conv2d(16, 32, 3, stride=1, padding=0)
 		self.maxp2 = nn.MaxPool2d(2, stride=1)
 		# self.conv3 = nn.Conv2d(64, 128, 3)
-		self.fc1 = nn.Linear(2*2*32, 256)
+		self.fc1 = nn.Linear(4*4*32, 256)
 		self.fc2 = nn.Linear(256, 5)
 
 		self.optimiser = optim.SGD(self.parameters(), lr=ALPHA)
 		self.loss = nn.MSELoss()
-		self.device = T.device('cuda:0' if T.cuda.is_available() else 'cpu')
-		self.to(self.device)
+		# self.device = T.device('cuda:0' if T.cuda.is_available() else 'cpu')
+		self.device = T.device('cpu')
+		# self.to(self.device)
 
 	def forward(self, observation):
-		observation = T.Tensor(observation)#.to(self.device)
-		observation = observation.view(-1, 4, 9, 9) # size of input
-		observation = self.conv1(observation)
+		observation = T.Tensor(observation).to(self.device)
+		observation = observation.view(-1, 3, 9, 9) # size of input
+		observation = F.relu(self.conv1(observation))
 		# observation = F.relu(self.maxp1(observation))
-		observation = self.conv2(observation)
+		observation = F.relu(self.conv2(observation))
 		observation = self.maxp2(observation)
 		# observation = F.relu(self.conv3(observation))
 		# print(observation)
-		observation = observation.view(-1, 2*2*32) # flatten
+		observation = observation.view(-1, 4*4*32) # flatten
 		observation = F.leaky_relu(self.fc1(observation))
 		
 		actions = self.fc2(observation)
-		actions = F.normalize(actions, p=2, dim=1)
+		# actions = F.normalize(actions, p=2, dim=1)
 
 		return actions
 
 class Agent(object):
-	def __init__(self, gamma, epsilon, alpha, maxMemorySize, epsEnd=0.05, replace=10000, actionSpace=[0,1,2,3,4]):
+	def __init__(self, gamma, epsilon, alpha, maxMemorySize, epsEnd=0.08, replace=10000, actionSpace=[0,1,2,3,4]):
 		self.ALPHA = alpha
 		self.GAMMA = gamma
 		self.EPSILON = epsilon
@@ -94,6 +95,8 @@ class Agent(object):
 
 		miniBatch = self.memory[memStart:memStart+batch_size]
 		# print("miniBatch", miniBatch)
+		# print()
+		# print()
 
 		memory = np.array(miniBatch)
 		# print("memory", list(memory))
@@ -131,8 +134,8 @@ class Agent(object):
 
 		# linear decrease of epsilon
 		if self.steps > 500:
-			if self.EPSILON - 2e-5 > self.EPS_END:
-				self.EPSILON -= 2e-5
+			if self.EPSILON - 1e-5 > self.EPS_END:
+				self.EPSILON -= 1e-5
 			else:
 				self.EPSILON = self.EPS_END
 

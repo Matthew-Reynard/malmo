@@ -1,4 +1,5 @@
-import sys, termios, tty, os, time
+# import sys, tty, os, time
+# import termios
 
 import matplotlib.pyplot as plt 
 import numpy as np
@@ -129,16 +130,16 @@ def createGrid(grid_size, obstacles_array, scale):
 	return a
 
 
-def getch():
-    fd = sys.stdin.fileno()
-    old_settings = termios.tcgetattr(fd)
-    try:
-        tty.setraw(sys.stdin.fileno())
-        ch = sys.stdin.read(1)
+# def getch():
+#     fd = sys.stdin.fileno()
+#     old_settings = termios.tcgetattr(fd)
+#     try:
+#         tty.setraw(sys.stdin.fileno())
+#         ch = sys.stdin.read(1)
  
-    finally:
-        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-    return ch
+#     finally:
+#         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+#     return ch
 
 
 def print_readable_time(current_time):

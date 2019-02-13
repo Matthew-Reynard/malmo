@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 
 # Imports
-import numpy as np
 import tensorflow as tf
+import numpy as np
 import time
 import math
 
@@ -20,7 +20,7 @@ LOGDIR = "./Logs/log0"
 
 GRID_SIZE = 7
 
-MAP_NUMBER = 0
+MAP_NUMBER = 2
 
 # MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
 MAP_PATH = None
@@ -31,23 +31,23 @@ def train():
 	print("\n ---- Training the Deep Neural Network ----- \n")
 
 	RENDER_TO_SCREEN = False
-	# RENDER_TO_SCREEN = True
+	RENDER_TO_SCREEN = True
 
 	env = Environment(wrap = False, 
 					  grid_size = 7, 
 					  rate = 80, 
 					  max_time = 30,
-					  food_count = 0,
+					  food_count = 1,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 1, 
+					  zombie_count = 0, 
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
 	if RENDER_TO_SCREEN:
 		env.prerender()
 
-	model = Network(name="model_7x7_zombie", load=True)
+	model = Network(name="model_local9_diamond", load=True)
 
 	brain = Brain(action_space = env.number_of_actions())
 
@@ -61,7 +61,7 @@ def train():
 
 	# Number of episodes
 	print_episode = 1000
-	total_episodes = 20000
+	total_episodes = 100000
 
 	saver = tf.train.Saver()
 
@@ -93,7 +93,7 @@ def train():
 			state, info = env.reset()
 			done = False
 
-			brain.linear_epsilon_decay(total_episodes, episode, start=0.5, end=0.05, percentage= 0.5)
+			# brain.linear_epsilon_decay(total_episodes, episode, start=0.3 , end=0.05, percentage=0.3)
 
 			# brain.linear_alpha_decay(total_episodes, episode)
 

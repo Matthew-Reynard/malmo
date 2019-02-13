@@ -221,8 +221,8 @@ class Environment:
 
         # Fill the state array with the appropriate state representation
         # self.state = self.state_array()
-        self.state = self.state_vector_3D()
-        # self.state = self.local_state_vector_3D()
+        # self.state = self.state_vector_3D()
+        self.state = self.local_state_vector_3D()
 
         # Reset the time
         self.time = 0
@@ -331,8 +331,11 @@ class Environment:
 
         # Initialze to -1 for every time step - to find the fastest route (can be a more negative reward)
         # reward = -1
-        reward = 0.1
+        reward = -0.05
         # reward = 0.3
+        # reward = math.sqrt((self.steve.x - self.zombie.array[0][0])**2 + (self.steve.y - self.zombie.array[0][1])**2)/20
+
+        # print(reward)
 
         # Test: if moving, give a reward
         # if self.steve.dx != 0 or self.steve.dy != 0:
@@ -367,7 +370,7 @@ class Environment:
                 self.steve.y = self.steve.prev_pos[1]
                 self.steve.pos = self.steve.prev_pos
                 # done = True
-                reward = 0.0
+                reward = -0.1
 
         # Check for lava collision
         for i in range(self.lava.array_length):
@@ -453,7 +456,7 @@ class Environment:
             done = True
 
             # Reward functions
-            reward = 10
+            reward = 1
             # reward = 100 / (np.sqrt((self.steve.x-self.food.x)**2 + (self.steve.y-self.food.y)**2) + 1) # Including the distance between them
             # reward = 1000 * self.score
             # reward = 1000 / self.time # Including the time in the reward function
@@ -462,19 +465,19 @@ class Environment:
 
         # To make it compatible with malmo
         if self.score == self.NUM_OF_FOOD:
-            reward = 100
+            reward = 1
             if self.NUM_OF_FOOD != 0:
                 done = True
 
         # If the episode takes longer than the max time, it ends
         if self.time == self.MAX_TIME_PER_EPISODE:
-            reward = 10
+            # reward = -1.0
             done = True
 
         # Get the new_state
         # new_state = self.state_array()
-        new_state = self.state_vector_3D()
-        # new_state = self.local_state_vector_3D()
+        # new_state = self.state_vector_3D()
+        new_state = self.local_state_vector_3D()
 
         # A dictionary of information that may be useful
         info = {"time": self.time, "score": self.score}
@@ -581,13 +584,15 @@ class Environment:
 
         state[0, int(self.steve.y/self.SCALE), int(self.steve.x/self.SCALE)] = 1
 
-        # state[1, int(self.food.y/self.SCALE), int(self.food.x/self.SCALE)] = 1
+        state[1, int(self.food.y/self.SCALE), int(self.food.x/self.SCALE)] = 1
 
+        # Obstacles
         for i in range(self.obstacle.array_length):
             state[2, int(self.obstacle.array[i][1]/self.SCALE), int(self.obstacle.array[i][0]/self.SCALE)] = 1
 
-        for i in range(len(self.zombie.array)):
-            state[1, int(self.zombie.array[i][1]/self.SCALE), int(self.zombie.array[i][0]/self.SCALE)] = 1
+        # Zombies
+        # for i in range(len(self.zombie.array)):
+        #     state[1, int(self.zombie.array[i][1]/self.SCALE), int(self.zombie.array[i][0]/self.SCALE)] = 1
 
         return state
 
@@ -604,8 +609,8 @@ class Environment:
         sx = int(self.steve.x/self.SCALE)
         sy = int(self.steve.y/self.SCALE)
 
-        # state = np.zeros((3, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE))
-        state = np.zeros((4, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE)) 
+        state = np.zeros((3, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE))
+        # state = np.zeros((4, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE)) 
 
         # Agent
         local_pos = int((self.LOCAL_GRID_SIZE-1)/2)
@@ -630,7 +635,7 @@ class Environment:
             y_prime_food = local_pos+int(self.food.array[i][1]/self.SCALE)-int(self.steve.y/self.SCALE)
 
             if x_prime_food < self.LOCAL_GRID_SIZE and x_prime_food >= 0 and y_prime_food < self.LOCAL_GRID_SIZE and y_prime_food >= 0:
-                # state[1, y_prime_food, x_prime_food] = 1
+                state[1, y_prime_food, x_prime_food] = 1
                 pass
 
 
@@ -664,7 +669,7 @@ class Environment:
             y_prime_zom = local_pos+int(self.zombie.array[i][1]/self.SCALE)-int(self.steve.y/self.SCALE)
 
             if x_prime_zom < self.LOCAL_GRID_SIZE and x_prime_zom >= 0 and y_prime_zom < self.LOCAL_GRID_SIZE and y_prime_zom >= 0:
-                state[1, y_prime_zom, x_prime_zom] = 1
+                # state[1, y_prime_zom, x_prime_zom] = 1
                 pass
 
         # Lava
@@ -673,7 +678,8 @@ class Environment:
             y_prime_lava = local_pos+int(self.lava.array[i][1]/self.SCALE)-int(self.steve.y/self.SCALE)
 
             if x_prime_lava < self.LOCAL_GRID_SIZE and x_prime_lava >= 0 and y_prime_lava < self.LOCAL_GRID_SIZE and y_prime_lava >= 0:
-                state[3, y_prime_lava, x_prime_lava] = 1
+                # state[3, y_prime_lava, x_prime_lava] = 1
+                pass
 
         return state
 
