@@ -333,9 +333,8 @@ class Environment:
         # reward = -1
         reward = -0.05
         # reward = 0.3
-        # reward = math.sqrt((self.steve.x - self.zombie.array[0][0])**2 + (self.steve.y - self.zombie.array[0][1])**2)/20
-
-        # print(reward)
+        if len(self.zombie.array) > 0:
+            reward = (math.sqrt((self.steve.x - self.zombie.array[0][0])**2 + (self.steve.y - self.zombie.array[0][1])**2)/20)/4
 
         # Test: if moving, give a reward
         # if self.steve.dx != 0 or self.steve.dy != 0:
@@ -370,7 +369,7 @@ class Environment:
                 self.steve.y = self.steve.prev_pos[1]
                 self.steve.pos = self.steve.prev_pos
                 # done = True
-                reward = -0.1
+                # reward = -0.1
 
         # Check for lava collision
         for i in range(self.lava.array_length):
@@ -399,7 +398,6 @@ class Environment:
                 reward = -1.0
                 break
 
-
         # Make the most recent history have the most negative rewards
         # decay = (1+reward_each_time_step)/(self.steve.history_size-1)
         # for i in range(len(self.steve.history) - 1):
@@ -411,49 +409,36 @@ class Environment:
         # Checking if Steve has reached the food
         reached_food, eaten_food = self.food.eat(self.steve)
 
-        # Checking if the steve has reached the multiplier
-        # reached_multiplier, eaten_multiplier = self.zombie.eat(self.steve)
-
-        # if reached_multiplier:
-        #     # After every 3 multipliers are gathered, increase the score multiplier
-        #     if self.multiplier.amount_eaten % 3 == 0 and self.multiplier.amount_eaten != 0:
-        #         self.steve.score_multiplier += 1
-
-        #     disallowed = []
-        #     [disallowed.append(grid_pos) for grid_pos in self.obstacle.array]
-        #     [disallowed.append(grid_pos) for grid_pos in self.food.array]
-        #     self.multiplier.make(self.grid, disallowed, index = eaten_multiplier)
-
-
         # Reward: Including the distance between them
         # if reward == 0:
         #     reward = ((self.GRID_SIZE**2) / np.sqrt(((self.steve.x/self.SCALE-self.food.x/self.SCALE)**2 + (self.steve.y/self.SCALE-self.food.y/self.SCALE)**2) + 1)**2)/(self.GRID_SIZE**2)
             # print(reward) 
 
-        if self.spawn_new_food:
-            disallowed = []
-            [disallowed.append(grid_pos) for grid_pos in self.obstacle.array]
-            # [disallowed.append(grid_pos) for grid_pos in self.zombie.array]
-            # if self.steve.pos not in disallowed:
-            #     disallowed.append(self.steve.pos)
-            self.food.make(self.grid, disallowed, index = self.last_eaten_food)
-            self.spawn_new_food = False
-            reached_food = False
+        # ADDED FOR ALLOWING THE MODEL TO HAVE STEVE OVER THE FOOD IN THE STATE
+        # if self.spawn_new_food:
+        #     disallowed = []
+        #     [disallowed.append(grid_pos) for grid_pos in self.obstacle.array]
+        #     # [disallowed.append(grid_pos) for grid_pos in self.zombie.array]
+        #     # if self.steve.pos not in disallowed:
+        #         # disallowed.append(self.steve.pos)
+        #     self.food.make(self.grid, disallowed, index = self.last_eaten_food)
+        #     self.spawn_new_food = False
+        #     reached_food = False
         
         # If Steve reaches the food, increment score
         if reached_food:
             self.score += 1
             self.last_eaten_food = eaten_food
 
-            self.spawn_new_food = True
+            self.spawn_new_food = False
             # Create a piece of food that is not within Steve
-            # disallowed = []
-            # [disallowed.append(grid_pos) for grid_pos in self.obstacle.array]
+            disallowed = []
+            [disallowed.append(grid_pos) for grid_pos in self.obstacle.array]
             # [disallowed.append(grid_pos) for grid_pos in self.zombie.array]
-            # self.food.make(self.grid, disallowed, index = eaten_food)
+            self.food.make(self.grid, disallowed, index = eaten_food)
 
             # Only collect 1 food item at a time
-            done = True
+            # done = True
 
             # Reward functions
             reward = 1
@@ -465,12 +450,15 @@ class Environment:
 
         # To make it compatible with malmo
         if self.score == self.NUM_OF_FOOD:
-            reward = 1
+            # reward = 1
+            pass
             if self.NUM_OF_FOOD != 0:
                 done = True
+                pass
 
         # If the episode takes longer than the max time, it ends
         if self.time == self.MAX_TIME_PER_EPISODE:
+            # print("Steve survived :)")
             # reward = -1.0
             done = True
 
@@ -478,6 +466,8 @@ class Environment:
         # new_state = self.state_array()
         # new_state = self.state_vector_3D()
         new_state = self.local_state_vector_3D()
+
+        # print(reward)
 
         # A dictionary of information that may be useful
         info = {"time": self.time, "score": self.score}
@@ -635,7 +625,7 @@ class Environment:
             y_prime_food = local_pos+int(self.food.array[i][1]/self.SCALE)-int(self.steve.y/self.SCALE)
 
             if x_prime_food < self.LOCAL_GRID_SIZE and x_prime_food >= 0 and y_prime_food < self.LOCAL_GRID_SIZE and y_prime_food >= 0:
-                state[1, y_prime_food, x_prime_food] = 1
+                # state[1, y_prime_food, x_prime_food] = 1
                 pass
 
 
@@ -669,7 +659,7 @@ class Environment:
             y_prime_zom = local_pos+int(self.zombie.array[i][1]/self.SCALE)-int(self.steve.y/self.SCALE)
 
             if x_prime_zom < self.LOCAL_GRID_SIZE and x_prime_zom >= 0 and y_prime_zom < self.LOCAL_GRID_SIZE and y_prime_zom >= 0:
-                # state[1, y_prime_zom, x_prime_zom] = 1
+                state[1, y_prime_zom, x_prime_zom] = 1
                 pass
 
         # Lava
@@ -763,8 +753,8 @@ class Environment:
             while not GAME_OVER:
 
                 # print(self.steve.history)
-
-                action = self.render()
+                action = self.controls()
+                # action = self.render()
 
                 # print(self.pixels().shape)
 
@@ -785,9 +775,10 @@ class Environment:
                 # self.zombie.move(self.maze, self.steve, self.steps)
 
                 # print("")
+                self.render()
 
                 if GAME_OVER:
-                    print("Game Over")
+                    print("Game Over: time:", i["time"])
                     # self.render()
 
         self.end()
