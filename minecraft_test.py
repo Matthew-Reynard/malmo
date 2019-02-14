@@ -61,7 +61,7 @@ def train():
 
 	# Number of episodes
 	print_episode = 1000
-	total_episodes = 100000
+	total_episodes = 1000000
 
 	saver = tf.train.Saver()
 
@@ -93,7 +93,7 @@ def train():
 			state, info = env.reset()
 			done = False
 
-			# brain.linear_epsilon_decay(total_episodes, episode, start=0.3 , end=0.05, percentage=0.3)
+			# brain.linear_epsilon_decay(total_episodes, episode, start=0.5 , end=0.05, percentage=0.5)
 
 			# brain.linear_alpha_decay(total_episodes, episode)
 

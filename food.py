@@ -43,8 +43,8 @@ class Food:
         # [allowed.remove(pos) for pos in disallowed]
 
         # If you want the food to only spawn in 3 different locations
-        if self.amount == 1:
-            allowed = [(2*20,6*20),(6*20,6*20),(5*20,1*20)]
+        # if self.amount == 1:
+        #     allowed = [(2*20,6*20),(6*20,6*20),(5*20,1*20)]
 
         for i in range(self.amount):
             new_pos = allowed[np.random.choice(len(allowed))]

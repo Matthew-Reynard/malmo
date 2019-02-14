@@ -49,7 +49,7 @@ class Steve:
         # [allowed.remove(pos) for pos in disallowed]
 
         # Only spawn in one location
-        allowed = [(2*20, 2*20)]
+        # allowed = [(2*20, 2*20)]
 
         self.pos = allowed[np.random.choice(len(allowed))]
 
