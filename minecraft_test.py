@@ -31,7 +31,7 @@ def train():
 	print("\n ---- Training the Deep Neural Network ----- \n")
 
 	RENDER_TO_SCREEN = False
-	# RENDER_TO_SCREEN = True
+	RENDER_TO_SCREEN = True
 
 	env = Environment(wrap = False, 
 					  grid_size = 7, 
@@ -61,7 +61,7 @@ def train():
 
 	# Number of episodes
 	print_episode = 1000
-	total_episodes = 100000
+	total_episodes = 120000
 
 	saver = tf.train.Saver()
 
@@ -93,7 +93,7 @@ def train():
 			state, info = env.reset()
 			done = False
 
-			brain.linear_epsilon_decay(total_episodes, episode, start=0.4 , end=0.05, percentage=0.5)
+			# brain.linear_epsilon_decay(total_episodes, episode, start=0.4 , end=0.05, percentage=0.7)
 
 			# brain.linear_alpha_decay(total_episodes, episode)
 
@@ -205,8 +205,8 @@ def play():
 
 if __name__ == '__main__':
 
-	# train()
+	train()
 
 	# run()
 
-	play()
+	# play()
