@@ -334,7 +334,7 @@ class Environment:
         reward = -0.05
         # reward = 0.3
         if len(self.zombie.array) > 0:
-            reward = (math.sqrt((self.steve.x - self.zombie.array[0][0])**2 + (self.steve.y - self.zombie.array[0][1])**2)/20)/4
+            reward = (math.sqrt((self.steve.x - self.zombie.array[0][0])**2 + (self.steve.y - self.zombie.array[0][1])**2)/20)/self.GRID_SIZE
 
         # Test: if moving, give a reward
         # if self.steve.dx != 0 or self.steve.dy != 0:
@@ -438,10 +438,10 @@ class Environment:
             self.food.make(self.grid, disallowed, index = eaten_food)
 
             # Only collect 1 food item at a time
-            # done = True
+            done = True
 
             # Reward functions
-            reward = 1
+            reward = 10
             # reward = 100 / (np.sqrt((self.steve.x-self.food.x)**2 + (self.steve.y-self.food.y)**2) + 1) # Including the distance between them
             # reward = 1000 * self.score
             # reward = 1000 / self.time # Including the time in the reward function
@@ -599,8 +599,8 @@ class Environment:
         sx = int(self.steve.x/self.SCALE)
         sy = int(self.steve.y/self.SCALE)
 
-        state = np.zeros((3, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE))
-        # state = np.zeros((4, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE)) 
+        # state = np.zeros((3, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE))
+        state = np.zeros((4, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE)) 
 
         # Agent
         local_pos = int((self.LOCAL_GRID_SIZE-1)/2)
@@ -625,7 +625,7 @@ class Environment:
             y_prime_food = local_pos+int(self.food.array[i][1]/self.SCALE)-int(self.steve.y/self.SCALE)
 
             if x_prime_food < self.LOCAL_GRID_SIZE and x_prime_food >= 0 and y_prime_food < self.LOCAL_GRID_SIZE and y_prime_food >= 0:
-                # state[1, y_prime_food, x_prime_food] = 1
+                state[1, y_prime_food, x_prime_food] = 1
                 pass
 
 
@@ -635,7 +635,7 @@ class Environment:
             y_prime_obs = local_pos+int(self.obstacle.array[i][1]/self.SCALE)-int(self.steve.y/self.SCALE)
 
             if x_prime_obs < self.LOCAL_GRID_SIZE and x_prime_obs >= 0 and y_prime_obs < self.LOCAL_GRID_SIZE and y_prime_obs >= 0:
-                state[2, y_prime_obs, x_prime_obs] = 1
+                state[3, y_prime_obs, x_prime_obs] = 1
 
         # Out of bounds
         for j in range(0, self.LOCAL_GRID_SIZE):
@@ -645,13 +645,13 @@ class Environment:
                 y_prime_wall = local_pos-sy
 
                 if i < x_prime_wall or j < y_prime_wall:
-                    state[2, j, i] = 1
+                    state[3, j, i] = 1
 
                 x_prime_wall = local_pos+(self.GRID_SIZE-sx)-1
                 y_prime_wall = local_pos+(self.GRID_SIZE-sy)-1
 
                 if i > x_prime_wall or j > y_prime_wall:
-                    state[2, j, i] = 1
+                    state[3, j, i] = 1
 
         # Zombies
         for i in range(len(self.zombie.array)):
@@ -659,7 +659,7 @@ class Environment:
             y_prime_zom = local_pos+int(self.zombie.array[i][1]/self.SCALE)-int(self.steve.y/self.SCALE)
 
             if x_prime_zom < self.LOCAL_GRID_SIZE and x_prime_zom >= 0 and y_prime_zom < self.LOCAL_GRID_SIZE and y_prime_zom >= 0:
-                state[1, y_prime_zom, x_prime_zom] = 1
+                state[2, y_prime_zom, x_prime_zom] = 1
                 pass
 
         # Lava
@@ -765,16 +765,16 @@ class Environment:
                 # print("\n\n\n") # DEBUGGING
                 # if r != -0.05:
                 #     print("Reward: ",r) # DEBUGGING
-                # print(self.local_state_vector_3D()) # DEBUGGING
+                print(self.local_state_vector_3D()) # DEBUGGING
                 # print(self.state_vector_3D()) # DEBUGGING
                 
-                # print(r)
+                print(r)
                 # For the steve to look like it ate the food, render needs to be last
                 # Next piece of code if very BAD programming
 
                 # self.zombie.move(self.maze, self.steve, self.steps)
 
-                # print("")
+                # print("") 
                 self.render()
 
                 if GAME_OVER:

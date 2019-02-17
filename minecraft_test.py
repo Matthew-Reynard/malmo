@@ -31,12 +31,12 @@ def train():
 	print("\n ---- Training the Deep Neural Network ----- \n")
 
 	RENDER_TO_SCREEN = False
-	RENDER_TO_SCREEN = True
+	# RENDER_TO_SCREEN = True
 
 	env = Environment(wrap = False, 
 					  grid_size = 7, 
 					  rate = 80, 
-					  max_time = 200,
+					  max_time = 100,
 					  food_count = 0,
 					  obstacle_count = 0,
 					  lava_count = 0,
@@ -47,7 +47,7 @@ def train():
 	if RENDER_TO_SCREEN:
 		env.prerender()
 
-	model = Network(name="model_local9_zombie", load=True)
+	model = Network(name="zombie_dojo_local9", load=True)
 
 	brain = Brain(action_space = env.number_of_actions())
 
@@ -61,7 +61,7 @@ def train():
 
 	# Number of episodes
 	print_episode = 1000
-	total_episodes = 100000
+	total_episodes = 200000
 
 	saver = tf.train.Saver()
 
@@ -93,7 +93,7 @@ def train():
 			state, info = env.reset()
 			done = False
 
-			# brain.linear_epsilon_decay(total_episodes, episode, start=0.3 , end=0.05, percentage=0.3 )
+			brain.linear_epsilon_decay(total_episodes, episode, start=0.2, end=0.05, percentage=0.3)
 
 			# brain.linear_alpha_decay(total_episodes, episode)
 
@@ -183,7 +183,7 @@ def run():
 def play():
 	print("\n ----- Playing the game -----\n")
 
-	GRID_SIZE = 8
+	GRID_SIZE = 7
 
 	MAP_NUMBER = 2
 
@@ -193,7 +193,7 @@ def play():
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE, 
 					  rate = 100,
-					  food_count = 3,
+					  food_count = 0,
 					  obstacle_count = 0,
 					  lava_count = 0,
 					  zombie_count = 1,
