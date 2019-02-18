@@ -45,7 +45,7 @@ from utils import createGrid
 
 class Environment:
 
-    def __init__(self, wrap = False, grid_size = 10, rate = 100, max_time = math.inf, action_space = 5, food_count = 1, obstacle_count = 0, lava_count = 0, zombie_count = 0, map_path = None):
+    def __init__(self, wrap=False, grid_size=10, local_size=9, rate=100, max_time=math.inf, action_space=5, food_count=1, obstacle_count=0, lava_count=0, zombie_count=0, map_path=None):
         """
         Initialise the Game Environment with default values
         """
@@ -54,7 +54,7 @@ class Environment:
         self.UPDATE_RATE = rate
         self.SCALE = 20 # Scale of each block 20x20 pixels
         self.GRID_SIZE = grid_size
-        self.LOCAL_GRID_SIZE = 9 # Has to be an odd number
+        self.LOCAL_GRID_SIZE = local_size # Has to be an odd number
         self.ENABLE_WRAP = wrap
         if not self.ENABLE_WRAP: 
             self.GRID_SIZE += 2
@@ -567,8 +567,9 @@ class Environment:
     def state_vector_3D(self):
         """
         State as a 3D vector of the whole map for the CNN
+
+        Shape = (Layers, GRID_SIZE, GRID_SIZE)
         """
-        # print(int(self.steve.y/self.SCALE), int(self.steve.x/self.SCALE))
 
         state = np.zeros((3, self.GRID_SIZE, self.GRID_SIZE))
 
@@ -591,8 +592,7 @@ class Environment:
         """
         State as a 3D vector of the local area around the steve
 
-        Shape = (3,9,9) w/out history
-        Shape = (4,9,9) w/ history
+        Shape = (Layers, LOCAL_GRID_SIZE, LOCAL_GRID_SIZE)
         """
 
         #s = steve
@@ -606,36 +606,23 @@ class Environment:
         local_pos = int((self.LOCAL_GRID_SIZE-1)/2)
         state[0, local_pos, local_pos] = 1
 
-        # History
-        # decay = 1/self.steve.history_size
-
-        # for i in range(len(self.steve.history)-1):
-        #     x_prime = local_pos+int(self.steve.history[-i-2][0]/self.SCALE)-int(self.steve.x/self.SCALE)
-        #     y_prime = local_pos+int(self.steve.history[-i-2][1]/self.SCALE)-int(self.steve.y/self.SCALE)
-
-        #     if x_prime < self.LOCAL_GRID_SIZE and x_prime >= 0 and y_prime < self.LOCAL_GRID_SIZE and y_prime >= 0:
-        #         if 1-decay*i >= 0 and state[3, y_prime, x_prime] == 0:
-        #             state[3, y_prime, x_prime] = 1-decay*i
-        #         # else:
-        #             # state[3, y_prime, x_prime] = 0
-
         # Food
         for i in range(self.food.amount):
-            x_prime_food = local_pos+int(self.food.array[i][0]/self.SCALE)-int(self.steve.x/self.SCALE)
-            y_prime_food = local_pos+int(self.food.array[i][1]/self.SCALE)-int(self.steve.y/self.SCALE)
+            x_prime_food = local_pos+int(self.food.array[i][0]/self.SCALE)-sx
+            y_prime_food = local_pos+int(self.food.array[i][1]/self.SCALE)-sy
 
             if x_prime_food < self.LOCAL_GRID_SIZE and x_prime_food >= 0 and y_prime_food < self.LOCAL_GRID_SIZE and y_prime_food >= 0:
                 state[1, y_prime_food, x_prime_food] = 1
                 pass
 
-
         # Obstacles
         for i in range(self.obstacle.array_length):
-            x_prime_obs = local_pos+int(self.obstacle.array[i][0]/self.SCALE)-int(self.steve.x/self.SCALE)
-            y_prime_obs = local_pos+int(self.obstacle.array[i][1]/self.SCALE)-int(self.steve.y/self.SCALE)
+            x_prime_obs = local_pos+int(self.obstacle.array[i][0]/self.SCALE)-sx
+            y_prime_obs = local_pos+int(self.obstacle.array[i][1]/self.SCALE)-sy
 
             if x_prime_obs < self.LOCAL_GRID_SIZE and x_prime_obs >= 0 and y_prime_obs < self.LOCAL_GRID_SIZE and y_prime_obs >= 0:
                 state[3, y_prime_obs, x_prime_obs] = 1
+                pass
 
         # Out of bounds
         for j in range(0, self.LOCAL_GRID_SIZE):
@@ -646,17 +633,19 @@ class Environment:
 
                 if i < x_prime_wall or j < y_prime_wall:
                     state[3, j, i] = 1
+                    pass
 
                 x_prime_wall = local_pos+(self.GRID_SIZE-sx)-1
                 y_prime_wall = local_pos+(self.GRID_SIZE-sy)-1
 
                 if i > x_prime_wall or j > y_prime_wall:
                     state[3, j, i] = 1
+                    pass
 
         # Zombies
         for i in range(len(self.zombie.array)):
-            x_prime_zom = local_pos+int(self.zombie.array[i][0]/self.SCALE)-int(self.steve.x/self.SCALE)
-            y_prime_zom = local_pos+int(self.zombie.array[i][1]/self.SCALE)-int(self.steve.y/self.SCALE)
+            x_prime_zom = local_pos+int(self.zombie.array[i][0]/self.SCALE)-sx
+            y_prime_zom = local_pos+int(self.zombie.array[i][1]/self.SCALE)-sy
 
             if x_prime_zom < self.LOCAL_GRID_SIZE and x_prime_zom >= 0 and y_prime_zom < self.LOCAL_GRID_SIZE and y_prime_zom >= 0:
                 state[2, y_prime_zom, x_prime_zom] = 1
@@ -664,17 +653,31 @@ class Environment:
 
         # Lava
         for i in range(self.lava.array_length):
-            x_prime_lava = local_pos+int(self.lava.array[i][0]/self.SCALE)-int(self.steve.x/self.SCALE)
-            y_prime_lava = local_pos+int(self.lava.array[i][1]/self.SCALE)-int(self.steve.y/self.SCALE)
+            x_prime_lava = local_pos+int(self.lava.array[i][0]/self.SCALE)-sx
+            y_prime_lava = local_pos+int(self.lava.array[i][1]/self.SCALE)-sy
 
             if x_prime_lava < self.LOCAL_GRID_SIZE and x_prime_lava >= 0 and y_prime_lava < self.LOCAL_GRID_SIZE and y_prime_lava >= 0:
                 # state[3, y_prime_lava, x_prime_lava] = 1
                 pass
 
+        # History
+        decay = 1/self.steve.history_size
+
+        for i in range(len(self.steve.history)-1):
+            x_prime = local_pos+int(self.steve.history[-i-2][0]/self.SCALE)-sx
+            y_prime = local_pos+int(self.steve.history[-i-2][1]/self.SCALE)-sy
+
+            if x_prime < self.LOCAL_GRID_SIZE and x_prime >= 0 and y_prime < self.LOCAL_GRID_SIZE and y_prime >= 0:
+                if 1-decay*i >= 0 and state[3, y_prime, x_prime] == 0:
+                    # state[3, y_prime, x_prime] = 1-decay*i
+                    pass
+                # else:
+                    # state[3, y_prime, x_prime] = 0
+
         return state
 
 
-    def pixels(self): 
+    def get_pixels(self): 
         """
         Returns the pixels in a (GRID*20, GRID*20, 3) size array/
     
@@ -684,9 +687,9 @@ class Environment:
 
 
     def controls(self):
-        """Defines all the players controls during the game"""
-
-        GAME_OVER = False # NOT IMPLEMENTED YET
+        """
+        Defines all the players controls during the game
+        """
 
         action = 0 # Do nothing as default
 
@@ -699,31 +702,31 @@ class Environment:
             if event.type == pygame.KEYDOWN:
                 # print(event.key) #DEBUGGING
 
-                # In order to stop training and still save the Q txt file
+                # In order to quit easily
                 if (event.key == pygame.K_q):
                     self.end()
 
                 # Moving up
-                if (event.key == pygame.K_UP or event.key == pygame.K_w) and GAME_OVER == False:
+                if (event.key == pygame.K_UP or event.key == pygame.K_w):
 
                     if self.ACTION_SPACE == 5:
                         action = 1 # up
 
                 # Moving down
-                elif (event.key == pygame.K_DOWN or event.key == pygame.K_s) and GAME_OVER == False:
+                elif (event.key == pygame.K_DOWN or event.key == pygame.K_s):
 
                     if self.ACTION_SPACE == 5:
                         action = 2 # down
 
                 # Moving left
-                elif (event.key == pygame.K_LEFT or event.key == pygame.K_a) and GAME_OVER == False:
+                elif (event.key == pygame.K_LEFT or event.key == pygame.K_a):
 
                     if self.ACTION_SPACE == 5:
                         action = 3 # left
 
 
                 # Moving right
-                elif (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and GAME_OVER == False:
+                elif (event.key == pygame.K_RIGHT or event.key == pygame.K_d):
 
                     if self.ACTION_SPACE == 5:
                         action = 4 # right
@@ -756,30 +759,20 @@ class Environment:
                 action = self.controls()
                 # action = self.render()
 
-                # print(self.pixels().shape)
+                # print(self.get_pixels().shape)
 
-                # When the steve touches the food, game ends
-                # action_space has to be 3 for the players controls, 
-                # because they know that the steve can't go backwards
                 s, r, GAME_OVER, i = self.step(action)
+                
                 # print("\n\n\n") # DEBUGGING
-                # if r != -0.05:
-                #     print("Reward: ",r) # DEBUGGING
-                print(self.local_state_vector_3D()) # DEBUGGING
+                # print(self.local_state_vector_3D()) # DEBUGGING
                 # print(self.state_vector_3D()) # DEBUGGING
                 
-                print(r)
-                # For the steve to look like it ate the food, render needs to be last
-                # Next piece of code if very BAD programming
+                # print(r)
 
-                # self.zombie.move(self.maze, self.steve, self.steps)
-
-                # print("") 
                 self.render()
 
                 if GAME_OVER:
                     print("Game Over: time:", i["time"])
-                    # self.render()
 
         self.end()
 

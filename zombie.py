@@ -1,4 +1,6 @@
 import numpy as np
+
+# custom imports
 from utils import Node
 
 class Zombie:
@@ -28,6 +30,7 @@ class Zombie:
         self.zombie_img = pygame.transform.scale(self.zombie_img, (20, 20))
 
 
+    # Reset the zombies positions
     def reset(self, grid, disallowed):
         self.array.clear()
         self.amount_eaten = 0
@@ -46,6 +49,7 @@ class Zombie:
         # If you want the food to only spawn in 3 different locations
         # if self.amount == 1:
             # allowed = [(2*20,7*20),(6*20,6*20),(7*20,1*20)]
+        # allowed = [(14*20,2*20),(2*20,7*20)]
 
         for i in range(self.amount):
             new_pos = allowed[np.random.choice(len(allowed))]
@@ -58,7 +62,7 @@ class Zombie:
             self.y = self.array[0][1]
 
 
-    # Load a food item into the screen at a random location
+    # Load a zombie into the map at a random location
     def make(self, grid, disallowed, index = 0):
         
         # Make a copy of the grid
@@ -80,7 +84,7 @@ class Zombie:
 
         # If you want the food to only spawn in 3 different locations
         # if self.amount == 1:
-            # allowed = [(2*20,6*20),(5*20,5*20),(6*20,1*20)]
+        #     allowed = [(7*20,9*20),(8*20,13*20)]
 
         # Choose a random allowed position to be the new food position
         self.array[index] = allowed[np.random.choice(len(allowed))]
@@ -90,46 +94,8 @@ class Zombie:
             self.x = self.array[0][0]
             self.y = self.array[0][1]
 
-    # make a piece of food within the local grid
-    def make_within_range(self, grid_size, scale, snake, local_grid_size = 3):
-        made = False
-        rows = grid_size
-        cols = grid_size
 
-        while not made:
-            myRow = np.random.randint(0, rows-1)
-            myCol = np.random.randint(0, cols-1)
-
-            self.pos = (myCol * scale, myRow * scale) # multiplying by scale
-
-            for i in range(0, snake.tail_length + 1):
-                # print("making food")
-                # Need to change this to the whole body of the snake
-                if self.pos == snake.box[i]:
-                    made = False # the food IS within the snakes body
-                    break
-                elif abs(snake.x - self.pos[0])/scale <= local_grid_size and abs(snake.y - self.pos[1])/scale <= local_grid_size:
-                    self.x = myCol * scale
-                    self.y = myRow * scale
-                    made = True # the food IS NOT within the snakes body and within range
-
-
-    def eat(self, snake):
-
-        reached = False
-        index = 0
-
-        for i in range(self.amount):
-            increase_multiplier = ((snake.x, snake.y) == (self.array[i][0], self.array[i][1]))
-            if increase_multiplier:
-                self.amount_eaten += 1
-                reached = True
-                index = i
-                break
-
-        return reached, index
-
-
+    # Move the zombie by a* or random movement
     def move(self, maze, steve, steps):
         """After a certain amount of charater steps, the zombie takes a step"""
 
@@ -212,15 +178,14 @@ class Zombie:
                 maze = self.updateMaze(maze, 2)
 
 
-
-
-    #Draw the food
+    # Draw the zombie
     def draw(self, display):
         """Draw the zombies on the display"""
         for i in range(self.amount):
             display.blit(self.zombie_img, self.array[i])
 
 
+    # A star path finding algorithm for zombies
     def astar(self, maze, start, end):
         """Returns a list of tuples as a path from the given start to the given end in the given maze"""
 
@@ -317,6 +282,7 @@ class Zombie:
                 break
 
 
+    # Update the maze for the a* algorithm
     def updateMaze(self, maze, zombie_index):
 
         new_maze = maze.copy() # copy it, dont make it equal to each other

@@ -1,4 +1,3 @@
-# import random
 import numpy as np
 
 class Steve:
@@ -22,6 +21,7 @@ class Steve:
         self.score_multiplier = 1
 
 
+    # Load steve image for better visuals 
     def create(self, pygame):
 
         # PYGAME STUFF
@@ -37,6 +37,7 @@ class Steve:
         self.steve_img = pygame.transform.scale(self.steve_img, (20, 20))
 
 
+    # Reset steve at a specific/random location in env
     def reset(self, grid, disallowed):
 
         allowed = grid[:]
@@ -60,6 +61,7 @@ class Steve:
         self.history.append((self.x, self.y))
 
 
+    # Update steve position
     def update(self, scale, action, action_space):
 
         # ACTION SPACE OF 5 - Nothing, Up, Down, Left, Right
@@ -108,6 +110,8 @@ class Steve:
             self.history.pop(0)
 
 
+    # Draw steve
     def draw(self, display):
-        # Draw steve  
+
         display.blit(self.steve_img, self.pos)
+        

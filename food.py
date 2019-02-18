@@ -1,5 +1,3 @@
-# Maybe can use numpy.random instead of this
-# import random
 import numpy as np
 
 class Food:
@@ -14,6 +12,7 @@ class Food:
         self.array = [self.pos]
         self.amount = number
 
+
     # Create the Pygame sections of the food to render it
     def create(self, pygame):
 
@@ -26,6 +25,8 @@ class Food:
         # If the image isn't 20x20 pixels
         self.food_img = pygame.transform.scale(self.food_img, (20, 20))
 
+
+    # Reset the food
     def reset(self, amount, grid, disallowed):
         self.array.clear()
 
@@ -45,6 +46,7 @@ class Food:
         # If you want the food to only spawn in 3 different locations
         # if self.amount == 1:
         #     allowed = [(2*20,6*20),(6*20,6*20),(5*20,1*20)]
+        # allowed = [(6*20,5*20),(10*20,4*20),(10*20,8*20)]
 
         for i in range(self.amount):
             new_pos = allowed[np.random.choice(len(allowed))]
@@ -113,6 +115,7 @@ class Food:
                     made = True # the food IS NOT within the snakes body and within range
 
 
+    # Return true if steve reached the food, and which food was reached
     def eat(self, snake):
 
         reached = False

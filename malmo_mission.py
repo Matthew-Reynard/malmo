@@ -60,13 +60,13 @@ b_out_textfile_path_save = "./Data/b_out.npy"
 LOGDIR = "./Logs/log0"
 
 # Parameters
-GRID_SIZE = 50
+GRID_SIZE = 16
 LOCAL_GRID_SIZE = 9 # Has to be an odd number (I think...)
 SEED = 1
 WRAP = False
 FOOD_COUNT = 0
 OBSTACLE_COUNT = 0
-MAP_PATH = "./Maps/Grid{}/map5.txt".format(GRID_SIZE)
+MAP_PATH = "./Maps/Grid{}/map2.txt".format(GRID_SIZE)
 
 REPLAY_MEMORY = 25000
 
@@ -187,7 +187,7 @@ def setupMinecraft():
 
     my_mission.drawCuboid(-4, 106, -4, GRID_SIZE+3, 106, GRID_SIZE+3, "lava")
     my_mission.drawCuboid(0, 107, 0, GRID_SIZE-1, 107, GRID_SIZE-1, "stone")
-    my_mission.drawCuboid(0, 108, 0, GRID_SIZE-1, 110, GRID_SIZE-1, "air")
+    # my_mission.drawCuboid(0, 108, 0, GRID_SIZE-1, 110, GRID_SIZE-1, "air")
 
 
     for j in range(GRID_SIZE):
@@ -200,12 +200,13 @@ def setupMinecraft():
         for i in range(GRID_SIZE):
             if gridmap[j][i] == '2':
                 my_mission.drawBlock(i, 107, j, "air")
+                # pass
 
     # my_mission.drawLine(0, 107, 8, 15, 107, 8, "netherrack")
 
-    # my_mission.drawItem(7, 109, 8, "diamond")
-    # my_mission.drawItem(5, 109, 1, "diamond")
-    # my_mission.drawItem(1, 109, 6, "diamond")
+    my_mission.drawItem(14-5, 109, 14-4, "diamond")
+    my_mission.drawItem(14-9, 109, 14-3, "diamond")
+    my_mission.drawItem(14-9, 109, 14-7, "diamond")
 
     my_mission.drawBlock(-1, 109, GRID_SIZE, "torch")
     my_mission.drawBlock(GRID_SIZE, 109, GRID_SIZE, "torch")

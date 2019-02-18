@@ -9,9 +9,13 @@ import sys, os
 
 class Network():
 
-	def __init__(self, name="test_model", load=False):
+	def __init__(self, local_size=9, name="test_model", load=False):
 
-		self.LOCAL_GRID_SIZE = 9
+		self.LOCAL_GRID_SIZE = local_size
+
+		# Adjust W_fc input size
+		self.scale = 9*9
+		# self.scale = 4*4
 
 		self.n_input_channels = 4
 
@@ -50,13 +54,13 @@ class Network():
 		return tf.nn.conv2d(x, W, strides=[1,1,1,1], padding ="VALID", name = name)
 
 
-	# Max pooling
-	# strides changed from 2 to 1
+	# Max pooling: strides changed from 2 to 1
 	def maxpool2d(self, x, name = None):
 
 		return tf.nn.max_pool(x, ksize=[1,2,2,1], strides=[1,1,1,1], padding='VALID', name = name)
 
 
+	# Create the model and load the weights and biases
 	def create(self, data):
 
 		if self.load:
@@ -82,7 +86,7 @@ class Network():
 
 			weights = {'W_conv1':tf.Variable(tf.truncated_normal([3, 3, self.n_input_channels, self.n_out_channels_conv1], mean=0, stddev=1.0, seed=0), name = 'W_conv1'),
 				   	   'W_conv2':tf.Variable(tf.truncated_normal([3, 3, self.n_out_channels_conv1, self.n_out_channels_conv2], mean=0, stddev=1.0, seed=1), name = 'W_conv2'),
-				   	   'W_fc':tf.Variable(tf.truncated_normal([4*4*self.n_out_channels_conv2, self.n_out_fc], mean=0, stddev=1.0, seed=2), name = 'W_fc'),
+				   	   'W_fc':tf.Variable(tf.truncated_normal([self.scale*self.n_out_channels_conv2, self.n_out_fc], mean=0, stddev=1.0, seed=2), name = 'W_fc'),
 				   	   'W_out':tf.Variable(tf.truncated_normal([self.n_out_fc, self.n_actions], mean=0, stddev=1.0, seed=3), name = 'W_out')}
 
 			biases = {'b_conv1':tf.Variable(tf.constant(0.1, shape=[self.n_out_channels_conv1]), name = 'b_conv1'),
@@ -94,12 +98,16 @@ class Network():
 		x = tf.reshape(data, shape=[-1, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE, self.n_input_channels])
 
 		conv1 = self.conv2d(x, weights['W_conv1'], name = 'conv1')
-		# conv1 = maxpool2d(conv1, name = 'max_pool1')
+		conv1 = self.maxpool2d(conv1, name = 'max_pool1')
 
 		conv2 = self.conv2d(conv1, weights['W_conv2'], name = 'conv2')
 		conv2 = self.maxpool2d(conv2, name = 'max_pool2')
 
-		fc = tf.reshape(conv2,[-1, 4*4*self.n_out_channels_conv2])
+		fc = tf.reshape(conv2,[-1, self.scale*self.n_out_channels_conv2])
+
+		# dropout test
+		# fc = tf.nn.dropout(fc, 0.9)
+
 		fc = tf.nn.relu(tf.matmul(fc, weights['W_fc']) + biases['b_fc'])
 
 		actions = tf.matmul(fc, weights['W_out']) + biases['b_out']
@@ -108,6 +116,7 @@ class Network():
 		return actions, weights, biases
 
 
+	# Setup the model architecture (used for tensorboard)
 	def setup(self, brain):
 
 		with tf.name_scope('Model'):
@@ -132,6 +141,7 @@ class Network():
 			self.action_t = tf.argmax(self.actions, axis=1)
 
 
+	# Save the models weights and biases
 	def save(self, sess, verbose = False):
 
 		path = self.path + self.name + ".npz"

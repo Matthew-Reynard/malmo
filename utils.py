@@ -1,13 +1,15 @@
-# import sys, tty, os, time
-# import termios
+import sys, os
 
-import matplotlib.pyplot as plt 
+if sys.platform == 'linux': 
+	import termios, tty
+
 import numpy as np
+import matplotlib.pyplot as plt 
 import time
-import threading
 import math
 
 
+# Used for zombie A* algorithm
 class Node():
     """A node class for A* Pathfinding"""
 
@@ -33,52 +35,19 @@ class Trajectory():
         self.done = done
 
 
-class myThread(threading.Thread):
-	def __init__(self, threadID, name, counter):
-		threading.Thread.__init__(self)
-		self.threadID = threadID
-		self.name = name
-		self.counter = counter
-
-	def run(self):
-		print("Starting " + self.name)
-		print_time(self.name, 5, self.counter)
-		print("Exiting " + self.name)
-
-
-def plot_loss():
-	pass
-
-
-def loading():
-	threading.Thread(target=print_rotation)
-
-
+# Just for fun, wanted to implement something similar while training
 def print_rotation():
 	for i in range(1000):
-		print("|", end="\r")
+		print("\r|", end="\r")
 		time.sleep(0.1)
-		print("/", end="\r")
+		print("\r/", end="\r")
 		time.sleep(0.1)
-		print("-", end="\r")
+		print("\r-", end="\r")
 		time.sleep(0.1)
-		print("\\", end="\r")
+		print("\r\\", end="")
 		time.sleep(0.1)
-
-
-def print_time(threadName, counter, delay):
-	while counter:
-		if False:
-			threadName.exit()
-		print("|", end="\r")
-		time.sleep(0.1)
-		print("/", end="\r")
-		time.sleep(0.1)
-		print("-", end="\r")
-		time.sleep(0.1)
-		print("\\", end="\r")
-		time.sleep(0.1)
-		counter -= 1
+		print("", end="\b")
+		time.sleep(0.01)
 
 
 def plotLearning(x, scores, epsilons, filename):
@@ -130,16 +99,18 @@ def createGrid(grid_size, obstacles_array, scale):
 	return a
 
 
-# def getch():
-#     fd = sys.stdin.fileno()
-#     old_settings = termios.tcgetattr(fd)
-#     try:
-#         tty.setraw(sys.stdin.fileno())
-#         ch = sys.stdin.read(1)
- 
-#     finally:
-#         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-#     return ch
+if sys.platform == 'linux': 
+	def getch():
+
+	    fd = sys.stdin.fileno()
+	    old_settings = termios.tcgetattr(fd)
+	    try:
+	        tty.setraw(sys.stdin.fileno())
+	        ch = sys.stdin.read(1)
+	 
+	    finally:
+	        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+	    return ch
 
 
 def print_readable_time(current_time):
@@ -153,3 +124,4 @@ def print_readable_time(current_time):
 			print("\ttime {0:.0f}:0{1:.0f}:{2:.0f}".format(math.floor((current_time/60)/60), math.floor((current_time/60)%60), current_time%60))
 		else:
 			print("\ttime {0:.0f}:{1:.0f}:{2:.0f}".format(math.floor((current_time/60)/60), math.floor((current_time/60)%60), current_time%60))
+

@@ -66,7 +66,8 @@
         <DrawCuboid x1="0" y1="108" z1="0" x2="15" y2="110" z2="15" type="air" />
         <!-- <DrawBlock x="5" y="107" z="5" type="redstone_block"/> -->
 
-        <!-- <DrawEntity x="7.5" y="108.0" z="7.5" type="Zombie" yaw="0" pitch="0" xVel="0" yVel="0" zVel="0"/> -->
+        <DrawEntity x="1.5" y="108.0" z="13.5" type="Zombie" yaw="0" pitch="0" xVel="0" yVel="0" zVel="0"/>
+        <DrawEntity x="13.5" y="108.0" z="8.5" type="Zombie" yaw="0" pitch="0" xVel="0" yVel="0" zVel="0"/>
       </DrawingDecorator>
 
       <!--
@@ -97,7 +98,7 @@
       </ClassroomDecorator>
       -->
 
-      <ServerQuitFromTimeUp timeLimitMs="300000" description="out_of_time"/>
+      <ServerQuitFromTimeUp timeLimitMs="30000" description="out_of_time"/>
       <ServerQuitWhenAnyAgentFinishes/>
     </ServerHandlers>
   </ServerSection>
@@ -106,12 +107,13 @@
   <AgentSection mode="Creative"> 
     <Name>Steve</Name>
     <AgentStart>
-      <Placement x="1.5" y="108.0" z="1.5" pitch="0" yaw="0"/>
+      <!-- <Placement x="1.5" y="108.0" z="1.5" pitch="0" yaw="0"/> -->
+      <Placement x="7.5" y="108.0" z="4.5" pitch="0" yaw="0"/>
       <Inventory>
-        <!-- <InventoryItem slot="0" type="diamond_sword"/> -->
-        <InventoryItem slot="0" type="stone" quantity="64"/>
+        <InventoryItem slot="0" type="diamond_sword"/>
+        <!-- <InventoryItem slot="0" type="stone" quantity="64"/> -->
         <InventoryItem slot="1" type="diamond_pickaxe"/>
-        <InventoryItem slot="4" type="stick" quantity="2"/>
+        <!-- <InventoryItem slot="4" type="stick" quantity="2"/> -->
       </Inventory>
     </AgentStart>
     

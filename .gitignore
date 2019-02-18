@@ -1,7 +1,7 @@
 
 MalmoPlatform/
-tmp/
 Models/Torch
+tmp/
 tests/
 mnist/
 Logs/
