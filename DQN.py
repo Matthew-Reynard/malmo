@@ -20,7 +20,7 @@ class Network():
 
 		self.n_input_channels = 4
 
-		self.n_out_channels_conv1 = 16
+		self.n_out_channels_conv1 = 16 # changed from 16
 		self.n_out_channels_conv2 = 32
 		self.n_out_fc = 256
 
@@ -57,7 +57,7 @@ class Network():
 		return tf.nn.conv2d(x, W, strides=[1,1,1,1], padding ="VALID", name = name)
 
 
-	# Max pooling: strides changed from 2 to 1
+	# Max pooling: strides changed from [1,1,1,1] to [1,2,2,1]
 	def maxpool2d(self, x, name = None):
 
 		return tf.nn.max_pool(x, ksize=[1,2,2,1], strides=[1,1,1,1], padding='VALID', name = name)
@@ -112,12 +112,16 @@ class Network():
 		x = tf.reshape(data, shape=[-1, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE, self.n_input_channels])
 
 		conv1 = self.conv2d(x, weights['W_conv1'], name = 'conv1')
+
+		# print(conv1.shape)
 		if self.LOCAL_GRID_SIZE == 15:
 			conv1 = self.maxpool2d(conv1, name = 'max_pool1')
+		# print(conv1.shape)
 
 		conv2 = self.conv2d(conv1, weights['W_conv2'], name = 'conv2')
+		# print(conv2.shape)
 		conv2 = self.maxpool2d(conv2, name = 'max_pool2')
-
+		# print(conv2.shape)
 		fc = tf.reshape(conv2,[-1, self.scale*self.n_out_channels_conv2])
 
 		# dropout test

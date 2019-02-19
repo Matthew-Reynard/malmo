@@ -29,6 +29,7 @@ MAP_NUMBER = 2
 MAP_PATH = None
 
 
+# Train
 def train():
 
 	print("\n ---- Training the Deep Neural Network ----- \n")
@@ -40,7 +41,7 @@ def train():
 					  grid_size = GRID_SIZE,
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80, 
-					  max_time = 50,
+					  max_time = 30,
 					  food_count = 3,
 					  obstacle_count = 0,
 					  lava_count = 0,
@@ -64,8 +65,8 @@ def train():
 	avg_error = 0
 
 	# Number of episodes
-	print_episode = 1000
-	total_episodes = 100000
+	print_episode = 100
+	total_episodes = 10000
 
 	saver = tf.train.Saver()
 
@@ -97,7 +98,7 @@ def train():
 			state, info = env.reset()
 			done = False
 
-			brain.linear_epsilon_decay(total_episodes, episode, start=0.3, end=0.05, percentage=0.3)
+			# brain.linear_epsilon_decay(total_episodes, episode, start=0.5, end=0.05, percentage=0.5)
 
 			# brain.linear_alpha_decay(total_episodes, episode)
 
@@ -199,7 +200,7 @@ def train_MetaNetwork():
 	MAP_PATH = None
 
 	RENDER_TO_SCREEN = False
-	# RENDER_TO_SCREEN = True
+	RENDER_TO_SCREEN = True
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE,
@@ -220,9 +221,9 @@ def train_MetaNetwork():
 
 	zombie_net = Network(local_size=LOCAL_GRID_SIZE, name="zombie_dojo_local9", load=True)
 
-	model = MetaNetwork(local_size=LOCAL_GRID_SIZE, name="meta_network_local9", load=True)
+	model = MetaNetwork(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True)
 
-	brain = Brain(epsilon=0.05, action_space = 2)
+	brain = Brain(epsilon=0.01, action_space = 2)
 
 	diamond_net.setup(brain)
 	zombie_net.setup(brain)
@@ -255,8 +256,8 @@ def train_MetaNetwork():
 		if USE_SAVED_MODEL_FILE:
 			saver.restore(sess, MODEL_PATH_SAVE)
 			print("Model restored.")
-
-		sess.run(init)
+		else:
+			sess.run(init)
 
 		writer.add_graph(sess.graph)
 
@@ -268,7 +269,7 @@ def train_MetaNetwork():
 			state, info = env.reset()
 			done = False
 
-			brain.linear_epsilon_decay(total_episodes, episode, start=0.5, end=0.05, percentage=0.5)
+			# brain.linear_epsilon_decay(total_episodes, episode, start=0.5, end=0.05, percentage=0.5)
 
 			# brain.linear_alpha_decay(total_episodes, episode)
 

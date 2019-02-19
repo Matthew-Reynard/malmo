@@ -335,8 +335,8 @@ class Environment:
         # reward = 0.3
 
         # Linear distance reward
-        if len(self.zombie.array) > 0:
-            reward = (math.sqrt((self.steve.x - self.zombie.array[0][0])**2 + (self.steve.y - self.zombie.array[0][1])**2)/20)/self.GRID_SIZE
+        # if len(self.zombie.array) > 0:
+        #     reward = (math.sqrt((self.steve.x - self.zombie.array[0][0])**2 + (self.steve.y - self.zombie.array[0][1])**2)/20)/self.GRID_SIZE
 
         # Exponential distance reward
         # if len(self.zombie.array) > 0:
@@ -401,7 +401,7 @@ class Environment:
             # print(zombie_hit)
             if zombie_hit:
                 done = True
-                reward = -1.0
+                reward = -10.0
                 break
 
         # Make the most recent history have the most negative rewards
