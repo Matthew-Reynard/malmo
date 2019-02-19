@@ -20,7 +20,7 @@ LOGDIR = "./Logs/"+MODEL_NAME
 
 USE_SAVED_MODEL_FILE = False
 
-GRID_SIZE = 7
+GRID_SIZE = 8
 LOCAL_GRID_SIZE = 15
 MAP_NUMBER = 2
 
@@ -39,7 +39,7 @@ def train():
 					  grid_size = GRID_SIZE,
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80, 
-					  max_time = 20,
+					  max_time = 30,
 					  food_count = 1,
 					  obstacle_count = 0,
 					  lava_count = 0,
@@ -64,7 +64,7 @@ def train():
 
 	# Number of episodes
 	print_episode = 1000
-	total_episodes = 100000
+	total_episodes = 1000000
 
 	saver = tf.train.Saver()
 
@@ -96,7 +96,7 @@ def train():
 			state, info = env.reset()
 			done = False
 
-			brain.linear_epsilon_decay(total_episodes, episode, start=0.3, end=0.05, percentage=0.5)
+			brain.linear_epsilon_decay(total_episodes, episode, start=0.3, end=0.05, percentage=0.3)
 
 			# brain.linear_alpha_decay(total_episodes, episode)
 
@@ -297,8 +297,8 @@ def play():
 
 if __name__ == '__main__':
 
-	# train()
+	train()
 
 	# run()
 
-	play()
+	# play()
