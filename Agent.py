@@ -39,6 +39,19 @@ class Brain():
 
 		return action
 
+	def choose_dojo(self, state, sess, model, action_space, epsilon):
+		Q_vector = sess.run(model.q_values, feed_dict={model.input: state})
+		
+		# Deciding one which action to take
+		if np.random.rand() <= epsilon:
+			action = np.random.choice(action_space)
+		else:
+			action = sess.run(model.action_t, feed_dict={model.actions: Q_vector})
+		
+		# self.steps += 1
+
+		return action
+
 
 	def linear_epsilon_decay(self, total, episode, start=0.5, end=0.05, percentage=0.5):
 		

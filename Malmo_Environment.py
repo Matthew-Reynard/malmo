@@ -333,8 +333,14 @@ class Environment:
         # reward = -1
         reward = -0.05
         # reward = 0.3
+
+        # Linear distance reward
         if len(self.zombie.array) > 0:
             reward = (math.sqrt((self.steve.x - self.zombie.array[0][0])**2 + (self.steve.y - self.zombie.array[0][1])**2)/20)/self.GRID_SIZE
+
+        # Exponential distance reward
+        # if len(self.zombie.array) > 0:
+        #     reward = (((self.steve.x - self.zombie.array[0][0])**2 + (self.steve.y - self.zombie.array[0][1])**2)/20**2)/self.GRID_SIZE
 
         # Test: if moving, give a reward
         # if self.steve.dx != 0 or self.steve.dy != 0:
@@ -438,7 +444,7 @@ class Environment:
             self.food.make(self.grid, disallowed, index = eaten_food)
 
             # Only collect 1 food item at a time
-            done = True
+            # done = True
 
             # Reward functions
             reward = 10
