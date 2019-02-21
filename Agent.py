@@ -39,6 +39,7 @@ class Brain():
 
 		return action
 
+
 	def choose_dojo(self, state, sess, model, action_space, epsilon):
 		Q_vector = sess.run(model.q_values, feed_dict={model.input: state})
 		
@@ -68,4 +69,27 @@ class Brain():
 		if self.ALPHA < end: 
 			self.ALPHA = end
 
+
+	def train(self, model, sess):
+
+		memory = self.memory[self.memCntr%self.memSize-1]
+
+		output_vector = sess.run(model.q_values, feed_dict={model.input: memory[0]})
+
+		if memory[3]:
+			output_vector[:,memory[1]] = memory[2]
+			# print("Reward:", reward)
+		else:
+			# Gathering the now current state's action-value vector
+			y_prime = sess.run(model.q_values, feed_dict={model.input: memory[4]})
+
+			# Equation for training
+			maxq = sess.run(model.y_prime_max, feed_dict={model.actions: y_prime})
+
+			# RL Equation
+			output_vector[:,memory[1]] = memory[2] + (self.GAMMA * maxq)
+
+		_, e = sess.run([model.optimizer, model.error], feed_dict={model.input: memory[0], model.actions: output_vector})
+
+		return e
 

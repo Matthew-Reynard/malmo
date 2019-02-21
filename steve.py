@@ -28,6 +28,7 @@ class Steve:
 
         white = (255,255,255)
         self.steve_img = pygame.image.load("./Images/steve_head.png").convert()
+        # self.steve_img = pygame.image.load("./Images/steve_sword.png").convert()
         # self.steve_img.set_colorkey(white) # sets white to alpha
 
         # self.steve_img = pygame.transform.flip(self.steve_img, False, True) #

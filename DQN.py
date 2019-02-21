@@ -9,7 +9,7 @@ import sys, os
 
 class Network():
 
-	def __init__(self, local_size=9, name="test_model", load=False):
+	def __init__(self, local_size=9, name="test_model", load=False, trainable = True):
 
 		self.LOCAL_GRID_SIZE = local_size
 
@@ -48,7 +48,7 @@ class Network():
 		self.name = name
 		self.load = load
 
-		self.trainable = True
+		self.trainable = trainable
 
 
 	# 2D convolution
