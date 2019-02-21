@@ -20,9 +20,9 @@ class Network():
 
 		self.n_input_channels = 4
 
-		self.n_out_channels_conv1 = 16 # changed from 16
+		self.n_out_channels_conv1 = 16 # changed from 16 -> 32
 		self.n_out_channels_conv2 = 32
-		self.n_out_fc = 256
+		self.n_out_fc = 256 # changed from 256 -> 512
 
 		self.filter1_size = 3
 		self.filter2_size = 3
@@ -113,23 +113,23 @@ class Network():
 
 		conv1 = self.conv2d(x, weights['W_conv1'], name = 'conv1')
 
-		# print(conv1.shape)
+		print(conv1.shape)
 		if self.LOCAL_GRID_SIZE == 15:
 			conv1 = self.maxpool2d(conv1, name = 'max_pool1')
-		# print(conv1.shape)
+		print(conv1.shape)
 
 		conv2 = self.conv2d(conv1, weights['W_conv2'], name = 'conv2')
-		# print(conv2.shape)
+		print(conv2.shape)
 		conv2 = self.maxpool2d(conv2, name = 'max_pool2')
-		# print(conv2.shape)
+		print(conv2.shape)
 		fc = tf.reshape(conv2,[-1, self.scale*self.n_out_channels_conv2])
-
+		print(fc.shape)
 		# dropout test
-		# fc = tf.nn.dropout(fc, 0.9)
+		fc = tf.nn.dropout(fc, 0.9)
 
 		fc = tf.nn.relu(tf.matmul(fc, weights['W_fc']) + biases['b_fc'])
-
 		actions = tf.matmul(fc, weights['W_out']) + biases['b_out']
+		print(actions.shape)
 		actions = tf.nn.l2_normalize(actions)
 
 		return actions, weights, biases

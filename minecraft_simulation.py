@@ -12,8 +12,8 @@ from Agent import Brain
 from Malmo_Environment import Environment
 from utils import print_readable_time
 
-MODEL_NAME = "diamond_dojo_local9_1"
-# MODEL_NAME = "diamond_dojo_local15"
+# MODEL_NAME = "diamond_dojo_local9_1"
+MODEL_NAME = "diamond_dojo_local15"
 
 MODEL_PATH_SAVE = "./Models/Tensorflow/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -21,8 +21,8 @@ LOGDIR = "./Logs/"+MODEL_NAME
 
 USE_SAVED_MODEL_FILE = False
 
-GRID_SIZE = 5
-LOCAL_GRID_SIZE = 9
+GRID_SIZE = 8
+LOCAL_GRID_SIZE = 15
 MAP_NUMBER = 2
 
 # MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
@@ -52,7 +52,7 @@ def train():
 	if RENDER_TO_SCREEN:
 		env.prerender()
 
-	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=False)
+	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True)
 
 	brain = Brain(epsilon=0.05, action_space = env.number_of_actions())
 
@@ -484,9 +484,9 @@ def play():
 
 if __name__ == '__main__':
 
-	# train()
+	train()
 
-	train_MetaNetwork()
+	# train_MetaNetwork()
 
 	# run()
 
