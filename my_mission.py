@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
+import numpy as np
+
+missionXML='''<?xml version="1.0" encoding="UTF-8"?>
 <Mission xmlns="http://ProjectMalmo.microsoft.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
   <About>
@@ -67,7 +69,7 @@
         <DrawCuboid x1="0" y1="108" z1="0" x2="8" y2="110" z2="8" type="air" />
         <!-- <DrawBlock x="5" y="107" z="5" type="redstone_block"/> -->
 
-        <DrawEntity x="1.5" y="108.0" z="1.5" type="Zombie" yaw="0" pitch="0" xVel="0" yVel="0" zVel="0"/>
+        <DrawEntity x="'''+str(np.random.randint(1,8)+0.5)+'''" y="108.0" z="'''+str(np.random.randint(1,8)+0.5)+'''" type="Zombie" yaw="0" pitch="0" xVel="0" yVel="0" zVel="0"/>
         <!-- <DrawEntity x="13.5" y="108.0" z="8.5" type="Zombie" yaw="0" pitch="0" xVel="0" yVel="0" zVel="0"/> -->
       </DrawingDecorator>
 
@@ -219,3 +221,4 @@
   </AgentSection>
 
 </Mission>
+'''

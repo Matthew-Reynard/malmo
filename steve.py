@@ -12,6 +12,7 @@ class Steve:
         self.prev_pos = (self.x, self.y)
         
         self.steve_img = None
+        self.steve_img2 = None
 
         # Used for the CNN local network input to see where the snake has been recently
         self.history_size = 5 # Needs to be proportional to the grid size
@@ -19,6 +20,8 @@ class Steve:
 
         # Not used
         self.score_multiplier = 1
+
+        self.hasSword = False
 
 
     # Load steve image for better visuals 
@@ -28,7 +31,7 @@ class Steve:
 
         white = (255,255,255)
         self.steve_img = pygame.image.load("./Images/steve_head.png").convert()
-        # self.steve_img = pygame.image.load("./Images/steve_sword.png").convert()
+        self.steve_img2 = pygame.image.load("./Images/steve_sword.png").convert()
         # self.steve_img.set_colorkey(white) # sets white to alpha
 
         # self.steve_img = pygame.transform.flip(self.steve_img, False, True) #
@@ -36,6 +39,7 @@ class Steve:
 
         # If the images arent 20x20 pixels, scales down or up
         self.steve_img = pygame.transform.scale(self.steve_img, (20, 20))
+        self.steve_img2 = pygame.transform.scale(self.steve_img2, (20, 20))
 
 
     # Reset steve at a specific/random location in env
@@ -60,6 +64,8 @@ class Steve:
 
         self.history.clear()
         self.history.append((self.x, self.y))
+
+        self.hasSword = False
 
 
     # Update steve position
@@ -114,5 +120,8 @@ class Steve:
     # Draw steve
     def draw(self, display):
 
-        display.blit(self.steve_img, self.pos)
+        if self.hasSword:
+            display.blit(self.steve_img2, self.pos)
+        else:
+            display.blit(self.steve_img, self.pos)
         

@@ -26,17 +26,19 @@ a head and a food, its doesn't
 
 '''
 
+import sys
+import math # Used for infinity game time
 import numpy as np
 import contextlib
 with contextlib.redirect_stdout(None):
     import pygame # Allows pygame to import without printing the pygame welcome message
+
+# custom imports
 from steve import Steve
 from food import Food
 from obstacle import Obstacle
 from lava import Lava
 from zombie import Zombie
-import sys
-import math # Used for infinity game time
 from utils import createGrid
 
 # import csv
@@ -339,8 +341,8 @@ class Environment:
         #     reward = (math.sqrt((self.steve.x - self.zombie.array[0][0])**2 + (self.steve.y - self.zombie.array[0][1])**2)/20)/self.GRID_SIZE
 
         # Exponential distance reward
-        # if len(self.zombie.array) > 0:
-        #     reward = (((self.steve.x - self.zombie.array[0][0])**2 + (self.steve.y - self.zombie.array[0][1])**2)/20**2)/self.GRID_SIZE
+        if len(self.zombie.array) > 0:
+            reward = (((self.steve.x - self.zombie.array[0][0])**2 + (self.steve.y - self.zombie.array[0][1])**2)/20**2)/self.GRID_SIZE
 
         # Test: if moving, give a reward
         # if self.steve.dx != 0 or self.steve.dy != 0:
@@ -453,6 +455,10 @@ class Environment:
             # reward = 1000 / self.time # Including the time in the reward function
         else:
             self.spawn_new_food = False
+
+        # For fun
+        if self.score == 2:
+            self.steve.hasSword = True
 
         # To make it compatible with malmo
         if self.score == self.NUM_OF_FOOD:

@@ -7,6 +7,7 @@ import tensorflow as tf
 import numpy as np
 import sys, os
 
+
 class Network():
 
 	def __init__(self, local_size=9, name="test_model", load=False, trainable = True):
@@ -109,28 +110,38 @@ class Network():
 				   	  'b_out':tf.Variable(tf.constant(0.1, shape=[self.n_actions]), name = 'b_out')}
 
 
+		print("MODEL:", self.name)
+
 		x = tf.reshape(data, shape=[-1, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE, self.n_input_channels])
+		print("Input:", x.shape)
 
 		conv1 = self.conv2d(x, weights['W_conv1'], name = 'conv1')
-
-		print(conv1.shape)
+		print("Conv1:", conv1.shape)
+		
 		if self.LOCAL_GRID_SIZE == 15:
 			conv1 = self.maxpool2d(conv1, name = 'max_pool1')
-		print(conv1.shape)
+		print("MaxP1:", conv1.shape)
 
 		conv2 = self.conv2d(conv1, weights['W_conv2'], name = 'conv2')
-		print(conv2.shape)
+		print("Conv2:", conv2.shape)
+		
 		conv2 = self.maxpool2d(conv2, name = 'max_pool2')
-		print(conv2.shape)
+		print("MaxP2:", conv2.shape)
+		
 		fc = tf.reshape(conv2,[-1, self.scale*self.n_out_channels_conv2])
-		print(fc.shape)
-		# dropout test
-		fc = tf.nn.dropout(fc, 0.9)
+		print("Reshape:", fc.shape)
+
+		if self.trainable:
+			fc = tf.nn.dropout(fc, 0.9)
 
 		fc = tf.nn.relu(tf.matmul(fc, weights['W_fc']) + biases['b_fc'])
+		print("FC:", fc.shape)
+
 		actions = tf.matmul(fc, weights['W_out']) + biases['b_out']
-		print(actions.shape)
+		print("Actions:", actions.shape)
+
 		actions = tf.nn.l2_normalize(actions)
+		print("")
 
 		return actions, weights, biases
 
@@ -189,7 +200,7 @@ class Network():
 
 class MetaNetwork():
 
-	def __init__(self, local_size=9, name="test_model", load=False):
+	def __init__(self, local_size=9, name="test_model", load=False, trainable = True):
 
 		self.LOCAL_GRID_SIZE = local_size
 
@@ -228,6 +239,9 @@ class MetaNetwork():
 		self.path = "./Models/Tensorflow/"
 		self.name = name
 		self.load = load
+
+		# Not used yet
+		self.trainable = trainable
 
 
 	# 2D convolution

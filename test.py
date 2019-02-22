@@ -24,14 +24,21 @@ import numpy as np
 # b.append(9)
 # b.pop(0)
 # print(b)
-memSize = 10
-memCntr = 0
-memory=[]
+# memSize = 10
+# memCntr = 0
+# memory=[]
 
-for i in range(20):
-    if memCntr < memSize:
-        memory.append([0,memCntr])
-    else:
-        memory[memCntr%memSize] = [0,memCntr]
-    memCntr += 1
-    print(memory)
+# for i in range(20):
+#     if memCntr < memSize:
+#         memory.append([0,memCntr])
+#     else:
+#         memory[memCntr%memSize] = [0,memCntr]
+#     memCntr += 1
+#     print(memory)
+
+from my_mission import missionXML
+
+print(missionXML)
+
+# myfile = open("mission2.xml", "w")  
+# myfile.write(mydata)  

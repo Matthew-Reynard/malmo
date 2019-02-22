@@ -110,7 +110,7 @@ class Zombie:
             # print(maze)
 
             # 1st zombie moves according to the a* algorithm
-            star_steps = 5
+            star_steps = 4
             self.array[0] = list(self.array[0])
             
             if path != None:
