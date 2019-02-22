@@ -13,7 +13,8 @@ from Malmo_Environment import Environment
 from utils import print_readable_time
 
 # MODEL_NAME = "diamond_dojo_local9_1"
-MODEL_NAME = "diamond_dojo_local15"
+MODEL_NAME = "zombie_dojo_local15"
+# MODEL_NAME = "diamond_dojo_local15"
 
 MODEL_PATH_SAVE = "./Models/Tensorflow/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -35,17 +36,17 @@ def train():
 	print("\n ---- Training the Deep Neural Network ----- \n")
 
 	RENDER_TO_SCREEN = False
-	# RENDER_TO_SCREEN = True
+	RENDER_TO_SCREEN = True
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE,
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80, 
-					  max_time = 20,
-					  food_count = 1,
+					  max_time = 40,
+					  food_count = 0,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 0, 
+					  zombie_count = 1, 
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
@@ -66,7 +67,7 @@ def train():
 
 	# Number of episodes
 	print_episode = 1000
-	total_episodes = 100000
+	total_episodes = 1000000
 
 	saver = tf.train.Saver()
 
@@ -101,7 +102,7 @@ def train():
 			state, info = env.reset()
 			done = False
 
-			brain.linear_epsilon_decay(total_episodes, episode, start=0.5, end=0.05, percentage=0.5)
+			# brain.linear_epsilon_decay(total_episodes, episode, start=0.3, end=0.05, percentage=0.5)
 
 			# brain.linear_alpha_decay(total_episodes, episode)
 
@@ -460,22 +461,22 @@ def run():
 def play():
 	print("\n ----- Playing the game -----\n")
 
-	GRID_SIZE = 16
+	GRID_SIZE = 8
 	LOCAL_GRID_SIZE = 15 # for printing out the state
 
 	MAP_NUMBER = 2
 
-	MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
-	# MAP_PATH = None
+	# MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
+	MAP_PATH = None
 
-	env = Environment(wrap = True, 
+	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE, 
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 100,
-					  food_count = 3,
+					  food_count = 1,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 2,
+					  zombie_count = 0,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
