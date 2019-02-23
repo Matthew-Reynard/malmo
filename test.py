@@ -1,6 +1,8 @@
 print("TESTING")
 
-import numpy as np 
+import numpy as np
+
+from math import pi
 
 # a = np.array([[[0,0],
 # 			   [0,0]],
@@ -36,9 +38,31 @@ import numpy as np
 #     memCntr += 1
 #     print(memory)
 
-from my_mission import missionXML
+# from my_mission import missionXML
 
-print(missionXML)
+# print(missionXML)
 
 # myfile = open("mission2.xml", "w")  
 # myfile.write(mydata)  
+
+grid = 9
+
+
+# for x in range(grid):
+# 	print(np.exp((x*1.41)-grid))
+
+for x in range(grid):
+	print(np.tan(x))
+
+print(np.tan(pi/4))
+
+y = [0,1,2,3,4,5,6,7,8,9]
+
+z = list(map(lambda x: ((x/grid)*(pi/2))-pi/4, y))
+
+print(z)
+
+for x in z:
+	print(np.tan(x))
+
+# def test():

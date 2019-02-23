@@ -40,6 +40,7 @@ from obstacle import Obstacle
 from lava import Lava
 from zombie import Zombie
 from utils import createGrid
+from math import pi
 
 # import csv
 # import pandas as pd
@@ -332,21 +333,34 @@ class Environment:
         done = False
 
         # Initialze to -1 for every time step - to find the fastest route (can be a more negative reward)
-        # reward = -1
         reward = -0.05
-        # reward = 0.3
+
+        # Negetive exponential distance rewards
+        if len(self.zombie.array) > 0:
+            distance = (math.sqrt((self.steve.x - self.zombie.array[0][0])**2 + (self.steve.y - self.zombie.array[0][1])**2)/self.GRID_SIZE)/2
+            # print(distance)
+            
+            # normal_distance = ((distance/self.GRID_SIZE)*(pi/2))-pi/4
+            # normal_distance = ((distance/self.GRID_SIZE)*(1.0))-0.4
+
+            # reward = np.tan(normal_distance)
+            reward = -np.exp(-distance)*10
 
         # Linear distance reward
         # if len(self.zombie.array) > 0:
         #     reward = (math.sqrt((self.steve.x - self.zombie.array[0][0])**2 + (self.steve.y - self.zombie.array[0][1])**2)/20)/self.GRID_SIZE
 
         # Exponential distance reward
-        if len(self.zombie.array) > 0:
-            reward = (((self.steve.x - self.zombie.array[0][0])**2 + (self.steve.y - self.zombie.array[0][1])**2)/20**2)/self.GRID_SIZE
+        # if len(self.zombie.array) > 0:
+        #     reward = (((self.steve.x - self.zombie.array[0][0])**2 + (self.steve.y - self.zombie.array[0][1])**2)/20**2)/self.GRID_SIZE
 
         # Test: if moving, give a reward
         # if self.steve.dx != 0 or self.steve.dy != 0:
         #     reward = -0.01
+
+        # Test for having a barrier around the zombie
+        # if reward < 0.143:
+        #     reward = -5
 
 
         # Update the position of steve 
@@ -392,15 +406,11 @@ class Environment:
 
         # Check if zombie gets steve
         for i in range(self.zombie.amount):
-            # if self.steve.pos == (self.zombie.array[i][0]+1*20, self.zombie.array[i][1]) \
-            # or self.steve.pos == (self.zombie.array[i][0]-1*20, self.zombie.array[i][1]) \
-            # or self.steve.pos == (self.zombie.array[i][0], self.zombie.array[i][1]+1*20) \
-            # or self.steve.pos == (self.zombie.array[i][0], self.zombie.array[i][1]-1*20):
             if self.steve.pos == (self.zombie.array[i][0], self.zombie.array[i][1]):
                 zombie_hit = True
             else:
                 zombie_hit = False
-            # print(zombie_hit)
+
             if zombie_hit:
                 done = True
                 reward = -10.0

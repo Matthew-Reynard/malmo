@@ -12,41 +12,44 @@ from Agent import Brain
 from Malmo_Environment import Environment
 from utils import print_readable_time
 
-# MODEL_NAME = "diamond_dojo_local9_1"
-MODEL_NAME = "zombie_dojo_local9_1"
+# MODEL_NAME = "diamond_dojo_local9"
+# MODEL_NAME = "zombie_dojo_local9"
 # MODEL_NAME = "diamond_dojo_local15"
-
+# MODEL_NAME = "zombie_dojo_local15"
+# MODEL_NAME = "complex_local9"
+# MODEL_NAME = "complex_local15"
 # MODEL_NAME = "meta_network_local9"
-# DIAMOND_MODEL_NAME = "diamond_dojo_local9"
-# ZOMBIE_MODEL_NAME = "zombie_dojo_local9"
-
-MODEL_PATH_SAVE = "./Models/Tensorflow/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
-
-LOGDIR = "./Logs/"+MODEL_NAME
-
-USE_SAVED_MODEL_FILE = False
-
-GRID_SIZE = 8
-LOCAL_GRID_SIZE = 9
-MAP_NUMBER = 2
-
-# MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
-MAP_PATH = None
+# MODEL_NAME = "meta_network_local15"
 
 
 # Train
 def train():
 
+	MODEL_NAME = "zombie_dojo_local9_2"
+
+	MODEL_PATH_SAVE = "./Models/Tensorflow/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
+
+	LOGDIR = "./Logs/"+MODEL_NAME
+
+	USE_SAVED_MODEL_FILE = False
+
+	GRID_SIZE = 8
+	LOCAL_GRID_SIZE = 9
+	MAP_NUMBER = 2
+
+	# MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
+	MAP_PATH = None
+
 	print("\n ---- Training the Deep Neural Network ----- \n")
 
 	RENDER_TO_SCREEN = False
-	RENDER_TO_SCREEN = True
+	# RENDER_TO_SCREEN = True
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE,
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80, 
-					  max_time = 100,
+					  max_time = 200,
 					  food_count = 0,
 					  obstacle_count = 0,
 					  lava_count = 0,
@@ -57,7 +60,7 @@ def train():
 	if RENDER_TO_SCREEN:
 		env.prerender()
 
-	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True)
+	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=False)
 
 	brain = Brain(epsilon=0.05, action_space = env.number_of_actions())
 
@@ -106,7 +109,7 @@ def train():
 			state, info = env.reset()
 			done = False
 
-			# brain.linear_epsilon_decay(total_episodes, episode, start=0.5, end=0.05, percentage=0.5)
+			brain.linear_epsilon_decay(total_episodes, episode, start=0.5, end=0.05, percentage=0.5)
 
 			# brain.linear_alpha_decay(total_episodes, episode)
 
@@ -192,7 +195,9 @@ def train_MetaNetwork():
 
 	print("\n ---- Training the Meta Network ----- \n")
 
-	MODEL_NAME = "meta_network_local9"
+	MODEL_NAME = "meta_network_local15"
+	DIAMOND_MODEL_NAME = "diamond_dojo_local15"
+	ZOMBIE_MODEL_NAME = "zombie_dojo_local15"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -200,8 +205,8 @@ def train_MetaNetwork():
 
 	USE_SAVED_MODEL_FILE = False
 
-	GRID_SIZE = 7
-	LOCAL_GRID_SIZE = 9
+	GRID_SIZE = 8
+	LOCAL_GRID_SIZE = 15
 	MAP_PATH = None
 
 	RENDER_TO_SCREEN = False
@@ -222,11 +227,11 @@ def train_MetaNetwork():
 	if RENDER_TO_SCREEN:
 		env.prerender()
 
-	model = MetaNetwork(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True)
+	model = MetaNetwork(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=False)
 
-	diamond_net = Network(local_size=LOCAL_GRID_SIZE, name="diamond_dojo_local9", load=True, trainable = False)
+	diamond_net = Network(local_size=LOCAL_GRID_SIZE, name=DIAMOND_MODEL_NAME, load=True, trainable = False)
 
-	zombie_net = Network(local_size=LOCAL_GRID_SIZE, name="zombie_dojo_local9", load=True, trainable = False)
+	zombie_net = Network(local_size=LOCAL_GRID_SIZE, name=ZOMBIE_MODEL_NAME, load=True, trainable = False)
 
 	brain = Brain(epsilon=0.01, action_space = 2)
 
@@ -242,7 +247,7 @@ def train_MetaNetwork():
 
 	# Number of episodes
 	print_episode = 1000
-	total_episodes = 200000
+	total_episodes = 100000
 
 	saver = tf.train.Saver()
 
@@ -255,6 +260,7 @@ def train_MetaNetwork():
 	# Tensorboard capabilties
 	writer = tf.summary.FileWriter(LOGDIR)
 
+ 	# GPU capabilities
 	gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.8)
 
 	# Begin session
@@ -276,7 +282,7 @@ def train_MetaNetwork():
 			state, info = env.reset()
 			done = False
 
-			brain.linear_epsilon_decay(total_episodes, episode, start=0.2, end=0.05, percentage=0.3)
+			brain.linear_epsilon_decay(total_episodes, episode, start=0.5, end=0.05, percentage=0.5)
 
 			# brain.linear_alpha_decay(total_episodes, episode)
 
@@ -374,6 +380,21 @@ def train_MetaNetwork():
 # Run the given model
 def run():
 
+	MODEL_NAME = "zombie_dojo_local9_1"
+
+	MODEL_PATH_SAVE = "./Models/Tensorflow/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
+
+	LOGDIR = "./Logs/"+MODEL_NAME
+
+	USE_SAVED_MODEL_FILE = False
+
+	GRID_SIZE = 8
+	LOCAL_GRID_SIZE = 9
+	MAP_NUMBER = 2
+
+	# MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
+	MAP_PATH = None
+
 	print("\n ---- Running the Deep Q Network ----- \n")
 
 	RENDER_TO_SCREEN = True
@@ -393,7 +414,7 @@ def run():
 	if RENDER_TO_SCREEN:
 		env.prerender()
 
-	model = Network(local_size=LOCAL_GRID_SIZE, name=ZOMBIE_MODEL_NAME, load=True)
+	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True)
 
 	brain = Brain(epsilon=0.01, action_space = env.number_of_actions())
 
@@ -438,7 +459,7 @@ def run():
 				# Update environment with by performing action
 				new_state, reward, done, info = env.step(action)
 
-				print(new_state)
+				# print(new_state)
 
 				state = new_state
 
@@ -468,7 +489,7 @@ def run_MetaNetwork():
 
 	MODEL_NAME = "meta_network_local9"
 	DIAMOND_MODEL_NAME = "diamond_dojo_local9"
-	ZOMBIE_MODEL_NAME = "zombie_dojo_local9"
+	ZOMBIE_MODEL_NAME = "zombie_dojo_local9_1"
 
 	MODEL_PATH_LOAD = "./Models/Tensorflow/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -588,7 +609,7 @@ def play():
 	print("\n ----- Playing the game -----\n")
 
 	GRID_SIZE = 8
-	LOCAL_GRID_SIZE = 15 # for printing out the state
+	LOCAL_GRID_SIZE = 9 # for printing out the state
 
 	MAP_NUMBER = 2
 
@@ -599,7 +620,7 @@ def play():
 					  grid_size = GRID_SIZE, 
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 100,
-					  food_count = 0,
+					  food_count = 3,
 					  obstacle_count = 0,
 					  lava_count = 0,
 					  zombie_count = 1,
@@ -611,7 +632,7 @@ def play():
 
 if __name__ == '__main__':
 
-	train()
+	# train()
 
 	# train_MetaNetwork()
 
@@ -619,4 +640,4 @@ if __name__ == '__main__':
 
 	# run_MetaNetwork()
 
-	# play()
+	play()
