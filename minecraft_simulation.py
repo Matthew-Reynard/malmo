@@ -13,19 +13,25 @@ from Malmo_Environment import Environment
 from utils import print_readable_time
 
 # MODEL_NAME = "diamond_dojo_local9"
-# MODEL_NAME = "zombie_dojo_local9"
 # MODEL_NAME = "diamond_dojo_local15"
+# diamond_dojo_local15_maps
+
+# MODEL_NAME = "zombie_dojo_local9"
 # MODEL_NAME = "zombie_dojo_local15"
+
 # MODEL_NAME = "complex_local9"
 # MODEL_NAME = "complex_local15"
+
 # MODEL_NAME = "meta_network_local9"
 # MODEL_NAME = "meta_network_local15"
+
+# MODEL_NAME = "explore_dojo_local15"
 
 
 # Train
 def train():
 
-	MODEL_NAME = "complex_local9"
+	MODEL_NAME = "explore_dojo_local15"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -33,27 +39,27 @@ def train():
 
 	USE_SAVED_MODEL_FILE = False
 
-	GRID_SIZE = 8
-	LOCAL_GRID_SIZE = 9
+	GRID_SIZE = 10
+	LOCAL_GRID_SIZE = 15
 	MAP_NUMBER = 0
 
-	# MAP_PATH = "./Maps/Grid{}/map0_{}.txt".format(GRID_SIZE, MAP_NUMBER)
-	MAP_PATH = None
+	MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
+	# MAP_PATH = None
 
 	print("\n ---- Training the Deep Neural Network ----- \n")
 
 	RENDER_TO_SCREEN = False
-	# RENDER_TO_SCREEN = True
+	RENDER_TO_SCREEN = True
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE,
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80, 
-					  max_time = 200,
-					  food_count = 3,
+					  max_time = 50,
+					  food_count = 0,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 1, 
+					  zombie_count = 0, 
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
@@ -108,13 +114,13 @@ def train():
 		for episode in range(total_episodes):
 
 			# Make a random map 0: lava, 1: obstacle
-			# MAP_PATH = "./Maps/Grid10/map1_{}.txt".format(np.random.randint(4))
-            # self.set_map(MAP_PATH)
+			MAP_PATH = "./Maps/Grid10/map{}.txt".format(np.random.randint(10))
+			env.set_map(MAP_PATH)
 
 			state, info = env.reset()
 			done = False
 
-			brain.linear_epsilon_decay(total_episodes, episode, start=0.4, end=0.05, percentage=0.5)
+			# brain.linear_epsilon_decay(total_episodes, episode, start=0.5, end=0.05, percentage=0.5)
 
 			# brain.linear_alpha_decay(total_episodes, episode)
 
@@ -130,7 +136,7 @@ def train():
 
 				# print(action)
 
-				# Update environment with by performing action
+				# Update environment by performing action
 				new_state, reward, done, info = env.step(action)
 
 				# print(new_state)
@@ -138,22 +144,6 @@ def train():
 				brain.store_transition(state, action, reward, done, new_state)
 				
 				e = brain.train(model, sess)
-
-				## Standard training with learning after every step
-
-				# if done:
-				# 	Q_vector[:,action] = reward
-				# else:
-				# 	# Gathering the now current state's action-value vector
-				# 	y_prime = sess.run(model.q_values, feed_dict={model.input: new_state})
-
-				# 	# Equation for training
-				# 	maxq = sess.run(model.y_prime_max, feed_dict={model.actions: y_prime})
-
-				# 	# RL Equation
-				# 	Q_vector[:,action] = reward + (brain.GAMMA * maxq)
-
-				# _, e = sess.run([model.optimizer, model.error], feed_dict={model.input: state, model.actions: Q_vector})
 
 				state = new_state
 
@@ -203,6 +193,7 @@ def train_MetaNetwork():
 	MODEL_NAME = "meta_network_local15"
 	DIAMOND_MODEL_NAME = "diamond_dojo_local15"
 	ZOMBIE_MODEL_NAME = "zombie_dojo_local15"
+	# EXPLORE_MODEL_NAME = "explore_dojo_local15"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -238,11 +229,14 @@ def train_MetaNetwork():
 
 	zombie_net = Network(local_size=LOCAL_GRID_SIZE, name=ZOMBIE_MODEL_NAME, load=True, trainable = False)
 
+	# explore_net = Network(local_size=LOCAL_GRID_SIZE, name=EXPLORE_MODEL_NAME, load=True, trainable = False)
+
 	brain = Brain(epsilon=0.01, action_space = 2)
 
 	model.setup(brain)
 	diamond_net.setup(brain)
 	zombie_net.setup(brain)
+	# explore_net.setup(brain)
 
 	tf.summary.scalar('error', tf.squeeze(model.error))
 
@@ -304,13 +298,19 @@ def train_MetaNetwork():
 				# print(dojo)
 
 				if dojo == 0:
-					state[2] = 0 # Zero out the zombies layer
-					# print(state)
+					# state[2] = 0 # Zero out the zombies layer
+					state = np.delete(state, 2, 0)# Take out the zombie layer
+					state = np.delete(state, 5, 0)# Take out the history layer
 					action = brain.choose_dojo(state, sess, diamond_net, env.number_of_actions(), 0.01)
 				elif dojo == 1:
-					state[1] = 0 # Zero out the diamond layer
-					# print(state)
+					# state[1] = 0 # Zero out the diamond layer
+					state = np.delete(state, 1, 0)# Take out the diamond layer
+					state = np.delete(state, 5, 0)# Take out the history layer
 					action = brain.choose_dojo(state, sess, zombie_net, env.number_of_actions(), 0.01)
+				elif dojo == 2:
+					state = np.delete(state, 1, 0)# Take out the diamond layer
+					state = np.delete(state, 2, 0)# Take out the zombie layer
+					action = brain.choose_dojo(state, sess, explore_net, env.number_of_actions(), 0.01)
 
 				# print(action)
 
@@ -613,22 +613,22 @@ def run_MetaNetwork():
 def play():
 	print("\n ----- Playing the game -----\n")
 
-	GRID_SIZE = 8
-	LOCAL_GRID_SIZE = 9 # for printing out the state
+	GRID_SIZE = 10
+	LOCAL_GRID_SIZE = 15 # for printing out the state
 
 	MAP_NUMBER = np.random.randint(4)
 
-	# MAP_PATH = "./Maps/Grid{}/map0_{}.txt".format(GRID_SIZE, MAP_NUMBER)
-	MAP_PATH = None
+	MAP_PATH = "./Maps/Grid{}/map0_{}.txt".format(GRID_SIZE, MAP_NUMBER)
+	# MAP_PATH = None
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE, 
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 100,
-					  food_count = 3,
+					  food_count = 0,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 1,
+					  zombie_count = 0,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
@@ -638,9 +638,9 @@ def play():
 # Main function
 if __name__ == '__main__':
 
-	# train()
+	train()
 
-	train_MetaNetwork()
+	# train_MetaNetwork()
 
 	# run()
 

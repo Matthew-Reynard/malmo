@@ -333,6 +333,7 @@ class Environment:
         done = False
 
         # Initialze to -1 for every time step - to find the fastest route (can be a more negative reward)
+        # reward = 0.1
         reward = -0.05
 
         # Negetive exponential distance rewards
@@ -399,7 +400,7 @@ class Environment:
 
             if in_lava:
                 done = True
-                reward = -0.8
+                reward = -10.0
 
         # Update the position of the zombie 
         self.zombie.move(self.maze, self.steve, self.steps)
@@ -417,12 +418,12 @@ class Environment:
                 break
 
         # Make the most recent history have the most negative rewards
-        # decay = (1+reward_each_time_step)/(self.steve.history_size-1)
-        # for i in range(len(self.steve.history) - 1):
-        #     # print(-1*(1-decay*i))
-        #     if ((self.steve.x, self.steve.y) == (self.steve.history[-i-2][0], self.steve.history[-i-2][1])):
-        #         reward = -1*(1-decay*i)
-        #         break
+        decay = (1+reward_each_time_step)/(self.steve.history_size-1)
+        for i in range(len(self.steve.history) - 1):
+            # print(-1*(1-decay*i))
+            if ((self.steve.x, self.steve.y) == (self.steve.history[-i-2][0], self.steve.history[-i-2][1])):
+                # reward = -1*(1-decay*i)
+                break
 
         # Checking if Steve has reached the food
         reached_food, eaten_food = self.food.eat(self.steve)
@@ -622,6 +623,14 @@ class Environment:
         Shape = (Layers, LOCAL_GRID_SIZE, LOCAL_GRID_SIZE)
         """
 
+        s_pos = 0
+        d_pos = 1
+        # z_pos = 2
+        l_pos = 2
+        o_ops = 3
+        # h_pos = 1
+
+
         #s = steve
         sx = int(self.steve.x/self.SCALE)
         sy = int(self.steve.y/self.SCALE)
@@ -631,7 +640,7 @@ class Environment:
 
         # Agent
         local_pos = int((self.LOCAL_GRID_SIZE-1)/2)
-        state[0, local_pos, local_pos] = 1
+        state[s_pos, local_pos, local_pos] = 1
 
         # Food
         for i in range(self.food.amount):
@@ -639,7 +648,7 @@ class Environment:
             y_prime_food = local_pos+int(self.food.array[i][1]/self.SCALE)-sy
 
             if x_prime_food < self.LOCAL_GRID_SIZE and x_prime_food >= 0 and y_prime_food < self.LOCAL_GRID_SIZE and y_prime_food >= 0:
-                state[1, y_prime_food, x_prime_food] = 1
+                state[d_pos, y_prime_food, x_prime_food] = 1
                 pass
 
         # Obstacles
@@ -648,7 +657,7 @@ class Environment:
             y_prime_obs = local_pos+int(self.obstacle.array[i][1]/self.SCALE)-sy
 
             if x_prime_obs < self.LOCAL_GRID_SIZE and x_prime_obs >= 0 and y_prime_obs < self.LOCAL_GRID_SIZE and y_prime_obs >= 0:
-                state[3, y_prime_obs, x_prime_obs] = 1
+                state[o_ops, y_prime_obs, x_prime_obs] = 1
                 pass
 
         # Out of bounds
@@ -659,14 +668,14 @@ class Environment:
                 y_prime_wall = local_pos-sy
 
                 if i < x_prime_wall or j < y_prime_wall:
-                    state[3, j, i] = 1
+                    state[o_ops, j, i] = 1
                     pass
 
                 x_prime_wall = local_pos+(self.GRID_SIZE-sx)-1
                 y_prime_wall = local_pos+(self.GRID_SIZE-sy)-1
 
                 if i > x_prime_wall or j > y_prime_wall:
-                    state[3, j, i] = 1
+                    state[o_ops, j, i] = 1
                     pass
 
         # Zombies
@@ -675,7 +684,7 @@ class Environment:
             y_prime_zom = local_pos+int(self.zombie.array[i][1]/self.SCALE)-sy
 
             if x_prime_zom < self.LOCAL_GRID_SIZE and x_prime_zom >= 0 and y_prime_zom < self.LOCAL_GRID_SIZE and y_prime_zom >= 0:
-                state[2, y_prime_zom, x_prime_zom] = 1
+                # state[z_pos, y_prime_zom, x_prime_zom] = 1
                 pass
 
         # Lava
@@ -684,7 +693,7 @@ class Environment:
             y_prime_lava = local_pos+int(self.lava.array[i][1]/self.SCALE)-sy
 
             if x_prime_lava < self.LOCAL_GRID_SIZE and x_prime_lava >= 0 and y_prime_lava < self.LOCAL_GRID_SIZE and y_prime_lava >= 0:
-                # state[3, y_prime_lava, x_prime_lava] = 1
+                state[l_pos, y_prime_lava, x_prime_lava] = 1
                 pass
 
         # History
@@ -696,10 +705,10 @@ class Environment:
 
             if x_prime < self.LOCAL_GRID_SIZE and x_prime >= 0 and y_prime < self.LOCAL_GRID_SIZE and y_prime >= 0:
                 if 1-decay*i >= 0 and state[3, y_prime, x_prime] == 0:
-                    # state[3, y_prime, x_prime] = 1-decay*i
+                    # state[h_pos, y_prime, x_prime] = 1-decay*i
                     pass
                 # else:
-                    # state[3, y_prime, x_prime] = 0
+                    # state[h_pos, y_prime, x_prime] = 0
 
         return state
 
@@ -797,10 +806,10 @@ class Environment:
                 s, r, GAME_OVER, i = self.step(action)
                 
                 # print("\n\n\n") # DEBUGGING
-                # print(self.local_state_vector_3D()) # DEBUGGING
+                print(self.local_state_vector_3D()) # DEBUGGING
                 # print(self.state_vector_3D()) # DEBUGGING
                 
-                # print(r)
+                print(r)
 
                 self.render()
 

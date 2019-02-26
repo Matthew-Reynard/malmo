@@ -67,7 +67,7 @@
         <DrawCuboid x1="0" y1="108" z1="0" x2="8" y2="110" z2="8" type="air" />
         <!-- <DrawBlock x="5" y="107" z="5" type="redstone_block"/> -->
 
-        <DrawEntity x="1.5" y="108.0" z="1.5" type="Zombie" yaw="0" pitch="0" xVel="0" yVel="0" zVel="0"/>
+        <!-- <DrawEntity x="1.5" y="108.0" z="1.5" type="Zombie" yaw="0" pitch="0" xVel="0" yVel="0" zVel="0"/> -->
         <!-- <DrawEntity x="13.5" y="108.0" z="8.5" type="Zombie" yaw="0" pitch="0" xVel="0" yVel="0" zVel="0"/> -->
       </DrawingDecorator>
 
@@ -121,6 +121,8 @@
     </AgentStart>
     
     <AgentHandlers>
+
+      <AbsoluteMovementCommands/>
       
       <DiscreteMovementCommands/>
 

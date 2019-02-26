@@ -45,24 +45,38 @@ from math import pi
 # myfile = open("mission2.xml", "w")  
 # myfile.write(mydata)  
 
-grid = 9
+# grid = 9
 
+
+# # for x in range(grid):
+# # 	print(np.exp((x*1.41)-grid))
 
 # for x in range(grid):
-# 	print(np.exp((x*1.41)-grid))
+# 	print(np.tan(x))
 
-for x in range(grid):
-	print(np.tan(x))
+# print(np.tan(pi/4))
 
-print(np.tan(pi/4))
+# y = [0,1,2,3,4,5,6,7,8,9]
 
-y = [0,1,2,3,4,5,6,7,8,9]
+# z = list(map(lambda x: ((x/grid)*(pi/2))-pi/4, y))
 
-z = list(map(lambda x: ((x/grid)*(pi/2))-pi/4, y))
+# print(z)
 
-print(z)
-
-for x in z:
-	print(np.tan(x))
+# for x in z:
+# 	print(np.tan(x))
 
 # def test():
+
+state = np.zeros((4,3,3))
+
+state[1] = 1
+
+state[2] = 2
+
+state[3] = 3
+
+state = np.delete(state, 1, 0)
+
+# state.delete(2)
+
+print(state)

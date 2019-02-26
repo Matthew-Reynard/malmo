@@ -47,7 +47,7 @@ if sys.platform == 'linux':
 # DIAMOND_MODEL_NAME = "diamond_dojo_local9"
 # ZOMBIE_MODEL_NAME = "zombie_dojo_local9"
 
-MODEL_NAME = "zombie_dojo_local9"
+MODEL_NAME = "diamond_dojo_local9"
 
 MODEL_CHECKPOINT = "./Models/Tensorflow/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -77,6 +77,8 @@ def get_state(steve, diamonds, zombies, grid):
     state = np.zeros([4, LGS, LGS], dtype=np.float32)
     
     state[0,int((LGS-1)/2),int((LGS-1)/2)] = 1
+
+    # print(steve)
 
     # Diamonds
     for pos in diamonds:
@@ -357,7 +359,7 @@ def runMission(train = False, load = False):
                 # print("action:", action)
                 # print("action:", action_space[action])
                 agent_host.sendCommand(action_space[action])
-                # agent_host.sendCommand("move 1")
+                # agent_host.sendCommand("tp 1.5 115 2.5")
                 
                 world_state = agent_host.getWorldState()
 
@@ -529,14 +531,17 @@ def play():
     score = observations.get(u'Hotbar_2_size', 0)
     nearby_entites = observations.get(u'nearby_entites', 0)
     diamonds = []
+    zombies = []
     steve_pos = (0,0)
 
     for entity in nearby_entites:
         if entity["name"] == "diamond":
             diamonds.append((entity["x"], entity["z"]))
-        if entity["name"] == "steve":
+        if entity["name"] == "Steve":
             steve_pos = ((entity["x"], entity["z"]))
-    state = get_state(grid, steve_pos, diamonds)
+        if entity["name"] == "Zombie":
+            zombies.append((entity["x"], entity["z"]))
+    state = get_state(steve_pos, diamonds, zombies, grid)
 
     button_delay = 0.01
 
@@ -547,36 +552,51 @@ def play():
         print("-", end="")
         time.sleep(0.05)
 
+        print(steve_pos)
+        sx = steve_pos[0]
+        sy = steve_pos[1]
+
+        steve_pos = list(steve_pos)
+
         char = getch()
 
-        if (char == "p"):
+        if (char == "q"):
             print("Stop!")
             exit(0)
 
         if (char == "w"):
             print("Up pressed")
             time.sleep(button_delay)
-            agent_host.sendCommand("move 1")
+            # agent_host.sendCommand("move 1")
+            agent_host.sendCommand("tp {} 108 {}".format(np.floor(sx) + 0.5, np.floor(sy) + 1.5))
+            steve_pos[1] = steve_pos[1]+1
 
         elif (char == "s"):
             print("Down pressed")
             time.sleep(button_delay)
-            agent_host.sendCommand("move -1")
+            # agent_host.sendCommand("move -1")
+            agent_host.sendCommand("tp {} 108 {}".format(np.floor(sx) + 0.5, np.floor(sy) - 0.5))
+            steve_pos[1] = steve_pos[1]-1
 
         elif (char == "a"):
             print("Left pressed")
             time.sleep(button_delay)
-            agent_host.sendCommand("strafe -1")
+            # agent_host.sendCommand("strafe -1")
+            agent_host.sendCommand("tp {} 108 {}".format(np.floor(sx) + 1.5, np.floor(sy) + 1.5))
+            steve_pos[0] = steve_pos[0]+1
 
         elif (char == "d"):
             print("Right pressed")
             time.sleep(button_delay)
-            agent_host.sendCommand("strafe 1")
+            # agent_host.sendCommand("strafe 1")
+            agent_host.sendCommand("tp {} 108 {}".format(np.floor(sx) - 0.5, np.floor(sy) + 1.5))
+            steve_pos[0] = steve_pos[0]-1
 
         elif (char == " "):
             print("Jump pressed")
             time.sleep(button_delay)
             agent_host.sendCommand("jumpmove 1")
+            # agent_host.sendCommand("tp 1.5 115 2.5")
             # time.sleep(0.05)
             # agent_host.sendCommand("jump 0")
 
@@ -632,16 +652,20 @@ def play():
 
             nearby_entites = observations.get(u'nearby_entites', 0)
             diamonds = []
+            zombies = []
+            steve_pos = (0,0)
 
             for entity in nearby_entites:
                 if entity["name"] == "diamond":
                     diamonds.append((entity["x"], entity["z"]))
                 if entity["name"] == "Steve":
                     steve_pos = ((entity["x"], entity["z"]))
+                if entity["name"] == "Zombie":
+                    zombies.append((entity["x"], entity["z"]))
 
-            # print(state)
+            print(steve_pos)
             # Get new_state & reward
-            new_state = get_state(grid, steve_pos, diamonds)
+            new_state = get_state(steve_pos, diamonds, zombies, grid)
 
             state = new_state
 
@@ -816,6 +840,6 @@ def play():
 
 if __name__ == '__main__':
 
-    runMission(train = False, load = False)
+    # runMission(train = False, load = False)
     
-    # play()
+    play()
