@@ -336,15 +336,15 @@ class Environment:
         reward = -0.05
 
         # Negetive exponential distance rewards
-        if len(self.zombie.array) > 0:
-            distance = (math.sqrt((self.steve.x - self.zombie.array[0][0])**2 + (self.steve.y - self.zombie.array[0][1])**2)/self.GRID_SIZE)/2
+        # if len(self.zombie.array) > 0:
+        #     distance = (math.sqrt((self.steve.x - self.zombie.array[0][0])**2 + (self.steve.y - self.zombie.array[0][1])**2)/self.GRID_SIZE)/2
             # print(distance)
             
             # normal_distance = ((distance/self.GRID_SIZE)*(pi/2))-pi/4
             # normal_distance = ((distance/self.GRID_SIZE)*(1.0))-0.4
 
             # reward = np.tan(normal_distance)
-            reward = -np.exp(-distance)*10
+            # reward = -np.exp(-distance)*10
 
         # Linear distance reward
         # if len(self.zombie.array) > 0:
@@ -518,6 +518,11 @@ class Environment:
     def set_state(self, state):
         """Set the state of the game environment"""
         self.state = state
+
+
+    def set_map(self, map_path):
+
+        self.MAP_PATH = map_path
 
 
     def number_of_states(self):
@@ -770,6 +775,12 @@ class Environment:
         # self.reset()
 
         for i in range(10):
+
+            # MAP_NUMBER = np.random.randint(4)
+
+            # MAP_PATH = "./Maps/Grid10/map1_{}.txt".format(MAP_NUMBER)
+
+            # self.set_map(MAP_PATH)
 
             self.reset()
 
