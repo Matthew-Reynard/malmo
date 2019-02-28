@@ -16,6 +16,7 @@ class Obstacle:
 
         self.random_objects = []
     
+    
     def create(self, pygame):
         """Set the image for the obstacles"""
 
@@ -46,6 +47,7 @@ class Obstacle:
             self.array.append(new_pos)
             self.array_length += 1
             allowed.remove(new_pos)
+
 
     def reset_map(self, grid_size, map_path, wrap):
         # self.array.clear()
@@ -83,6 +85,7 @@ class Obstacle:
                     num = num + 1
 
         self.array_length = num
+
 
     def create_border(self, grid_size, scale):
         """Create all the obstacles, not in the disallowed positions"""

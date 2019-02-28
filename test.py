@@ -3,6 +3,9 @@ print("TESTING")
 import numpy as np
 
 from math import pi
+import sys
+from utils import getch
+# import getch
 
 # a = np.array([[[0,0],
 # 			   [0,0]],
@@ -67,16 +70,11 @@ from math import pi
 
 # def test():
 
-state = np.zeros((4,3,3))
+# state = np.zeros((4,3,3))
 
-state[1] = 1
+# state[1] = 1
+# state[2] = 2
+# state[3] = 3
+# state = np.delete(state, 1, 0)
 
-state[2] = 2
-
-state[3] = 3
-
-state = np.delete(state, 1, 0)
-
-# state.delete(2)
-
-print(state)
+# print(state)

@@ -26,7 +26,7 @@ a head and a food, its doesn't
 
 '''
 
-import sys
+import sys, os
 import math # Used for infinity game time
 import numpy as np
 import contextlib
@@ -314,10 +314,11 @@ class Environment:
         self.steps += 1
 
         # Rewards:
-        reward_out_of_bounds = -10
-        reward_hitting_tail = -10
-        reward_each_time_step = -0.01
-        reward_reaching_food = 10
+        reward_each_time_step = -0.05
+        reward_collecting_diamond = 10.0
+        reward_out_of_bounds = -1.0 # not used
+        reward_zombie_hit = -10.0
+        reward_in_lava = -10.0
 
         # Increment time step
         self.time += 1
@@ -333,8 +334,8 @@ class Environment:
         done = False
 
         # Initialze to -1 for every time step - to find the fastest route (can be a more negative reward)
-        # reward = 0.1
-        reward = -0.05
+        # reward = 0.2
+        reward = reward_each_time_step
 
         # Negetive exponential distance rewards
         # if len(self.zombie.array) > 0:
@@ -348,8 +349,8 @@ class Environment:
             # reward = -np.exp(-distance)*10
 
         # Linear distance reward
-        # if len(self.zombie.array) > 0:
-        #     reward = (math.sqrt((self.steve.x - self.zombie.array[0][0])**2 + (self.steve.y - self.zombie.array[0][1])**2)/20)/self.GRID_SIZE
+        if len(self.zombie.array) > 0:
+            reward = (math.sqrt((self.steve.x - self.zombie.array[0][0])**2 + (self.steve.y - self.zombie.array[0][1])**2)/20)/self.GRID_SIZE
 
         # Exponential distance reward
         # if len(self.zombie.array) > 0:
@@ -371,16 +372,16 @@ class Environment:
             self.wrap()
         else:
             if self.steve.x > self.DISPLAY_WIDTH - self.SCALE:
-                reward = -1 # very negative reward, to ensure that it never crashes into the side
+                reward = reward_out_of_bounds
                 done = True 
             if self.steve.x < 0:
-                reward = -1
+                reward = reward_out_of_bounds
                 done = True
             if self.steve.y > self.DISPLAY_HEIGHT - self.SCALE:
-                reward = -1
+                reward = reward_out_of_bounds
                 done = True
             if self.steve.y < 0:
-                reward = -1
+                reward = reward_out_of_bounds
                 done = True
 
         # Check for obstacle collision
@@ -400,7 +401,7 @@ class Environment:
 
             if in_lava:
                 done = True
-                reward = -10.0
+                reward = reward_in_lava
 
         # Update the position of the zombie 
         self.zombie.move(self.maze, self.steve, self.steps)
@@ -414,7 +415,7 @@ class Environment:
 
             if zombie_hit:
                 done = True
-                reward = -10.0
+                reward = reward_zombie_hit
                 break
 
         # Make the most recent history have the most negative rewards
@@ -460,7 +461,7 @@ class Environment:
             # done = True
 
             # Reward functions
-            reward = 10
+            reward = reward_collecting_diamond
             # reward = 100 / (np.sqrt((self.steve.x-self.food.x)**2 + (self.steve.y-self.food.y)**2) + 1) # Including the distance between them
             # reward = 1000 * self.score
             # reward = 1000 / self.time # Including the time in the reward function
@@ -624,10 +625,10 @@ class Environment:
         """
 
         s_pos = 0
-        d_pos = 1
-        # z_pos = 2
-        l_pos = 2
-        o_ops = 3
+        # d_pos = 1
+        z_pos = 1
+        # l_pos = 2
+        o_ops = 2
         # h_pos = 1
 
 
@@ -635,8 +636,7 @@ class Environment:
         sx = int(self.steve.x/self.SCALE)
         sy = int(self.steve.y/self.SCALE)
 
-        # state = np.zeros((3, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE))
-        state = np.zeros((4, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE)) 
+        state = np.zeros((3, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE)) 
 
         # Agent
         local_pos = int((self.LOCAL_GRID_SIZE-1)/2)
@@ -648,7 +648,7 @@ class Environment:
             y_prime_food = local_pos+int(self.food.array[i][1]/self.SCALE)-sy
 
             if x_prime_food < self.LOCAL_GRID_SIZE and x_prime_food >= 0 and y_prime_food < self.LOCAL_GRID_SIZE and y_prime_food >= 0:
-                state[d_pos, y_prime_food, x_prime_food] = 1
+                # state[d_pos, y_prime_food, x_prime_food] = 1
                 pass
 
         # Obstacles
@@ -684,7 +684,7 @@ class Environment:
             y_prime_zom = local_pos+int(self.zombie.array[i][1]/self.SCALE)-sy
 
             if x_prime_zom < self.LOCAL_GRID_SIZE and x_prime_zom >= 0 and y_prime_zom < self.LOCAL_GRID_SIZE and y_prime_zom >= 0:
-                # state[z_pos, y_prime_zom, x_prime_zom] = 1
+                state[z_pos, y_prime_zom, x_prime_zom] = 1
                 pass
 
         # Lava
@@ -693,7 +693,7 @@ class Environment:
             y_prime_lava = local_pos+int(self.lava.array[i][1]/self.SCALE)-sy
 
             if x_prime_lava < self.LOCAL_GRID_SIZE and x_prime_lava >= 0 and y_prime_lava < self.LOCAL_GRID_SIZE and y_prime_lava >= 0:
-                state[l_pos, y_prime_lava, x_prime_lava] = 1
+                # state[l_pos, y_prime_lava, x_prime_lava] = 1
                 pass
 
         # History
@@ -704,9 +704,9 @@ class Environment:
             y_prime = local_pos+int(self.steve.history[-i-2][1]/self.SCALE)-sy
 
             if x_prime < self.LOCAL_GRID_SIZE and x_prime >= 0 and y_prime < self.LOCAL_GRID_SIZE and y_prime >= 0:
-                if 1-decay*i >= 0 and state[3, y_prime, x_prime] == 0:
-                    # state[h_pos, y_prime, x_prime] = 1-decay*i
-                    pass
+                # if 1-decay*i >= 0 and state[h_pos, y_prime, x_prime] == 0:
+                #     state[h_pos, y_prime, x_prime] = 1-decay*i
+                pass
                 # else:
                     # state[h_pos, y_prime, x_prime] = 0
 

@@ -3,6 +3,9 @@ import sys, os
 if sys.platform == 'linux': 
 	import termios, tty
 
+if sys.platform == 'win32': 
+    import msvcrt
+
 import numpy as np
 import matplotlib.pyplot as plt 
 import time
@@ -101,7 +104,6 @@ def createGrid(grid_size, obstacles_array, scale):
 
 if sys.platform == 'linux': 
 	def getch():
-
 	    fd = sys.stdin.fileno()
 	    old_settings = termios.tcgetattr(fd)
 	    try:
@@ -111,6 +113,11 @@ if sys.platform == 'linux':
 	    finally:
 	        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
 	    return ch
+
+
+if sys.platform == 'win32':
+    def getch():
+        return msvcrt.getch().decode('UTF-8')
 
 
 def print_readable_time(current_time):

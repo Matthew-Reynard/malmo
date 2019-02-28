@@ -27,46 +27,51 @@ from utils import print_readable_time
 
 # MODEL_NAME = "explore_dojo_local15"
 
+# diamond_local15_input3
+# zombie_local15_input3
+
 
 # Train
 def train():
 
-	MODEL_NAME = "explore_dojo_local15"
+	MODEL_NAME = "zombie_local15_input3"
 
-	MODEL_PATH_SAVE = "./Models/Tensorflow/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
+	MODEL_PATH_SAVE = "./Models/Tensorflow/Dojos/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
 	LOGDIR = "./Logs/"+MODEL_NAME
 
 	USE_SAVED_MODEL_FILE = False
 
-	GRID_SIZE = 10
+	GRID_SIZE = 8
 	LOCAL_GRID_SIZE = 15
 	MAP_NUMBER = 0
+	RANDOMIZE_MAPS = False
 
-	MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
-	# MAP_PATH = None
+	# MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
+	MAP_PATH = None
+
 
 	print("\n ---- Training the Deep Neural Network ----- \n")
 
 	RENDER_TO_SCREEN = False
-	RENDER_TO_SCREEN = True
+	# RENDER_TO_SCREEN = True
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE,
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80, 
-					  max_time = 50,
+					  max_time = 150,
 					  food_count = 0,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 0, 
+					  zombie_count = 1, 
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
 	if RENDER_TO_SCREEN:
 		env.prerender()
 
-	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True)
+	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True, path="./Models/Tensorflow/Dojos/")
 
 	brain = Brain(epsilon=0.05, action_space = env.number_of_actions())
 
@@ -77,7 +82,7 @@ def train():
 	avg_time = 0
 	avg_score = 0
 	avg_error = 0
-
+ 
 	# Number of episodes
 	print_episode = 1000
 	total_episodes = 100000
@@ -94,7 +99,7 @@ def train():
 	# writer = tf.summary.FileWriter(LOGDIR)
 
 	# Assume that you have 12GB of GPU memory and want to allocate ~4GB:
-	gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.4)
+	gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.3)
 
 	# Begin session
 	with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
@@ -113,14 +118,15 @@ def train():
 
 		for episode in range(total_episodes):
 
-			# Make a random map 0: lava, 1: obstacle
-			MAP_PATH = "./Maps/Grid10/map{}.txt".format(np.random.randint(10))
-			env.set_map(MAP_PATH)
+			if RANDOMIZE_MAPS:
+				# Make a random map 0: lava, 1: obstacle
+				MAP_PATH = "./Maps/Grid10/map{}.txt".format(np.random.randint(10))
+				env.set_map(MAP_PATH)
 
 			state, info = env.reset()
 			done = False
 
-			# brain.linear_epsilon_decay(total_episodes, episode, start=0.5, end=0.05, percentage=0.5)
+			brain.linear_epsilon_decay(total_episodes, episode, start=0.4, end=0.05, percentage=0.6)
 
 			# brain.linear_alpha_decay(total_episodes, episode)
 
@@ -613,13 +619,13 @@ def run_MetaNetwork():
 def play():
 	print("\n ----- Playing the game -----\n")
 
-	GRID_SIZE = 10
+	GRID_SIZE = 8
 	LOCAL_GRID_SIZE = 15 # for printing out the state
 
-	MAP_NUMBER = np.random.randint(4)
+	# MAP_NUMBER = np.random.randint(10)
 
-	MAP_PATH = "./Maps/Grid{}/map0_{}.txt".format(GRID_SIZE, MAP_NUMBER)
-	# MAP_PATH = None
+	# MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
+	MAP_PATH = None
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE, 
@@ -628,7 +634,7 @@ def play():
 					  food_count = 0,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 0,
+					  zombie_count = 1,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 

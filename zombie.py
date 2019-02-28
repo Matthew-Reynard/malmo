@@ -17,6 +17,7 @@ class Zombie:
 
         self.amount_eaten = 0
 
+
     # Create the Pygame sections of the food to render it
     def create(self, pygame):
 

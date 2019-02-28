@@ -560,7 +560,7 @@ def play():
 
         char = getch()
 
-        if (char == "q"):
+        if (char == u"q"):
             print("Stop!")
             exit(0)
 
