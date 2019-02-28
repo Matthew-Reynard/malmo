@@ -16,37 +16,25 @@ from utils import print_readable_time
 # MODEL_NAME = "diamond_dojo_local15"
 # diamond_dojo_local15_maps
 
-# MODEL_NAME = "zombie_dojo_local9"
-# MODEL_NAME = "zombie_dojo_local15"
-
-# MODEL_NAME = "complex_local9"
-# MODEL_NAME = "complex_local15"
-
-# MODEL_NAME = "meta_network_local9"
-# MODEL_NAME = "meta_network_local15"
-
-# MODEL_NAME = "explore_dojo_local15"
-
 # diamond_local15_input3
-# zombie_local15_input3
-# explore_local15_input3
 
+# diamond_local15_maps
 
-# Train
+# Train network
 def train():
 
-	MODEL_NAME = "diamond_local15_input3"
+	MODEL_NAME = "diamond_local15_maps"
 
-	MODEL_PATH_SAVE = "./Models/Tensorflow/Dojos/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
+	MODEL_PATH_SAVE = "./Models/Tensorflow/Maps/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
 	LOGDIR = "./Logs/"+MODEL_NAME
 
 	USE_SAVED_MODEL_FILE = False
 
-	GRID_SIZE = 8
+	GRID_SIZE = 10
 	LOCAL_GRID_SIZE = 15
 	MAP_NUMBER = 0
-	RANDOMIZE_MAPS = False
+	RANDOMIZE_MAPS = True
 
 	# MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
 	MAP_PATH = None
@@ -55,16 +43,16 @@ def train():
 	print("\n ---- Training the Deep Neural Network ----- \n")
 
 	RENDER_TO_SCREEN = False
-	# RENDER_TO_SCREEN = True
+	RENDER_TO_SCREEN = True
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE,
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80, 
 					  max_time = 50,
-					  food_count = 1,
-					  obstacle_count = 0,
-					  lava_count = 0,
+					  food_count = 3,
+					  obstacle_count = 1,
+					  lava_count = 1,
 					  zombie_count = 0, 
 					  action_space = 5,
 					  map_path = MAP_PATH)
@@ -72,7 +60,7 @@ def train():
 	if RENDER_TO_SCREEN:
 		env.prerender()
 
-	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True, path="./Models/Tensorflow/Dojos/")
+	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=False, path="./Models/Tensorflow/Maps/")
 
 	brain = Brain(epsilon=0.05, action_space = env.number_of_actions())
 
@@ -127,7 +115,7 @@ def train():
 			state, info = env.reset()
 			done = False
 
-			brain.linear_epsilon_decay(total_episodes, episode, start=0.3, end=0.05, percentage=0.5)
+			brain.linear_epsilon_decay(total_episodes, episode, start=0.5, end=0.05, percentage=0.6)
 
 			# brain.linear_alpha_decay(total_episodes, episode)
 
@@ -389,257 +377,6 @@ def train_MetaNetwork():
 		writer.close()
 
 
-# Run the given model
-def run():
-
-	MODEL_NAME = "zombie_dojo_local9_1"
-
-	MODEL_PATH_SAVE = "./Models/Tensorflow/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
-
-	LOGDIR = "./Logs/"+MODEL_NAME
-
-	USE_SAVED_MODEL_FILE = False
-
-	GRID_SIZE = 8
-	LOCAL_GRID_SIZE = 9
-	MAP_NUMBER = 2
-
-	# MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
-	MAP_PATH = None
-
-	print("\n ---- Running the Deep Q Network ----- \n")
-
-	RENDER_TO_SCREEN = True
-
-	env = Environment(wrap = False, 
-					  grid_size = GRID_SIZE, 
-					  local_size = LOCAL_GRID_SIZE,
-					  rate = 80, 
-					  max_time = 100,
-					  food_count = 0,
-					  obstacle_count = 0,
-					  lava_count = 0,
-					  zombie_count = 1, 
-					  action_space = 5,
-					  map_path = MAP_PATH)
-
-	if RENDER_TO_SCREEN:
-		env.prerender()
-
-	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True)
-
-	brain = Brain(epsilon=0.01, action_space = env.number_of_actions())
-
-	model.setup(brain)
-
-	avg_time = 0
-	avg_score = 0
-
-	# Number of episodes
-	print_episode = 1
-	total_episodes = 10
-
-	saver = tf.train.Saver()
-
-	# Initialising all variables (weights and biases)
-	init = tf.global_variables_initializer()
-
-	# Begin session
-	with tf.Session() as sess:
-
-		# if USE_SAVED_MODEL_FILE:
-		# 	saver.restore(sess, MODEL_PATH_SAVE)
-		# 	print("Model restored.")
-
-		sess.run(init)
-
-		print("")
-
-		for episode in range(total_episodes):
-			state, info = env.reset()
-			done = False
-
-			if RENDER_TO_SCREEN:
-				env.render()
-
-			while not done:
-
-				action = brain.choose_action(state, sess, model)
-
-				# print(action)
-
-				# Update environment with by performing action
-				new_state, reward, done, info = env.step(action)
-
-				# print(new_state)
-
-				state = new_state
-
-				if RENDER_TO_SCREEN:
-					env.render()
-
-				if done:
-					avg_time += info["time"]
-					avg_score += info["score"]
-
-			if (episode%print_episode == 0 and episode != 0) or (episode == total_episodes-1):
-				
-				print("Ep:", episode,
-					"\tavg t: {0:.3f}".format(avg_time/print_episode),
-					"\tavg score: {0:.3f}".format(avg_score/print_episode),
-					"\tepsilon {0:.3f}".format(brain.EPSILON),
-					end="\n")
-
-				avg_time = 0
-				avg_score = 0
-
-
-# Run Meta Network with fixed Dojo networks
-def run_MetaNetwork():
-
-	print("\n ---- Running the Meta Network ----- \n")
-
-	MODEL_NAME = "meta_network_local15"
-	DIAMOND_MODEL_NAME = "diamond_dojo_local15"
-	ZOMBIE_MODEL_NAME = "zombie_dojo_local15"
-
-	MODEL_PATH_LOAD = "./Models/Tensorflow/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
-
-	USE_SAVED_MODEL_FILE = False
-
-	GRID_SIZE = 8
-	LOCAL_GRID_SIZE = 15
-	MAP_PATH = None
-
-	RENDER_TO_SCREEN = True
-
-	env = Environment(wrap = False, 
-					  grid_size = GRID_SIZE,
-					  local_size = LOCAL_GRID_SIZE,
-					  rate = 80, 
-					  max_time = 200,
-					  food_count = 3,
-					  obstacle_count = 0,
-					  lava_count = 0,
-					  zombie_count = 1, 
-					  action_space = 5,
-					  map_path = MAP_PATH)
-
-	if RENDER_TO_SCREEN:
-		env.prerender()
-
-	model = MetaNetwork(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True, trainable = False)
-
-	diamond_net = Network(local_size=LOCAL_GRID_SIZE, name=DIAMOND_MODEL_NAME, load=True, trainable = False)
-
-	zombie_net = Network(local_size=LOCAL_GRID_SIZE, name=ZOMBIE_MODEL_NAME, load=True, trainable = False)
-
-	brain = Brain(epsilon=0.01, action_space = 2)
-
-	model.setup(brain)
-	diamond_net.setup(brain)
-	zombie_net.setup(brain)
-
-	avg_time = 0
-	avg_score = 0
-
-	# Number of episodes
-	print_episode = 1
-	total_episodes = 10
-
-	# Checkpoint saver
-	saver = tf.train.Saver()
-
-	# Initialising all variables (weights and biases)
-	init = tf.global_variables_initializer()
-
-	gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.4)
-
-	# Begin session
-	with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
-
-		if USE_SAVED_MODEL_FILE:
-			saver.restore(sess, MODEL_PATH_LOAD)
-			print("Model restored.")
-		else:
-			sess.run(init)
-
-		start_time = time.time()
-
-		print("")
-
-		for episode in range(total_episodes):
-			state, info = env.reset()
-			done = False
-
-			if RENDER_TO_SCREEN:
-				env.render()
-
-			while not done:
-
-				dojo = brain.choose_action(state, sess, model)
-
-				if dojo == 0:
-					state[2] = 0 # Zero out the zombies layer
-					action = brain.choose_dojo(state, sess, diamond_net, env.number_of_actions(), 0.01)
-				elif dojo == 1:
-					state[1] = 0 # Zero out the diamond layer
-					action = brain.choose_dojo(state, sess, zombie_net, env.number_of_actions(), 0.01)
-
-				# Update environment with by performing action
-				new_state, reward, done, info = env.step(action)
-
-				# print(new_state)
-
-				brain.store_transition(state, dojo, reward, done, new_state)
-
-				state = new_state
-
-				if RENDER_TO_SCREEN:
-					env.render()
-
-				if done:
-					avg_time += info["time"]
-					avg_score += info["score"]
-
-			if (episode%print_episode == 0 and episode != 0) or (episode == total_episodes-1):
-				
-				current_time = math.floor(time.time()-start_time)
-				print("Ep:", episode,
-					"\tavg t: {0:.3f}".format(avg_time/print_episode),
-					"\tavg score: {0:.3f}".format(avg_score/print_episode),
-					"\tepsilon {0:.3f}".format(brain.EPSILON),
-					end="")
-				print_readable_time(current_time)
-
-				avg_time = 0
-				avg_score = 0
-
-
-# Play the game
-def play():
-	print("\n ----- Playing the game -----\n")
-
-	GRID_SIZE = 10
-	LOCAL_GRID_SIZE = 15 # for printing out the state
-
-	# MAP_NUMBER = np.random.randint(10)
-	# MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
-	MAP_PATH = None
-
-	env = Environment(wrap = False, 
-					  grid_size = GRID_SIZE, 
-					  local_size = LOCAL_GRID_SIZE,
-					  rate = 100,
-					  food_count = 1,
-					  obstacle_count = 0,
-					  lava_count = 0,
-					  zombie_count = 0,
-					  action_space = 5,
-					  map_path = MAP_PATH)
-
-	env.play()
-
 
 # Main function
 if __name__ == '__main__':
@@ -648,8 +385,3 @@ if __name__ == '__main__':
 
 	# train_MetaNetwork()
 
-	# run()
-
-	# run_MetaNetwork()
-
-	# play()

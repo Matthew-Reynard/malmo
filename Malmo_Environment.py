@@ -314,6 +314,7 @@ class Environment:
         self.steps += 1
 
         # Rewards:
+        # reward_each_time_step = 1.0
         reward_each_time_step = -0.05
         reward_collecting_diamond = 10.0
         reward_out_of_bounds = -1.0 # not used
@@ -625,8 +626,8 @@ class Environment:
         """
 
         s_pos = 0
-        # d_pos = 1
-        z_pos = 1
+        d_pos = 1
+        # z_pos = 1
         # l_pos = 2
         o_ops = 2
         # h_pos = 1
@@ -648,7 +649,7 @@ class Environment:
             y_prime_food = local_pos+int(self.food.array[i][1]/self.SCALE)-sy
 
             if x_prime_food < self.LOCAL_GRID_SIZE and x_prime_food >= 0 and y_prime_food < self.LOCAL_GRID_SIZE and y_prime_food >= 0:
-                # state[d_pos, y_prime_food, x_prime_food] = 1
+                state[d_pos, y_prime_food, x_prime_food] = 1
                 pass
 
         # Obstacles
@@ -684,7 +685,7 @@ class Environment:
             y_prime_zom = local_pos+int(self.zombie.array[i][1]/self.SCALE)-sy
 
             if x_prime_zom < self.LOCAL_GRID_SIZE and x_prime_zom >= 0 and y_prime_zom < self.LOCAL_GRID_SIZE and y_prime_zom >= 0:
-                state[z_pos, y_prime_zom, x_prime_zom] = 1
+                # state[z_pos, y_prime_zom, x_prime_zom] = 1
                 pass
 
         # Lava
@@ -785,11 +786,11 @@ class Environment:
 
         for i in range(10):
 
-            # MAP_NUMBER = np.random.randint(4)
+            MAP_NUMBER = np.random.randint(10)
 
-            # MAP_PATH = "./Maps/Grid10/map1_{}.txt".format(MAP_NUMBER)
+            MAP_PATH = "./Maps/Grid10/map{}.txt".format(MAP_NUMBER)
 
-            # self.set_map(MAP_PATH)
+            self.set_map(MAP_PATH)
 
             self.reset()
 
@@ -806,7 +807,7 @@ class Environment:
                 s, r, GAME_OVER, i = self.step(action)
                 
                 # print("\n\n\n") # DEBUGGING
-                print(self.local_state_vector_3D()) # DEBUGGING
+                # print(self.local_state_vector_3D()) # DEBUGGING
                 # print(self.state_vector_3D()) # DEBUGGING
                 
                 print(r)
