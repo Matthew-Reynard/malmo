@@ -627,8 +627,8 @@ class Environment:
 
         s_pos = 0
         d_pos = 1
-        # z_pos = 2
-        l_pos = 2
+        z_pos = 2
+        # l_pos = 2
         o_ops = 3
         # h_pos = 3
 
@@ -685,7 +685,7 @@ class Environment:
             y_prime_zom = local_pos+int(self.zombie.array[i][1]/self.SCALE)-sy
 
             if x_prime_zom < self.LOCAL_GRID_SIZE and x_prime_zom >= 0 and y_prime_zom < self.LOCAL_GRID_SIZE and y_prime_zom >= 0:
-                # state[z_pos, y_prime_zom, x_prime_zom] = 1
+                state[z_pos, y_prime_zom, x_prime_zom] = 1
                 pass
 
         # Lava
@@ -694,7 +694,7 @@ class Environment:
             y_prime_lava = local_pos+int(self.lava.array[i][1]/self.SCALE)-sy
 
             if x_prime_lava < self.LOCAL_GRID_SIZE and x_prime_lava >= 0 and y_prime_lava < self.LOCAL_GRID_SIZE and y_prime_lava >= 0:
-                state[l_pos, y_prime_lava, x_prime_lava] = 1
+                # state[l_pos, y_prime_lava, x_prime_lava] = 1
                 pass
 
         # History
