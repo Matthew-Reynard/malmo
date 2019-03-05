@@ -19,7 +19,7 @@ class Network():
 		if self.LOCAL_GRID_SIZE == 9:
 			self.scale = 4*4
 
-		self.n_input_channels = 3
+		self.n_input_channels = 4
 
 		self.n_out_channels_conv1 = 16 # changed from 16 -> 32
 		self.n_out_channels_conv2 = 32
@@ -236,7 +236,7 @@ class MetaNetwork():
 		self.weights = None
 		self.biases = None
 
-		self.path = "./Models/Tensorflow/"
+		self.path = "./Models/Tensorflow/Meta/"
 		self.name = name
 		self.load = load
 
@@ -345,9 +345,9 @@ class MetaNetwork():
 		path = self.path + self.name + ".npz"
 		
 		try:
-			os.makedirs('./Models/Tensorflow/', exist_ok=True)
+			os.makedirs('./Models/Tensorflow/Meta/', exist_ok=True)
 		except Exception as e:
-			print(e,'Could not create directory ./Models/Tensorflow')
+			print(e,'Could not create directory ./Models/Tensorflow/Meta')
 
 		w1 = np.array(sess.run(self.weights['W_conv1']))
 		w2 = np.array(sess.run(self.weights['W_conv2']))

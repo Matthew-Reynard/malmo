@@ -319,7 +319,7 @@ class Environment:
         reward_collecting_diamond = 10.0
         reward_out_of_bounds = -1.0 # not used
         reward_zombie_hit = -10.0
-        reward_in_lava = -10.0
+        reward_in_lava = -1.0
 
         # Increment time step
         self.time += 1
@@ -350,8 +350,8 @@ class Environment:
             # reward = -np.exp(-distance)*10
 
         # Linear distance reward
-        if len(self.zombie.array) > 0:
-            reward = (math.sqrt((self.steve.x - self.zombie.array[0][0])**2 + (self.steve.y - self.zombie.array[0][1])**2)/20)/self.GRID_SIZE
+        # if len(self.zombie.array) > 0:
+        #     reward = (math.sqrt((self.steve.x - self.zombie.array[0][0])**2 + (self.steve.y - self.zombie.array[0][1])**2)/20)/self.GRID_SIZE
 
         # Exponential distance reward
         # if len(self.zombie.array) > 0:
@@ -627,17 +627,17 @@ class Environment:
 
         s_pos = 0
         d_pos = 1
-        # z_pos = 1
-        # l_pos = 2
-        o_ops = 2
-        # h_pos = 1
+        # z_pos = 2
+        l_pos = 2
+        o_ops = 3
+        # h_pos = 3
 
 
         #s = steve
         sx = int(self.steve.x/self.SCALE)
         sy = int(self.steve.y/self.SCALE)
 
-        state = np.zeros((3, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE)) 
+        state = np.zeros((4, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE)) 
 
         # Agent
         local_pos = int((self.LOCAL_GRID_SIZE-1)/2)
@@ -694,7 +694,7 @@ class Environment:
             y_prime_lava = local_pos+int(self.lava.array[i][1]/self.SCALE)-sy
 
             if x_prime_lava < self.LOCAL_GRID_SIZE and x_prime_lava >= 0 and y_prime_lava < self.LOCAL_GRID_SIZE and y_prime_lava >= 0:
-                # state[l_pos, y_prime_lava, x_prime_lava] = 1
+                state[l_pos, y_prime_lava, x_prime_lava] = 1
                 pass
 
         # History

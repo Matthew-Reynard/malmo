@@ -39,7 +39,12 @@ class Lava:
         # Make a copy of the grid
         allowed = grid[:]
 
-        [allowed.remove(pos) for pos in disallowed]
+        for pos in disallowed:
+            try:
+                allowed.remove(pos)
+            except:
+                print("ERROR CAUGHT => ValueError: list.remove(x): x not in list (l)")
+        # [allowed.remove(pos) for pos in disallowed]
 
         for i in range(self.num_of_random_lava):
             new_pos = random.choice((allowed))
