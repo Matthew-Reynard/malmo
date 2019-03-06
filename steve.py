@@ -15,7 +15,7 @@ class Steve:
         self.steve_img2 = None
 
         # Used for the CNN local network input to see where the snake has been recently
-        self.history_size = 36 # Needs to be proportional to the grid size
+        self.history_size = 20 # Needs to be proportional to the grid size
         self.history = []
 
         # Not used

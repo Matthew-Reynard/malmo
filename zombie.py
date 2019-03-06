@@ -124,16 +124,16 @@ class Zombie:
 
                     # self.array[0] = self.pos
             else:
-                print(maze,"\nNeed to implement taking a random action")
-                # random_move = np.random.randint(0,4)
-                # if random_move == 0 and maze[int(self.array[0][0]/20)+1][int(self.array[0][1]/20)] == 0:
-                #     self.array[0][0] += 1*20
-                # if random_move == 1 and maze[int(self.array[0][0]/20)-1][int(self.array[0][1]/20)] == 0:
-                #     self.array[0][0] -= 1*20
-                # if random_move == 2 and maze[int(self.array[0][0]/20)][int(self.array[0][1]/20)+1] == 0:
-                #     self.array[0][1] += 1*20
-                # if random_move == 3 and maze[int(self.array[0][0]/20)][int(self.array[0][1]/20)-1] == 0:
-                #     self.array[0][1] -= 1*20
+                # print(maze,"\nNeed to implement taking a random action")
+                random_move = np.random.randint(0,4)
+                if random_move == 0 and maze[int(self.array[0][0]/20)+1][int(self.array[0][1]/20)] == 0:
+                    self.array[0][0] += 1*20
+                if random_move == 1 and maze[int(self.array[0][0]/20)-1][int(self.array[0][1]/20)] == 0:
+                    self.array[0][0] -= 1*20
+                if random_move == 2 and maze[int(self.array[0][0]/20)][int(self.array[0][1]/20)+1] == 0:
+                    self.array[0][1] += 1*20
+                if random_move == 3 and maze[int(self.array[0][0]/20)][int(self.array[0][1]/20)-1] == 0:
+                    self.array[0][1] -= 1*20
 
             self.array[0] = tuple(self.array[0])
 
@@ -277,8 +277,8 @@ class Zombie:
                 open_list.append(child)
 
             # This count might influence performance a bit
-            if count > 200:
-                print(count)
+            if count > 300:
+                # print(count)
                 # return None
                 break
 

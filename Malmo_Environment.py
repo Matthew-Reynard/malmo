@@ -314,12 +314,12 @@ class Environment:
         self.steps += 1
 
         # Rewards:
-        # reward_each_time_step = 1.0
-        reward_each_time_step = -0.05
+        reward_each_time_step = 1.0
+        # reward_each_time_step = -0.05
         reward_collecting_diamond = 10.0
         reward_out_of_bounds = -1.0 # not used
         reward_zombie_hit = -10.0
-        reward_in_lava = -1.0
+        reward_in_lava = -10.0
 
         # Increment time step
         self.time += 1
@@ -393,6 +393,10 @@ class Environment:
                 self.steve.x = self.steve.prev_pos[0]
                 self.steve.y = self.steve.prev_pos[1]
                 self.steve.pos = self.steve.prev_pos
+
+                self.steve.history.pop(len(self.steve.history)-1)
+                self.steve.history.append(self.steve.pos)
+
                 # done = True
                 # reward = -0.1
 
@@ -424,7 +428,7 @@ class Environment:
         for i in range(len(self.steve.history) - 1):
             # print(-1*(1-decay*i))
             if ((self.steve.x, self.steve.y) == (self.steve.history[-i-2][0], self.steve.history[-i-2][1])):
-                # reward = -1*(1-decay*i)
+                reward = -1*(1-decay*i)
                 break
 
         # Checking if Steve has reached the food
@@ -493,6 +497,7 @@ class Environment:
         new_state = self.local_state_vector_3D()
 
         # print(reward)
+        # print(self.steve.history)
 
         # A dictionary of information that may be useful
         info = {"time": self.time, "score": self.score}
@@ -626,11 +631,11 @@ class Environment:
         """
 
         s_pos = 0
-        d_pos = 1
-        z_pos = 2
-        # l_pos = 2
+        # d_pos = 1
+        # z_pos = 1
+        l_pos = 2
         o_ops = 3
-        # h_pos = 3
+        h_pos = 1
 
 
         #s = steve
@@ -649,7 +654,7 @@ class Environment:
             y_prime_food = local_pos+int(self.food.array[i][1]/self.SCALE)-sy
 
             if x_prime_food < self.LOCAL_GRID_SIZE and x_prime_food >= 0 and y_prime_food < self.LOCAL_GRID_SIZE and y_prime_food >= 0:
-                state[d_pos, y_prime_food, x_prime_food] = 1
+                # state[d_pos, y_prime_food, x_prime_food] = 1
                 pass
 
         # Obstacles
@@ -685,7 +690,7 @@ class Environment:
             y_prime_zom = local_pos+int(self.zombie.array[i][1]/self.SCALE)-sy
 
             if x_prime_zom < self.LOCAL_GRID_SIZE and x_prime_zom >= 0 and y_prime_zom < self.LOCAL_GRID_SIZE and y_prime_zom >= 0:
-                state[z_pos, y_prime_zom, x_prime_zom] = 1
+                # state[z_pos, y_prime_zom, x_prime_zom] = 1
                 pass
 
         # Lava
@@ -694,7 +699,7 @@ class Environment:
             y_prime_lava = local_pos+int(self.lava.array[i][1]/self.SCALE)-sy
 
             if x_prime_lava < self.LOCAL_GRID_SIZE and x_prime_lava >= 0 and y_prime_lava < self.LOCAL_GRID_SIZE and y_prime_lava >= 0:
-                # state[l_pos, y_prime_lava, x_prime_lava] = 1
+                state[l_pos, y_prime_lava, x_prime_lava] = 1
                 pass
 
         # History
@@ -705,8 +710,8 @@ class Environment:
             y_prime = local_pos+int(self.steve.history[-i-2][1]/self.SCALE)-sy
 
             if x_prime < self.LOCAL_GRID_SIZE and x_prime >= 0 and y_prime < self.LOCAL_GRID_SIZE and y_prime >= 0:
-                # if 1-decay*i >= 0 and state[h_pos, y_prime, x_prime] == 0:
-                #     state[h_pos, y_prime, x_prime] = 1-decay*i
+                if 1-decay*i >= 0 and state[h_pos, y_prime, x_prime] == 0:
+                    state[h_pos, y_prime, x_prime] = 1-decay*i
                 pass
                 # else:
                     # state[h_pos, y_prime, x_prime] = 0
@@ -807,7 +812,7 @@ class Environment:
                 s, r, GAME_OVER, i = self.step(action)
                 
                 # print("\n\n\n") # DEBUGGING
-                # print(self.local_state_vector_3D()) # DEBUGGING
+                print(self.local_state_vector_3D()) # DEBUGGING
                 # print(self.state_vector_3D()) # DEBUGGING
                 
                 print(r)

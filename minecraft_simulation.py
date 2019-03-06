@@ -35,12 +35,14 @@ from utils import print_readable_time
 # complex_local15_10r
 
 # diamond_local15_input4
+# zombie_local15_input4
+# explore_local15_input4
 
 
 # Train
 def train():
 
-	MODEL_NAME = "diamond_local15_input4"
+	MODEL_NAME = "explore_local15_input4"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/Dojos/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -67,7 +69,7 @@ def train():
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80,
 					  max_time = 100,
-					  food_count = 3,
+					  food_count = 0,
 					  obstacle_count = 0,
 					  lava_count = 0,
 					  zombie_count = 0,
@@ -132,7 +134,7 @@ def train():
 			state, info = env.reset()
 			done = False
 
-			brain.linear_epsilon_decay(total_episodes, episode, start=0.3, end=0.05, percentage=0.5)
+			brain.linear_epsilon_decay(total_episodes, episode, start=0.5, end=0.05, percentage=0.5)
 
 			# brain.linear_alpha_decay(total_episodes, episode)
 
@@ -643,10 +645,10 @@ def play():
 					  grid_size = GRID_SIZE, 
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 100,
-					  food_count = 3,
+					  food_count = 0,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 1,
+					  zombie_count = 0,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
@@ -656,13 +658,13 @@ def play():
 # Main function
 if __name__ == '__main__':
 
-	# train()
+	train()
 
 	# train_MetaNetwork()
 
 	# run()
 
-	run_MetaNetwork()
+	# run_MetaNetwork()
 
 	# play()
  
