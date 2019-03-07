@@ -632,10 +632,10 @@ class Environment:
 
         s_pos = 0
         # d_pos = 1
-        # z_pos = 1
+        z_pos = 1
         l_pos = 2
         o_ops = 3
-        h_pos = 1
+        # h_pos = 1
 
 
         #s = steve
@@ -690,7 +690,7 @@ class Environment:
             y_prime_zom = local_pos+int(self.zombie.array[i][1]/self.SCALE)-sy
 
             if x_prime_zom < self.LOCAL_GRID_SIZE and x_prime_zom >= 0 and y_prime_zom < self.LOCAL_GRID_SIZE and y_prime_zom >= 0:
-                # state[z_pos, y_prime_zom, x_prime_zom] = 1
+                state[z_pos, y_prime_zom, x_prime_zom] = 1
                 pass
 
         # Lava
@@ -710,8 +710,8 @@ class Environment:
             y_prime = local_pos+int(self.steve.history[-i-2][1]/self.SCALE)-sy
 
             if x_prime < self.LOCAL_GRID_SIZE and x_prime >= 0 and y_prime < self.LOCAL_GRID_SIZE and y_prime >= 0:
-                if 1-decay*i >= 0 and state[h_pos, y_prime, x_prime] == 0:
-                    state[h_pos, y_prime, x_prime] = 1-decay*i
+                # if 1-decay*i >= 0 and state[h_pos, y_prime, x_prime] == 0:
+                #     state[h_pos, y_prime, x_prime] = 1-decay*i
                 pass
                 # else:
                     # state[h_pos, y_prime, x_prime] = 0

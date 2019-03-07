@@ -42,7 +42,7 @@ from utils import print_readable_time
 # Train
 def train():
 
-	MODEL_NAME = "explore_local15_input4"
+	MODEL_NAME = "zombie_local15_input4"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/Dojos/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -72,14 +72,14 @@ def train():
 					  food_count = 0,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 0,
+					  zombie_count = 2,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
 	if RENDER_TO_SCREEN:
 		env.prerender()
 
-	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=False, path="./Models/Tensorflow/Dojos/")
+	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True, path="./Models/Tensorflow/Dojos/")
 
 	brain = Brain(epsilon=0.05, action_space = env.number_of_actions())
 
@@ -93,7 +93,7 @@ def train():
  
 	# Number of episodes
 	print_episode = 1000
-	total_episodes = 200000 
+	total_episodes = 100000 
 
 	saver = tf.train.Saver()
 
@@ -134,7 +134,7 @@ def train():
 			state, info = env.reset()
 			done = False
 
-			brain.linear_epsilon_decay(total_episodes, episode, start=0.5, end=0.05, percentage=0.5)
+			brain.linear_epsilon_decay(total_episodes, episode, start=0.3, end=0.05, percentage=0.5)
 
 			# brain.linear_alpha_decay(total_episodes, episode)
 
