@@ -132,3 +132,24 @@ def print_readable_time(current_time):
 		else:
 			print("\ttime {0:.0f}:{1:.0f}:{2:.0f}".format(math.floor((current_time/60)/60), math.floor((current_time/60)%60), current_time%60))
 
+
+def custom_epsilon(episodes, peaks):
+
+    epdivp = int(episodes/peaks)
+
+    t = np.linspace(1,episodes,episodes)
+    x = np.zeros(episodes)
+
+    # print(t)
+
+    n = -1
+
+    for i in range(len(t)):
+        if i%(epdivp) == 0:
+            n += 1
+
+        x[i] = np.exp((peaks*0.9*n)-i/(episodes/(peaks*5)))
+    
+    plt.plot(t, x)
+
+    plt.show()

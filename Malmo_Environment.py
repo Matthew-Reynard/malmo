@@ -303,7 +303,7 @@ class Environment:
         if self.steve.y < 0:
             self.steve.y = self.DISPLAY_HEIGHT - self.SCALE
         self.steve.pos = (self.steve.x, self.steve.y)
-
+ 
 
     def step(self, action):
         """
@@ -314,13 +314,14 @@ class Environment:
         self.steps += 1
 
         # Rewards:
-        reward_each_time_step = 1.0
-        # reward_each_time_step = -0.05
+        # reward_each_time_step = 1.0
+        reward_each_time_step = -0.05
         reward_collecting_diamond = 10.0
         reward_out_of_bounds = -1.0 # not used
         reward_zombie_hit = -10.0
-        reward_in_lava = -10.0
-
+        reward_in_lava = -3.0
+        # reward_in_lava = -10.0
+ 
         # Increment time step
         self.time += 1
 
@@ -428,7 +429,7 @@ class Environment:
         for i in range(len(self.steve.history) - 1):
             # print(-1*(1-decay*i))
             if ((self.steve.x, self.steve.y) == (self.steve.history[-i-2][0], self.steve.history[-i-2][1])):
-                reward = -1*(1-decay*i)
+                # reward = -1*(1-decay*i)
                 break
 
         # Checking if Steve has reached the food
@@ -631,11 +632,11 @@ class Environment:
         """
 
         s_pos = 0
-        # d_pos = 1
-        z_pos = 1
+        d_pos = 1
+        # z_pos = 2
+        # h_pos = 1
         l_pos = 2
         o_ops = 3
-        # h_pos = 1
 
 
         #s = steve
@@ -648,14 +649,24 @@ class Environment:
         local_pos = int((self.LOCAL_GRID_SIZE-1)/2)
         state[s_pos, local_pos, local_pos] = 1
 
-        # Food
+        # Diamonds
         for i in range(self.food.amount):
             x_prime_food = local_pos+int(self.food.array[i][0]/self.SCALE)-sx
             y_prime_food = local_pos+int(self.food.array[i][1]/self.SCALE)-sy
 
             if x_prime_food < self.LOCAL_GRID_SIZE and x_prime_food >= 0 and y_prime_food < self.LOCAL_GRID_SIZE and y_prime_food >= 0:
-                # state[d_pos, y_prime_food, x_prime_food] = 1
+                state[d_pos, y_prime_food, x_prime_food] = 1
                 pass
+
+        # Zombies
+        for i in range(len(self.zombie.array)):
+            x_prime_zom = local_pos+int(self.zombie.array[i][0]/self.SCALE)-sx
+            y_prime_zom = local_pos+int(self.zombie.array[i][1]/self.SCALE)-sy
+
+            if x_prime_zom < self.LOCAL_GRID_SIZE and x_prime_zom >= 0 and y_prime_zom < self.LOCAL_GRID_SIZE and y_prime_zom >= 0:
+                # state[z_pos, y_prime_zom, x_prime_zom] = 1
+                pass
+
 
         # Obstacles
         for i in range(self.obstacle.array_length):
@@ -683,15 +694,6 @@ class Environment:
                 if i > x_prime_wall or j > y_prime_wall:
                     state[o_ops, j, i] = 1
                     pass
-
-        # Zombies
-        for i in range(len(self.zombie.array)):
-            x_prime_zom = local_pos+int(self.zombie.array[i][0]/self.SCALE)-sx
-            y_prime_zom = local_pos+int(self.zombie.array[i][1]/self.SCALE)-sy
-
-            if x_prime_zom < self.LOCAL_GRID_SIZE and x_prime_zom >= 0 and y_prime_zom < self.LOCAL_GRID_SIZE and y_prime_zom >= 0:
-                state[z_pos, y_prime_zom, x_prime_zom] = 1
-                pass
 
         # Lava
         for i in range(self.lava.array_length):

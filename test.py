@@ -4,7 +4,7 @@ import numpy as np
 
 from math import pi
 import sys
-# from utils import getch
+from utils import custom_epsilon
 import matplotlib.pyplot as plt
 # import getch
 
@@ -80,27 +80,4 @@ import matplotlib.pyplot as plt
 
 # print(state)
 
-episodes = 1000
-
-t = np.linspace(1,episodes,episodes)
-x = np.zeros(episodes)
-
-# print(t)
-
-for i in range(len(t)):
-	# print(i)
-	if i < episodes/5:
-		x[i] = np.exp(-i/(episodes/10))
-
-	elif i < 2*episodes/5:
-		x[i] = 0.4
-	elif i < 3*episodes/5:
-		x[i] = 0.3
-	elif i < 4*episodes/5:
-		x[i] = 0.2
-	else:
-		x[i] = 0
-
-plt.plot(t, x)
-
-plt.show()
+custom_epsilon(1000, 5)
