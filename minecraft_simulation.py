@@ -44,7 +44,7 @@ from utils import print_readable_time
 # Train
 def train():
 
-	MODEL_NAME = "diamond_local15_input4_5f"
+	MODEL_NAME = "explore_local15_input4_tfgraph"
 
 	FOLDER = "Dojos"
 
@@ -72,18 +72,19 @@ def train():
 					  grid_size = GRID_SIZE,
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80,
-					  max_time = 40,
-					  food_count = 5,
+					  max_time = 200,
+					  food_count = 0,
 					  obstacle_count = 0,
 					  lava_count = 0,
 					  zombie_count = 0,
+					  history = 40,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
 	if RENDER_TO_SCREEN:
 		env.prerender()
 
-	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True, path="./Models/Tensorflow/"+FOLDER+"/")
+	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=False, path="./Models/Tensorflow/"+FOLDER+"/")
 
 	brain = Brain(epsilon=0.05, action_space = env.number_of_actions())
 
@@ -97,7 +98,7 @@ def train():
  
 	# Number of episodes
 	print_episode = 1000
-	total_episodes = 200000 
+	total_episodes = 100000 
 
 	saver = tf.train.Saver()
 
@@ -108,7 +109,7 @@ def train():
 	merged_summary = tf.summary.merge_all()
 
 	# Tensorboard capabilties
-	# writer = tf.summary.FileWriter(LOGDIR)
+	writer = tf.summary.FileWriter(LOGDIR)
 
 	# Assume that you have 12GB of GPU memory and want to allocate ~4GB:
 	gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.2)
@@ -122,7 +123,7 @@ def train():
 
 		sess.run(init)
 
-		# writer.add_graph(sess.graph)
+		writer.add_graph(sess.graph)
 
 		start_time = time.time()
 
@@ -138,7 +139,7 @@ def train():
 			state, info = env.reset()
 			done = False
 
-			brain.linear_epsilon_decay(total_episodes, episode, start=0.35, end=0.05, percentage=0.5)
+			brain.linear_epsilon_decay(total_episodes, episode, start=0.5, end=0.05, percentage=0.5)
 
 			# brain.linear_alpha_decay(total_episodes, episode)
 
@@ -161,7 +162,7 @@ def train():
 
 				brain.store_transition(state, action, reward, done, new_state)
 				
-				e = brain.train(model, sess)
+				e, Q_vector = brain.train(model, sess)
 
 				state = new_state
 
@@ -192,15 +193,15 @@ def train():
 				model.save(sess)
 				save_path = saver.save(sess, MODEL_PATH_SAVE)
 
-				# s = sess.run(merged_summary, feed_dict={model.input: state, model.actions: Q_vector})
-				# writer.add_summary(s, episode)
+				s = sess.run(merged_summary, feed_dict={model.input: state, model.actions: Q_vector})
+				writer.add_summary(s, episode)
 
 		model.save(sess, verbose=True)
 
 		save_path = saver.save(sess, MODEL_PATH_SAVE)
 		print("Model saved in path: %s" % save_path)
 
-		# writer.close()
+		writer.close()
 
 
 # Meta Network training with fixed Dojo networks
@@ -656,11 +657,12 @@ def play():
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE, 
 					  local_size = LOCAL_GRID_SIZE,
-					  rate = 100,
-					  food_count = 0,
+					  rate = 200,
+					  food_count = 3,
 					  obstacle_count = 0,
 					  lava_count = 0,
 					  zombie_count = 0,
+					  history = 0,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 

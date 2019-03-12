@@ -7,6 +7,7 @@ import sys
 from utils import custom_epsilon
 import matplotlib.pyplot as plt
 # import getch
+import csv
 
 # a = np.array([[[0,0],
 # 			   [0,0]],
@@ -80,4 +81,25 @@ import matplotlib.pyplot as plt
 
 # print(state)
 
-custom_epsilon(1000, 5)
+
+# custom_epsilon(1000, 5)
+
+with open("test.csv", 'r') as csvfile:
+	matrixreader = csv.reader(csvfile, delimiter=',')
+	a = []
+	b = []
+	for i, row in enumerate(matrixreader):
+		# a.append(row)
+		if i > 0:
+			print(row[2])
+			print()
+			a.append(float(row[2]))
+			b.append(float(row[1]))
+
+
+
+print(a)
+
+plt.plot(b,a)
+plt.show()
+

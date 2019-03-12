@@ -91,5 +91,5 @@ class Brain():
 
 		_, e = sess.run([model.optimizer, model.error], feed_dict={model.input: memory[0], model.actions: output_vector})
 
-		return e
+		return e, output_vector
 

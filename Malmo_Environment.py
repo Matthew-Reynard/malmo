@@ -48,7 +48,7 @@ from math import pi
 
 class Environment:
 
-    def __init__(self, wrap=False, grid_size=10, local_size=9, rate=100, max_time=math.inf, action_space=5, food_count=1, obstacle_count=0, lava_count=0, zombie_count=0, map_path=None):
+    def __init__(self, wrap=False, grid_size=10, local_size=9, rate=100, max_time=math.inf, action_space=5, food_count=1, obstacle_count=0, lava_count=0, zombie_count=0, history=30, map_path=None):
         """
         Initialise the Game Environment with default values
         """
@@ -71,7 +71,7 @@ class Environment:
         self.MAX_TIME_PER_EPISODE = max_time
 
         # Create and Initialise steve 
-        self.steve = Steve()
+        self.steve = Steve(history)
 
         # Create Food
         self.NUM_OF_FOOD = food_count
@@ -314,8 +314,8 @@ class Environment:
         self.steps += 1
 
         # Rewards:
-        # reward_each_time_step = 1.0
-        reward_each_time_step = -0.05
+        reward_each_time_step = 1.0
+        # reward_each_time_step = -0.05
         reward_collecting_diamond = 10.0
         reward_out_of_bounds = -1.0 # not used
         reward_zombie_hit = -10.0
@@ -425,20 +425,16 @@ class Environment:
                 break
 
         # Make the most recent history have the most negative rewards
-        decay = (1+reward_each_time_step)/(self.steve.history_size-1)
-        for i in range(len(self.steve.history) - 1):
-            # print(-1*(1-decay*i))
-            if ((self.steve.x, self.steve.y) == (self.steve.history[-i-2][0], self.steve.history[-i-2][1])):
-                # reward = -1*(1-decay*i)
-                break
+        if self.steve.history_size != 0:
+            decay = (reward_each_time_step)/(self.steve.history_size)
+            for i in range(len(self.steve.history) - 1):
+                # print(i,-1*(1-decay*i))
+                if ((self.steve.pos) == self.steve.history[-i-2]):
+                    reward = -1*(1-decay*i)
+                    break
 
         # Checking if Steve has reached the food
         reached_food, eaten_food = self.food.eat(self.steve)
-
-        # Reward: Including the distance between them
-        # if reward == 0:
-        #     reward = ((self.GRID_SIZE**2) / np.sqrt(((self.steve.x/self.SCALE-self.food.x/self.SCALE)**2 + (self.steve.y/self.SCALE-self.food.y/self.SCALE)**2) + 1)**2)/(self.GRID_SIZE**2)
-            # print(reward) 
 
         # ADDED FOR ALLOWING THE MODEL TO HAVE STEVE OVER THE FOOD IN THE STATE
         # if self.spawn_new_food:
@@ -468,9 +464,6 @@ class Environment:
 
             # Reward functions
             reward = reward_collecting_diamond
-            # reward = 100 / (np.sqrt((self.steve.x-self.food.x)**2 + (self.steve.y-self.food.y)**2) + 1) # Including the distance between them
-            # reward = 1000 * self.score
-            # reward = 1000 / self.time # Including the time in the reward function
         else:
             self.spawn_new_food = False
 
@@ -633,17 +626,17 @@ class Environment:
 
         s_pos = 0
         d_pos = 1
-        # z_pos = 2
-        # h_pos = 1
-        l_pos = 2
-        o_ops = 3
+        z_pos = 2
+        h_pos = 3
+        l_pos = 4
+        o_ops = 5
 
 
         #s = steve
         sx = int(self.steve.x/self.SCALE)
         sy = int(self.steve.y/self.SCALE)
 
-        state = np.zeros((4, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE)) 
+        state = np.zeros((6, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE)) 
 
         # Agent
         local_pos = int((self.LOCAL_GRID_SIZE-1)/2)
@@ -664,7 +657,7 @@ class Environment:
             y_prime_zom = local_pos+int(self.zombie.array[i][1]/self.SCALE)-sy
 
             if x_prime_zom < self.LOCAL_GRID_SIZE and x_prime_zom >= 0 and y_prime_zom < self.LOCAL_GRID_SIZE and y_prime_zom >= 0:
-                # state[z_pos, y_prime_zom, x_prime_zom] = 1
+                state[z_pos, y_prime_zom, x_prime_zom] = 1
                 pass
 
 
@@ -705,18 +698,26 @@ class Environment:
                 pass
 
         # History
-        decay = 1/self.steve.history_size
+        if self.steve.history_size != 0:
+            decay = 1/self.steve.history_size
 
         for i in range(len(self.steve.history)-1):
             x_prime = local_pos+int(self.steve.history[-i-2][0]/self.SCALE)-sx
             y_prime = local_pos+int(self.steve.history[-i-2][1]/self.SCALE)-sy
 
             if x_prime < self.LOCAL_GRID_SIZE and x_prime >= 0 and y_prime < self.LOCAL_GRID_SIZE and y_prime >= 0:
-                # if 1-decay*i >= 0 and state[h_pos, y_prime, x_prime] == 0:
-                #     state[h_pos, y_prime, x_prime] = 1-decay*i
+                if 1-decay*i >= 0 and state[h_pos, y_prime, x_prime] == 0:
+                    state[h_pos, y_prime, x_prime] = 1-decay*i
                 pass
-                # else:
-                    # state[h_pos, y_prime, x_prime] = 0
+
+
+        # Delete these layers:
+        # state = np.delete(state, s_pos, 0)
+        state = np.delete(state, d_pos, 0)
+        state = np.delete(state, z_pos, 0)
+        # state = np.delete(state, h_pos, 0)
+        # state = np.delete(state, l_pos, 0)
+        # state = np.delete(state, o_pos, 0)
 
         return state
 
@@ -814,8 +815,8 @@ class Environment:
                 s, r, GAME_OVER, i = self.step(action)
                 
                 # print("\n\n\n") # DEBUGGING
-                print(self.local_state_vector_3D()) # DEBUGGING
                 # print(self.state_vector_3D()) # DEBUGGING
+                # print(self.local_state_vector_3D()) # DEBUGGING
                 
                 print(r)
 
