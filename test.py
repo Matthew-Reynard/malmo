@@ -84,22 +84,59 @@ import csv
 
 # custom_epsilon(1000, 5)
 
-with open("test.csv", 'r') as csvfile:
-	matrixreader = csv.reader(csvfile, delimiter=',')
-	a = []
-	b = []
-	for i, row in enumerate(matrixreader):
-		# a.append(row)
-		if i > 0:
-			print(row[2])
-			print()
-			a.append(float(row[2]))
-			b.append(float(row[1]))
+# with open("test.csv", 'r') as csvfile:
+# 	matrixreader = csv.reader(csvfile, delimiter=',')
+# 	a = []
+# 	b = []
+# 	for i, row in enumerate(matrixreader):
+# 		# a.append(row)
+# 		if i > 0:
+# 			print(row[2])
+# 			print()
+# 			a.append(float(row[2]))
+# 			b.append(float(row[1]))
 
 
 
-print(a)
+# print(a)
 
-plt.plot(b,a)
-plt.show()
+# plt.plot(b,a)
+# plt.show()
 
+import tensorflow as tf
+
+x = tf.placeholder(tf.float32, [])
+
+# output
+y = tf.placeholder(tf.float32, [])
+
+# a=tf.Variable(1.0)
+
+b=tf.Variable(0.0)
+
+# error = tf.losses.mean_squared_error(labels=a, predictions=b)
+
+tf.summary.scalar('a', y)
+
+tf.summary.scalar('b', b)
+
+merged_summary = tf.summary.merge_all()
+init = tf.global_variables_initializer()
+writer = tf.summary.FileWriter("./Logs/test/")
+
+gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.2)
+
+    # Begin session
+with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
+    sess.run(init)
+
+    writer.add_graph(sess.graph)
+    a = 0
+    for episode in range(100):
+
+        a = a + 1
+        b = b + 2
+        s = sess.run(merged_summary, feed_dict={y: a})
+        writer.add_summary(s, episode)
+
+    writer.close()

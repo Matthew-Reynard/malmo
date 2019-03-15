@@ -38,13 +38,15 @@ from utils import print_readable_time
 # zombie_local15_input4
 # explore_local15_input4
 # diamond_local15_input4_5f
-
+# diamond_local15_input4_tfgraph
+# zombie_local15_input4_tfgraph
+# explore_local15_input4_tfgraph
 # complex_local15_input6
 
 # Train
 def train():
 
-	MODEL_NAME = "explore_local15_input4_tfgraph"
+	MODEL_NAME = "zombie_local15_input4_tfgraph"
 
 	FOLDER = "Dojos"
 
@@ -61,7 +63,7 @@ def train():
 
 	# MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
 	MAP_PATH = None
-
+ 
 
 	print("\n ---- Training the Deep Neural Network ----- \n")
 
@@ -76,21 +78,26 @@ def train():
 					  food_count = 0,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 0,
-					  history = 40,
+					  zombie_count = 2,
+					  history = 0,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
 	if RENDER_TO_SCREEN:
 		env.prerender()
 
-	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=False, path="./Models/Tensorflow/"+FOLDER+"/")
+	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True, path="./Models/Tensorflow/"+FOLDER+"/")
 
 	brain = Brain(epsilon=0.05, action_space = env.number_of_actions())
 
 	model.setup(brain)
 
+	score = tf.placeholder(tf.float32, [])
+	avg_t = tf.placeholder(tf.float32, [])
+
 	tf.summary.scalar('error', tf.squeeze(model.error))
+	tf.summary.scalar('score', score)
+	tf.summary.scalar('average time', avg_t)
 
 	avg_time = 0
 	avg_score = 0
@@ -98,7 +105,7 @@ def train():
  
 	# Number of episodes
 	print_episode = 1000
-	total_episodes = 100000 
+	total_episodes = 200000 
 
 	saver = tf.train.Saver()
 
@@ -139,7 +146,7 @@ def train():
 			state, info = env.reset()
 			done = False
 
-			brain.linear_epsilon_decay(total_episodes, episode, start=0.5, end=0.05, percentage=0.5)
+			brain.linear_epsilon_decay(total_episodes, episode, start=0.3, end=0.05, percentage=0.5)
 
 			# brain.linear_alpha_decay(total_episodes, episode)
 
@@ -185,16 +192,16 @@ def train():
 					end="")
 				print_readable_time(current_time)
 
-				avg_time = 0
-				avg_score = 0
-				avg_error = 0
-
 				# Save the model's weights and biases to .npz file
 				model.save(sess)
 				save_path = saver.save(sess, MODEL_PATH_SAVE)
 
-				s = sess.run(merged_summary, feed_dict={model.input: state, model.actions: Q_vector})
+				s = sess.run(merged_summary, feed_dict={model.input: state, model.actions: Q_vector, score:avg_score/print_episode, avg_t:avg_time/print_episode})
 				writer.add_summary(s, episode)
+
+				avg_time = 0
+				avg_score = 0
+				avg_error = 0
 
 		model.save(sess, verbose=True)
 
