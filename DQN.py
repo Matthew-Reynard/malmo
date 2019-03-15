@@ -290,28 +290,40 @@ class MetaNetwork():
 				   	  'b_fc':tf.Variable(tf.constant(0.1, shape=[self.n_out_fc]), name = 'b_fc'),
 				   	  'b_out':tf.Variable(tf.constant(0.1, shape=[self.n_actions]), name = 'b_out')}
 
+		print("MODEL:", self.name)
 
 		x = tf.reshape(data, shape=[-1, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE, self.n_input_channels])
+		print("Input:", x.shape)
 
 		conv1 = self.conv2d(x, weights['W_conv1'], name = 'conv1')
-		
+		print("Conv1:", conv1.shape)
+
 		if self.LOCAL_GRID_SIZE == 15:
 			conv1 = self.maxpool2d(conv1, name = 'max_pool1')
+		print("MaxP1:", conv1.shape)
 
 		conv2 = self.conv2d(conv1, weights['W_conv2'], name = 'conv2')
+		print("Conv2:", conv2.shape)
+
 		conv2 = self.maxpool2d(conv2, name = 'max_pool2')
+		print("MaxP2:", conv2.shape)
 
 		fc = tf.reshape(conv2,[-1, self.scale*self.n_out_channels_conv2])
-
-		# dropout test
-		# fc = tf.nn.dropout(fc, 0.9)
+		print("Reshape:", fc.shape)
+		
+		if self.trainable:
+			fc = tf.nn.dropout(fc, 0.9)
 
 		fc = tf.nn.relu(tf.matmul(fc, weights['W_fc']) + biases['b_fc'])
+		print("FC:", fc.shape)
 
-		actions = tf.matmul(fc, weights['W_out']) + biases['b_out']
-		actions = tf.nn.l2_normalize(actions)
-
-		return actions, weights, biases
+		dojos = tf.matmul(fc, weights['W_out']) + biases['b_out']
+		print("Dojos:", dojos.shape)
+		
+		dojos = tf.nn.l2_normalize(dojos)
+		print("")
+		
+		return dojos, weights, biases
 
 
 	# Setup the model architecture (used for tensorboard)

@@ -1,10 +1,10 @@
-
+# CUSTOM FOLDERS
 MalmoPlatform/
 Models/Torch
 tmp/
 tests/
 mnist/
-Logs/
+# Logs/
 
 # PYTHON STUFF
 

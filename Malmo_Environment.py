@@ -308,7 +308,7 @@ class Environment:
     def step(self, action):
         """
         Step through the game, one state at a time.
-        Return the reward, the new_state, whether its reached_food or not, and the time
+        Return the reward, the new_state, whether its reached_diamond or not, and the time
         """
 
         self.steps += 1
@@ -326,7 +326,7 @@ class Environment:
         self.time += 1
 
         # If the steve has reached the food
-        reached_food = False
+        reached_diamond = False
 
         hit_obstacle = False
 
@@ -336,7 +336,6 @@ class Environment:
         done = False
 
         # Initialze to -1 for every time step - to find the fastest route (can be a more negative reward)
-        # reward = 0.2
         reward = reward_each_time_step
 
         # Negetive exponential distance rewards
@@ -412,9 +411,11 @@ class Environment:
         # Update the position of the zombie 
         self.zombie.move(self.maze, self.steve, self.steps)
 
+
         # Check if zombie gets steve
         for i in range(self.zombie.amount):
-            if self.steve.pos == (self.zombie.array[i][0], self.zombie.array[i][1]):
+            # print(self.steve.pos, self.zombie.array[i])
+            if self.steve.pos == self.zombie.array[i]:
                 zombie_hit = True
             else:
                 zombie_hit = False
@@ -433,8 +434,8 @@ class Environment:
                     reward = -1*(1-decay*i)
                     break
 
-        # Checking if Steve has reached the food
-        reached_food, eaten_food = self.food.eat(self.steve)
+        # Checking if Steve has reached the diamond
+        reached_diamond, diamond_index = self.food.eat(self.steve)
 
         # ADDED FOR ALLOWING THE MODEL TO HAVE STEVE OVER THE FOOD IN THE STATE
         # if self.spawn_new_food:
@@ -445,19 +446,19 @@ class Environment:
         #         # disallowed.append(self.steve.pos)
         #     self.food.make(self.grid, disallowed, index = self.last_eaten_food)
         #     self.spawn_new_food = False
-        #     reached_food = False
+        #     reached_diamond = False
         
         # If Steve reaches the food, increment score
-        if reached_food:
+        if reached_diamond:
             self.score += 1
-            self.last_eaten_food = eaten_food
+            self.last_eaten_food = diamond_index
 
             self.spawn_new_food = False
             # Create a piece of food that is not within Steve
             disallowed = []
             [disallowed.append(grid_pos) for grid_pos in self.obstacle.array]
             # [disallowed.append(grid_pos) for grid_pos in self.zombie.array]
-            self.food.make(self.grid, disallowed, index = eaten_food)
+            self.food.make(self.grid, disallowed, index = diamond_index)
 
             # Only collect 1 food item at a time
             # done = True
@@ -796,7 +797,7 @@ class Environment:
 
             MAP_NUMBER = np.random.randint(10)
 
-            MAP_PATH = "./Maps/Grid10/map{}.txt".format(MAP_NUMBER)
+            MAP_PATH = "./Maps/Grid10/map1{}.txt".format(MAP_NUMBER)
 
             self.set_map(MAP_PATH)
 
@@ -818,7 +819,7 @@ class Environment:
                 # print(self.state_vector_3D()) # DEBUGGING
                 # print(self.local_state_vector_3D()) # DEBUGGING
                 
-                print(r)
+                # print(r)
 
                 self.render()
 

@@ -33,7 +33,6 @@ from utils import print_readable_time
 # explore_local15_input3
 
 # complex_local15_10r
-
 # diamond_local15_input4
 # zombie_local15_input4
 # explore_local15_input4
@@ -74,7 +73,7 @@ def train():
 					  grid_size = GRID_SIZE,
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80,
-					  max_time = 200,
+					  max_time = 100,
 					  food_count = 0,
 					  obstacle_count = 0,
 					  lava_count = 0,
@@ -94,18 +93,24 @@ def train():
 
 	score = tf.placeholder(tf.float32, [])
 	avg_t = tf.placeholder(tf.float32, [])
+	epsilon = tf.placeholder(tf.float32, [])
+	avg_r = tf.placeholder(tf.float32, [])
 
 	tf.summary.scalar('error', tf.squeeze(model.error))
 	tf.summary.scalar('score', score)
 	tf.summary.scalar('average time', avg_t)
+	tf.summary.scalar('epsilon', epsilon)
+	tf.summary.scalar('avg reward', avg_r)
 
 	avg_time = 0
 	avg_score = 0
 	avg_error = 0
- 
+	avg_reward = 0
+	cumulative_reward = 0
+
 	# Number of episodes
 	print_episode = 1000
-	total_episodes = 200000 
+	total_episodes = 100000 
 
 	saver = tf.train.Saver()
 
@@ -127,8 +132,8 @@ def train():
 		if USE_SAVED_MODEL_FILE:
 			saver.restore(sess, MODEL_PATH_SAVE)
 			print("Model restored.")
-
-		sess.run(init)
+		else:
+			sess.run(init)
 
 		writer.add_graph(sess.graph)
 
@@ -139,14 +144,13 @@ def train():
 		for episode in range(total_episodes):
 
 			if RANDOMIZE_MAPS:
-				# Make a random map 0: lava, 1: obstacle
 				MAP_PATH = "./Maps/Grid10/map{}.txt".format(np.random.randint(10))
 				env.set_map(MAP_PATH)
 
 			state, info = env.reset()
 			done = False
 
-			brain.linear_epsilon_decay(total_episodes, episode, start=0.3, end=0.05, percentage=0.5)
+			brain.linear_epsilon_decay(total_episodes, episode, start=0.2, end=0.05, percentage=0.5)
 
 			# brain.linear_alpha_decay(total_episodes, episode)
 
@@ -155,16 +159,11 @@ def train():
 
 			while not done:
 
-				# Retrieve the Q values from the NN in vector form
-				# Q_vector = sess.run(model.q_values, feed_dict={model.input: state})
-
 				action = brain.choose_action(state, sess, model)
-
 				# print(action)
 
 				# Update environment by performing action
 				new_state, reward, done, info = env.step(action)
-
 				# print(new_state)
 
 				brain.store_transition(state, action, reward, done, new_state)
@@ -173,13 +172,17 @@ def train():
 
 				state = new_state
 
+				cumulative_reward += reward
+
 				if RENDER_TO_SCREEN:
 					env.render()
 
 				if done:
 					avg_time += info["time"]
 					avg_score += info["score"]
+					avg_reward += cumulative_reward 
 					avg_error += e
+					cumulative_reward = 0
 
 			if (episode%print_episode == 0 and episode != 0) or (episode == total_episodes-1):
 				
@@ -188,6 +191,7 @@ def train():
 					"\tavg t: {0:.3f}".format(avg_time/print_episode),
 					"\tavg score: {0:.3f}".format(avg_score/print_episode),
 					"\tErr {0:.3f}".format(avg_error/print_episode),
+					"\tavg_reward {0:.3f}".format(avg_reward/print_episode), # avg cumulative reward
 					"\tepsilon {0:.3f}".format(brain.EPSILON),
 					end="")
 				print_readable_time(current_time)
@@ -196,12 +200,13 @@ def train():
 				model.save(sess)
 				save_path = saver.save(sess, MODEL_PATH_SAVE)
 
-				s = sess.run(merged_summary, feed_dict={model.input: state, model.actions: Q_vector, score:avg_score/print_episode, avg_t:avg_time/print_episode})
+				s = sess.run(merged_summary, feed_dict={model.input: state, model.actions: Q_vector, score:avg_score/print_episode, avg_t:avg_time/print_episode, epsilon:brain.EPSILON, avg_r:avg_reward/print_episode})
 				writer.add_summary(s, episode)
 
 				avg_time = 0
 				avg_score = 0
 				avg_error = 0
+				avg_reward = 0
 
 		model.save(sess, verbose=True)
 
@@ -422,9 +427,11 @@ def train_MetaNetwork():
 # Run the given model
 def run():
 
-	MODEL_NAME = "complex_local15_10r"
+	MODEL_NAME = "diamond_local15_input4_5f"
 
-	MODEL_PATH_SAVE = "./Models/Tensorflow/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
+	FOLDER = "Dojos"
+
+	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
 	LOGDIR = "./Logs/"+MODEL_NAME
 
@@ -432,7 +439,8 @@ def run():
 
 	GRID_SIZE = 10
 	LOCAL_GRID_SIZE = 15
-	MAP_NUMBER = 2
+	MAP_NUMBER = 0
+	RANDOMIZE_MAPS = True
 
 	# MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
 	MAP_PATH = None
@@ -440,25 +448,26 @@ def run():
 	print("\n ---- Running the Deep Q Network ----- \n")
 
 	RENDER_TO_SCREEN = False
+	RENDER_TO_SCREEN = True
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE, 
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80, 
-					  max_time = 200,
-					  food_count = 10,
+					  max_time = 40,
+					  food_count = 5,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 1, 
+					  zombie_count = 0, 
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
 	if RENDER_TO_SCREEN:
 		env.prerender()
 
-	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True, path="./Models/Tensorflow/Complex/", trainable = False, )
+	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True, path="./Models/Tensorflow/"+FOLDER+"/", trainable = False)
 
-	brain = Brain(epsilon=0.01, action_space = env.number_of_actions())
+	brain = Brain(epsilon=0.005, action_space = env.number_of_actions())
 
 	model.setup(brain)
 
@@ -466,8 +475,8 @@ def run():
 	avg_score = 0
 
 	# Number of episodes
-	print_episode = 100
-	total_episodes = 1000
+	print_episode = 1
+	total_episodes = 10
 
 	saver = tf.train.Saver()
 
@@ -477,15 +486,20 @@ def run():
 	# Begin session
 	with tf.Session() as sess:
 
-		# if USE_SAVED_MODEL_FILE:
-		# 	saver.restore(sess, MODEL_PATH_SAVE)
-		# 	print("Model restored.")
-
-		sess.run(init)
+		if USE_SAVED_MODEL_FILE:
+			saver.restore(sess, MODEL_PATH_SAVE)
+			print("Model restored.")
+		else:
+			sess.run(init)
 
 		print("")
 
 		for episode in range(total_episodes):
+			
+			if RANDOMIZE_MAPS:
+				MAP_PATH = "./Maps/Grid10/map{}.txt".format(np.random.randint(10))
+				env.set_map(MAP_PATH)
+
 			state, info = env.reset()
 			done = False
 
@@ -495,12 +509,10 @@ def run():
 			while not done:
 
 				action = brain.choose_action(state, sess, model)
-
 				# print(action)
 
 				# Update environment with by performing action
 				new_state, reward, done, info = env.step(action)
-
 				# print(new_state)
 
 				state = new_state
@@ -664,11 +676,11 @@ def play():
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE, 
 					  local_size = LOCAL_GRID_SIZE,
-					  rate = 200,
+					  rate = 100,
 					  food_count = 3,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 0,
+					  zombie_count = 2,
 					  history = 0,
 					  action_space = 5,
 					  map_path = MAP_PATH)
@@ -679,7 +691,7 @@ def play():
 # Main function
 if __name__ == '__main__':
 
-	train()
+	# train()
 
 	# train_MetaNetwork()
 
@@ -687,5 +699,5 @@ if __name__ == '__main__':
 
 	# run_MetaNetwork()
 
-	# play()
+	play()
  

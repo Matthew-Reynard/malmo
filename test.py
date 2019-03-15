@@ -9,19 +9,26 @@ import matplotlib.pyplot as plt
 # import getch
 import csv
 
+
+
+custom_epsilon(100000, 2, 0.8, 0.05)
+
+
+
+
 # a = np.array([[[0,0],
-# 			   [0,0]],
-# 			  [[0,0],
-# 			   [0,0]],
-# 			  [[0,0],
-# 			   [0,0]]])
+#              [0,0]],
+#             [[0,0],
+#              [0,0]],
+#             [[0,0],
+#              [0,0]]])
 
 
 # print(a)
 
 # for row in a[2]:
-# 	for col in row:
-# 		a[2][col] = 1
+#   for col in row:
+#       a[2][col] = 1
 
 # a[1] = 1
 
@@ -54,10 +61,10 @@ import csv
 
 
 # # for x in range(grid):
-# # 	print(np.exp((x*1.41)-grid))
+# #     print(np.exp((x*1.41)-grid))
 
 # for x in range(grid):
-# 	print(np.tan(x))
+#   print(np.tan(x))
 
 # print(np.tan(pi/4))
 
@@ -68,7 +75,7 @@ import csv
 # print(z)
 
 # for x in z:
-# 	print(np.tan(x))
+#   print(np.tan(x))
 
 # def test():
 
@@ -82,7 +89,6 @@ import csv
 # print(state)
 
 
-# custom_epsilon(1000, 5)
 
 # with open("test.csv", 'r') as csvfile:
 # 	matrixreader = csv.reader(csvfile, delimiter=',')
@@ -103,40 +109,45 @@ import csv
 # plt.plot(b,a)
 # plt.show()
 
-import tensorflow as tf
+# import tensorflow as tf
 
-x = tf.placeholder(tf.float32, [])
+# x = tf.placeholder(tf.float32, [])
 
-# output
-y = tf.placeholder(tf.float32, [])
+# # output
+# y = tf.placeholder(tf.float32, [])
 
-# a=tf.Variable(1.0)
+# # a=tf.Variable(1.0)
 
-b=tf.Variable(0.0)
+# b=tf.Variable(0.0)
 
-# error = tf.losses.mean_squared_error(labels=a, predictions=b)
+# # error = tf.losses.mean_squared_error(labels=a, predictions=b)
 
-tf.summary.scalar('a', y)
+# tf.summary.scalar('a', y)
 
-tf.summary.scalar('b', b)
+# # tf.summary.scalar('b', b)
 
-merged_summary = tf.summary.merge_all()
-init = tf.global_variables_initializer()
-writer = tf.summary.FileWriter("./Logs/test/")
+# merged_summary = tf.summary.merge_all()
+# init = tf.global_variables_initializer()
+# writer = tf.summary.FileWriter("./Logs/test/")
 
-gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.2)
+# gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.2)
+# start = 0.5
+# end = 0.05
+# percentage = 0.5
+# total = 1000
+#     # Begin session
+# with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
+#     sess.run(init)
 
-    # Begin session
-with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
-    sess.run(init)
+#     writer.add_graph(sess.graph)
+#     a = 0
+#     for episode in range(total):
 
-    writer.add_graph(sess.graph)
-    a = 0
-    for episode in range(100):
+#         a = (-(start-end)/ (percentage*total)) * episode + (start)
+#         if a < end:
+#             a = end
+#         # b = b + 2
+#         s = sess.run(merged_summary, feed_dict={y: a})
+#         writer.add_summary(s, episode)
 
-        a = a + 1
-        b = b + 2
-        s = sess.run(merged_summary, feed_dict={y: a})
-        writer.add_summary(s, episode)
-
-    writer.close()
+#     writer.close()
