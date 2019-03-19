@@ -314,13 +314,13 @@ class Environment:
         self.steps += 1
 
         # Rewards:
-        reward_each_time_step = 1.0
-        # reward_each_time_step = -0.05
+        # reward_each_time_step = 1.0
+        reward_each_time_step = -0.1
         reward_collecting_diamond = 10.0
         reward_out_of_bounds = -1.0 # not used
         reward_zombie_hit = -10.0
-        # reward_in_lava = -3.0
-        reward_in_lava = -10.0
+        reward_in_lava = -2.0
+        # reward_in_lava = -10.0
  
         # Increment time step
         self.time += 1
@@ -426,13 +426,13 @@ class Environment:
                 break
 
         # Make the most recent history have the most negative rewards
-        if self.steve.history_size != 0:
-            decay = (reward_each_time_step)/(self.steve.history_size)
-            for i in range(len(self.steve.history) - 1):
-                # print(i,-1*(1-decay*i))
-                if ((self.steve.pos) == self.steve.history[-i-2]):
-                    reward = -1*(1-decay*i)
-                    break
+        # if self.steve.history_size != 0:
+        #     decay = (reward_each_time_step)/(self.steve.history_size)
+        #     for i in range(len(self.steve.history) - 1):
+        #         # print(i,-1*(1-decay*i))
+        #         if ((self.steve.pos) == self.steve.history[-i-2]):
+        #             reward = -1*(1-decay*i)
+        #             break
 
         # Checking if Steve has reached the diamond
         reached_diamond, diamond_index = self.food.eat(self.steve)
@@ -624,14 +624,12 @@ class Environment:
 
         Shape = (Layers, LOCAL_GRID_SIZE, LOCAL_GRID_SIZE)
         """
-
         s_pos = 0
         d_pos = 1
         z_pos = 2
         h_pos = 3
         l_pos = 4
         o_ops = 5
-
 
         #s = steve
         sx = int(self.steve.x/self.SCALE)
@@ -714,8 +712,8 @@ class Environment:
 
         # Delete these layers:
         # state = np.delete(state, s_pos, 0)
-        state = np.delete(state, d_pos, 0)
-        # state = np.delete(state, z_pos, 0)
+        # state = np.delete(state, d_pos, 0)
+        state = np.delete(state, z_pos, 0)
         state = np.delete(state, h_pos, 0)
         # state = np.delete(state, l_pos, 0)
         # state = np.delete(state, o_pos, 0)

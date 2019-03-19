@@ -41,11 +41,14 @@ from utils import print_readable_time
 # zombie_local15_input4_tfgraph
 # explore_local15_input4_tfgraph
 # complex_local15_input6
+# complex_local15_input6_tfgraph
+
+# diamond_local15_input4_best
 
 # Train
 def train():
 
-	MODEL_NAME = "zombie_local15_input4_tfgraph"
+	MODEL_NAME = "diamond_local15_input4_best"
 
 	FOLDER = "Dojos"
 
@@ -59,7 +62,7 @@ def train():
 	LOCAL_GRID_SIZE = 15
 	MAP_NUMBER = 0
 	RANDOMIZE_MAPS = True
-
+ 
 	# MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
 	MAP_PATH = None
  
@@ -73,11 +76,11 @@ def train():
 					  grid_size = GRID_SIZE,
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80,
-					  max_time = 100,
-					  food_count = 0,
+					  max_time = 80,
+					  food_count = 5,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 2,
+					  zombie_count = 0,
 					  history = 0,
 					  action_space = 5,
 					  map_path = MAP_PATH)
@@ -110,7 +113,7 @@ def train():
 
 	# Number of episodes
 	print_episode = 1000
-	total_episodes = 100000 
+	total_episodes = 200000 
 
 	saver = tf.train.Saver()
 
@@ -150,7 +153,7 @@ def train():
 			state, info = env.reset()
 			done = False
 
-			brain.linear_epsilon_decay(total_episodes, episode, start=0.2, end=0.05, percentage=0.5)
+			brain.linear_epsilon_decay(total_episodes, episode, start=0.8, end=0.05, percentage=0.5)
 
 			# brain.linear_alpha_decay(total_episodes, episode)
 
@@ -180,8 +183,8 @@ def train():
 				if done:
 					avg_time += info["time"]
 					avg_score += info["score"]
-					avg_reward += cumulative_reward 
 					avg_error += e
+					avg_reward += cumulative_reward 
 					cumulative_reward = 0
 
 			if (episode%print_episode == 0 and episode != 0) or (episode == total_episodes-1):
@@ -218,13 +221,13 @@ def train():
 
 # Meta Network training with fixed Dojo networks
 def train_MetaNetwork():
-	
+
 	print("\n ---- Training the Meta Network ----- \n")
 
-	MODEL_NAME = "meta_local15_input6"
-	DIAMOND_MODEL_NAME = "diamond_local15_input4"
-	ZOMBIE_MODEL_NAME = "zombie_local15_input4"
-	EXPLORE_MODEL_NAME = "explore_local15_input4"
+	MODEL_NAME = "meta_local15_input6_tfgraph"
+	DIAMOND_MODEL_NAME = "diamond_local15_input4_tfgraph1"
+	ZOMBIE_MODEL_NAME = "zombie_local15_input4_tfgraph1"
+	EXPLORE_MODEL_NAME = "explore_local15_input4_tfgraph1"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/Meta/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -246,40 +249,52 @@ def train_MetaNetwork():
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80, 
 					  max_time = 200,
-					  food_count = 3,
+					  food_count = 5,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 2, 
+					  zombie_count = 2,
+					  history = 40, 
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
 	if RENDER_TO_SCREEN:
 		env.prerender()
 
-	model = MetaNetwork(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=False)
-
+	model = MetaNetwork(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True)
+ 
 	diamond_net = Network(local_size=LOCAL_GRID_SIZE, name=DIAMOND_MODEL_NAME, path="./Models/Tensorflow/Dojos/", load=True, trainable = False)
 
 	zombie_net = Network(local_size=LOCAL_GRID_SIZE, name=ZOMBIE_MODEL_NAME, path="./Models/Tensorflow/Dojos/", load=True, trainable = False)
 
 	explore_net = Network(local_size=LOCAL_GRID_SIZE, name=EXPLORE_MODEL_NAME, path="./Models/Tensorflow/Dojos/", load=True, trainable = False)
 
-	brain = Brain(epsilon=0.01, action_space = 2)
+	brain = Brain(epsilon=0.01, action_space=3)
 
 	model.setup(brain)
 	diamond_net.setup(brain)
 	zombie_net.setup(brain)
 	explore_net.setup(brain)
 
+	score = tf.placeholder(tf.float32, [])
+	avg_t = tf.placeholder(tf.float32, [])
+	epsilon = tf.placeholder(tf.float32, [])
+	avg_r = tf.placeholder(tf.float32, [])
+
 	tf.summary.scalar('error', tf.squeeze(model.error))
+	tf.summary.scalar('score', score)
+	tf.summary.scalar('average time', avg_t)
+	tf.summary.scalar('epsilon', epsilon)
+	tf.summary.scalar('avg reward', avg_r)
 
 	avg_time = 0
 	avg_score = 0
 	avg_error = 0
+	avg_reward = 0
+	cumulative_reward = 0
 
 	# Number of episodes
 	print_episode = 1000
-	total_episodes = 200000
+	total_episodes = 100000
 
 	saver = tf.train.Saver()
 
@@ -320,7 +335,7 @@ def train_MetaNetwork():
 			state, info = env.reset()
 			done = False
 
-			brain.linear_epsilon_decay(total_episodes, episode, start=0.5, end=0.05, percentage=0.5)
+			brain.linear_epsilon_decay(total_episodes, episode, start=0.4, end=0.05, percentage=0.5)
 
 			# brain.linear_alpha_decay(total_episodes, episode)
 
@@ -386,6 +401,8 @@ def train_MetaNetwork():
 
 				state = new_state
 
+				cumulative_reward += reward
+
 				if RENDER_TO_SCREEN:
 					env.render()
 
@@ -393,6 +410,8 @@ def train_MetaNetwork():
 					avg_time += info["time"]
 					avg_score += info["score"]
 					avg_error += e
+					avg_reward += cumulative_reward 
+					cumulative_reward = 0
 
 			if (episode%print_episode == 0 and episode != 0) or (episode == total_episodes-1):
 				
@@ -401,33 +420,35 @@ def train_MetaNetwork():
 					"\tavg t: {0:.3f}".format(avg_time/print_episode),
 					"\tavg score: {0:.3f}".format(avg_score/print_episode),
 					"\tErr {0:.3f}".format(avg_error/print_episode),
+					"\tavg_reward {0:.3f}".format(avg_reward/print_episode), # avg cumulative reward
 					"\tepsilon {0:.3f}".format(brain.EPSILON),
 					end="")
 				print_readable_time(current_time)
-
-				avg_time = 0
-				avg_score = 0
-				avg_error = 0
 
 				# Save the model's weights and biases to .npz file
 				model.save(sess)
 				save_path = saver.save(sess, MODEL_PATH_SAVE)
 
-				s = sess.run(merged_summary, feed_dict={model.input: state, model.actions: Dojo_vector})
+				s = sess.run(merged_summary, feed_dict={model.input: state, model.actions: Dojo_vector, score:avg_score/print_episode, avg_t:avg_time/print_episode, epsilon:brain.EPSILON, avg_r:avg_reward/print_episode})
 				writer.add_summary(s, episode)
+
+				avg_time = 0
+				avg_score = 0
+				avg_error = 0
+				avg_reward = 0
 
 		model.save(sess, verbose=True)
 
 		save_path = saver.save(sess, MODEL_PATH_SAVE)
 		print("Model saved in path: %s" % save_path)
 
-		writer.close()
+		writer.close()  
 
 
 # Run the given model
 def run():
 
-	MODEL_NAME = "diamond_local15_input4_5f"
+	MODEL_NAME = "diamond_local15_input4_best"
 
 	FOLDER = "Dojos"
 
@@ -454,7 +475,7 @@ def run():
 					  grid_size = GRID_SIZE, 
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80, 
-					  max_time = 40,
+					  max_time = 80,
 					  food_count = 5,
 					  obstacle_count = 0,
 					  lava_count = 0,
@@ -483,8 +504,10 @@ def run():
 	# Initialising all variables (weights and biases)
 	init = tf.global_variables_initializer()
 
+	gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.2)
+
 	# Begin session
-	with tf.Session() as sess:
+	with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
 
 		if USE_SAVED_MODEL_FILE:
 			saver.restore(sess, MODEL_PATH_SAVE)
@@ -541,67 +564,80 @@ def run_MetaNetwork():
 
 	print("\n ---- Running the Meta Network ----- \n")
 
-	MODEL_NAME = "meta_local15_input4"
-	DIAMOND_MODEL_NAME = "diamond_local15_input3"
-	ZOMBIE_MODEL_NAME = "zombie_local15_input3"
+	MODEL_NAME = "meta_local15_input6_tfgraph"
+	DIAMOND_MODEL_NAME = "diamond_local15_input4_tfgraph1"
+	ZOMBIE_MODEL_NAME = "zombie_local15_input4_tfgraph1"
+	EXPLORE_MODEL_NAME = "explore_local15_input4_tfgraph1"
 
-	MODEL_PATH_LOAD = "./Models/Tensorflow/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
+	MODEL_PATH_SAVE = "./Models/Tensorflow/Meta/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
+
+	LOGDIR = "./Logs/"+MODEL_NAME
 
 	USE_SAVED_MODEL_FILE = False
 
-	GRID_SIZE = 8
+	GRID_SIZE = 10 
 	LOCAL_GRID_SIZE = 15
 	MAP_PATH = None
 
+	RANDOMIZE_MAPS = True
+
 	RENDER_TO_SCREEN = False
+	RENDER_TO_SCREEN = True
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE,
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80, 
 					  max_time = 200,
-					  food_count = 10,
+					  food_count = 5,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 1, 
+					  zombie_count = 2,
+					  history = 40, 
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
 	if RENDER_TO_SCREEN:
 		env.prerender()
 
-	model = MetaNetwork(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True, trainable = False)
+	model = MetaNetwork(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True)
 
-	diamond_net = Network(local_size=LOCAL_GRID_SIZE, name=DIAMOND_MODEL_NAME, load=True, path="./Models/Tensorflow/Dojos/", trainable = False, )
+	diamond_net = Network(local_size=LOCAL_GRID_SIZE, name=DIAMOND_MODEL_NAME, path="./Models/Tensorflow/Dojos/", load=True, trainable = False)
 
-	zombie_net = Network(local_size=LOCAL_GRID_SIZE, name=ZOMBIE_MODEL_NAME, load=True, path="./Models/Tensorflow/Dojos/", trainable = False)
+	zombie_net = Network(local_size=LOCAL_GRID_SIZE, name=ZOMBIE_MODEL_NAME, path="./Models/Tensorflow/Dojos/", load=True, trainable = False)
 
-	brain = Brain(epsilon=0.00, action_space = 2)
+	explore_net = Network(local_size=LOCAL_GRID_SIZE, name=EXPLORE_MODEL_NAME, path="./Models/Tensorflow/Dojos/", load=True, trainable = False)
+
+	brain = Brain(epsilon=0.01, action_space=3)
 
 	model.setup(brain)
 	diamond_net.setup(brain)
 	zombie_net.setup(brain)
+	explore_net.setup(brain)
 
 	avg_time = 0
 	avg_score = 0
+	avg_error = 0
+	avg_reward = 0
+	cumulative_reward = 0
 
 	# Number of episodes
-	print_episode = 100
-	total_episodes = 1000
+	print_episode = 1000
+	total_episodes = 200000
 
-	# Checkpoint saver
 	saver = tf.train.Saver()
 
 	# Initialising all variables (weights and biases)
 	init = tf.global_variables_initializer()
 
-	gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.4)
+ 	# GPU capabilities
+	gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.3)
 
 	# Begin session
 	with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
 
 		if USE_SAVED_MODEL_FILE:
-			saver.restore(sess, MODEL_PATH_LOAD)
+			saver.restore(sess, MODEL_PATH_SAVE)
 			print("Model restored.")
 		else:
 			sess.run(init)
@@ -611,6 +647,12 @@ def run_MetaNetwork():
 		print("")
 
 		for episode in range(total_episodes):
+
+			if RANDOMIZE_MAPS:
+				# Make a random map 0: lava, 1: obstacle
+				MAP_PATH = "./Maps/Grid10/map{}.txt".format(np.random.randint(10))
+				env.set_map(MAP_PATH)
+
 			state, info = env.reset()
 			done = False
 
@@ -620,26 +662,33 @@ def run_MetaNetwork():
 			while not done:
 
 				dojo = brain.choose_action(state, sess, model)
+				# print(dojo)
 
 				if dojo == 0:
-					# state[2] = 0 # Zero out the zombies layer
 					dojo_state = state
 					dojo_state = np.delete(dojo_state, 2, 0)# Take out the zombie layer
-					action = brain.choose_dojo(dojo_state, sess, diamond_net, env.number_of_actions(), 0.0)
+					dojo_state = np.delete(dojo_state, 3, 0)# Take out the history layer
+					action = brain.choose_dojo(dojo_state, sess, diamond_net, env.number_of_actions(), 0.01)
 				elif dojo == 1:
-					# state[1] = 0 # Zero out the diamond layer
 					dojo_state = state
 					dojo_state = np.delete(dojo_state, 1, 0)# Take out the diamond layer
-					action = brain.choose_dojo(dojo_state, sess, zombie_net, env.number_of_actions(), 0.0)
+					dojo_state = np.delete(dojo_state, 3, 0)# Take out the history layer
+					action = brain.choose_dojo(dojo_state, sess, zombie_net, env.number_of_actions(), 0.01)
+				elif dojo == 2:
+					dojo_state = state
+					dojo_state = np.delete(dojo_state, 1, 0)# Take out the diamond layer
+					dojo_state = np.delete(dojo_state, 2, 0)# Take out the zombie layer
+					action = brain.choose_dojo(dojo_state, sess, explore_net, env.number_of_actions(), 0.01)
+
+				# print(action)
 
 				# Update environment with by performing action
 				new_state, reward, done, info = env.step(action)
-
 				# print(new_state)
 
-				brain.store_transition(state, dojo, reward, done, new_state)
-
 				state = new_state
+
+				cumulative_reward += reward
 
 				if RENDER_TO_SCREEN:
 					env.render()
@@ -647,6 +696,9 @@ def run_MetaNetwork():
 				if done:
 					avg_time += info["time"]
 					avg_score += info["score"]
+					avg_error += e
+					avg_reward += cumulative_reward 
+					cumulative_reward = 0
 
 			if (episode%print_episode == 0 and episode != 0) or (episode == total_episodes-1):
 				
@@ -654,12 +706,16 @@ def run_MetaNetwork():
 				print("Ep:", episode,
 					"\tavg t: {0:.3f}".format(avg_time/print_episode),
 					"\tavg score: {0:.3f}".format(avg_score/print_episode),
+					"\tErr {0:.3f}".format(avg_error/print_episode),
+					"\tavg_reward {0:.3f}".format(avg_reward/print_episode), # avg cumulative reward
 					"\tepsilon {0:.3f}".format(brain.EPSILON),
 					end="")
 				print_readable_time(current_time)
 
 				avg_time = 0
 				avg_score = 0
+				avg_error = 0
+				avg_reward = 0
 
 
 # Play the game
@@ -691,7 +747,7 @@ def play():
 # Main function
 if __name__ == '__main__':
 
-	# train()
+	train()
 
 	# train_MetaNetwork()
 
@@ -699,5 +755,5 @@ if __name__ == '__main__':
 
 	# run_MetaNetwork()
 
-	play()
+	# play()
  

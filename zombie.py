@@ -140,7 +140,7 @@ class Zombie:
             maze = self.updateMaze(maze, 0)
 
             # 2nd zombie moves randomly
-            random_steps = 3
+            random_steps = 2
             # print(self.array)
             if self.amount > 1 and steps%random_steps == 0:
                 self.array[1] = list(self.array[1])

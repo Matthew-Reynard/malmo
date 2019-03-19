@@ -1,0 +1,2 @@
+model_checkpoint_path: "meta_local15_input6_tfgraph.ckpt"
+all_model_checkpoint_paths: "meta_local15_input6_tfgraph.ckpt"
