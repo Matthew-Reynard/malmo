@@ -1,2 +1,0 @@
-model_checkpoint_path: "complex_local15_len.ckpt"
-all_model_checkpoint_paths: "complex_local15_len.ckpt"

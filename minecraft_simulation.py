@@ -43,7 +43,15 @@ from utils import print_readable_time
 # complex_local15_input6
 # complex_local15_input6_tfgraph
 
+# BEST DOJOS (w/Lava)
 # diamond_local15_input4_best
+# zombie_local15_input4_best
+# explore_local15_input4_best
+
+# diamond_local15_input4_300k
+# zombie_local15_input4_300k
+# explore_local15_input4_300k
+
 
 # Train
 def train():
@@ -66,18 +74,17 @@ def train():
 	# MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
 	MAP_PATH = None
  
+  v	print("\n ---- Training the Deep Neural Network ----- \n")
 
-	print("\n ---- Training the Deep Neural Network ----- \n")
-
-	RENDER_TO_SCREEN = False
+	RENDER_TO_SCREEN = False  
 	# RENDER_TO_SCREEN = True
 
 	env = Environment(wrap = False,
 					  grid_size = GRID_SIZE,
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80,
-					  max_time = 80,
-					  food_count = 5,
+					  max_time = 40,
+					  food_count = 8,
 					  obstacle_count = 0,
 					  lava_count = 0,
 					  zombie_count = 0,
@@ -127,7 +134,7 @@ def train():
 	writer = tf.summary.FileWriter(LOGDIR)
 
 	# Assume that you have 12GB of GPU memory and want to allocate ~4GB:
-	gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.2)
+	gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.1)
 
 	# Begin session
 	with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
@@ -153,7 +160,7 @@ def train():
 			state, info = env.reset()
 			done = False
 
-			brain.linear_epsilon_decay(total_episodes, episode, start=0.8, end=0.05, percentage=0.5)
+			brain.linear_epsilon_decay(total_episodes, episode, start=0.4, end=0.05, percentage=0.6)
 
 			# brain.linear_alpha_decay(total_episodes, episode)
 
@@ -355,18 +362,18 @@ def train_MetaNetwork():
 					# state[2] = 0 # Zero out the zombies layer
 					dojo_state = state
 					dojo_state = np.delete(dojo_state, 2, 0)# Take out the zombie layer
-					dojo_state = np.delete(dojo_state, 3, 0)# Take out the history layer
+					dojo_state = np.delete(dojo_state, 2, 0)# Take out the history layer
 					action = brain.choose_dojo(dojo_state, sess, diamond_net, env.number_of_actions(), 0.01)
 				elif dojo == 1:
 					# state[1] = 0 # Zero out the diamond layer
 					dojo_state = state
 					dojo_state = np.delete(dojo_state, 1, 0)# Take out the diamond layer
-					dojo_state = np.delete(dojo_state, 3, 0)# Take out the history layer
+					dojo_state = np.delete(dojo_state, 2, 0)# Take out the history layer
 					action = brain.choose_dojo(dojo_state, sess, zombie_net, env.number_of_actions(), 0.01)
 				elif dojo == 2:
 					dojo_state = state
 					dojo_state = np.delete(dojo_state, 1, 0)# Take out the diamond layer
-					dojo_state = np.delete(dojo_state, 2, 0)# Take out the zombie layer
+					dojo_state = np.delete(dojo_state, 1, 0)# Take out the zombie layer
 					action = brain.choose_dojo(dojo_state, sess, explore_net, env.number_of_actions(), 0.01)
 
 				# print(action)
@@ -448,7 +455,7 @@ def train_MetaNetwork():
 # Run the given model
 def run():
 
-	MODEL_NAME = "diamond_local15_input4_best"
+	MODEL_NAME = "zombie_local15_input4_300k"
 
 	FOLDER = "Dojos"
 
@@ -475,11 +482,12 @@ def run():
 					  grid_size = GRID_SIZE, 
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80, 
-					  max_time = 80,
-					  food_count = 5,
+					  max_time = 100,
+					  food_count = 0,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 0, 
+					  zombie_count = 2,
+					  history = 0,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
@@ -504,7 +512,7 @@ def run():
 	# Initialising all variables (weights and biases)
 	init = tf.global_variables_initializer()
 
-	gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.2)
+	gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.1)
 
 	# Begin session
 	with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
@@ -732,12 +740,12 @@ def play():
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE, 
 					  local_size = LOCAL_GRID_SIZE,
-					  rate = 100,
-					  food_count = 3,
+					  rate = 200,
+					  food_count = 5,
 					  obstacle_count = 0,
 					  lava_count = 0,
 					  zombie_count = 2,
-					  history = 0,
+					  history = 40,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
