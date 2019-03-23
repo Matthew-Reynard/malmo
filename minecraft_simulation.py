@@ -52,11 +52,12 @@ from utils import print_readable_time
 # zombie_local15_input4_300k
 # explore_local15_input4_300k
 
+# diamond_local15_input4_300k_cont
 
 # Train
 def train():
 
-	MODEL_NAME = "diamond_local15_input4_best"
+	MODEL_NAME = "diamond_local15_input4_best"  
 
 	FOLDER = "Dojos"
 
@@ -70,11 +71,11 @@ def train():
 	LOCAL_GRID_SIZE = 15
 	MAP_NUMBER = 0
 	RANDOMIZE_MAPS = True
- 
+
 	# MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
 	MAP_PATH = None
- 
-  v	print("\n ---- Training the Deep Neural Network ----- \n")
+
+	print("\n ---- Training the Deep Neural Network ----- \n")
 
 	RENDER_TO_SCREEN = False  
 	# RENDER_TO_SCREEN = True
@@ -83,8 +84,8 @@ def train():
 					  grid_size = GRID_SIZE,
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80,
-					  max_time = 40,
-					  food_count = 8,
+					  max_time = 100,
+					  food_count = 5,
 					  obstacle_count = 0,
 					  lava_count = 0,
 					  zombie_count = 0,
@@ -120,7 +121,7 @@ def train():
 
 	# Number of episodes
 	print_episode = 1000
-	total_episodes = 200000 
+	total_episodes = 100000 
 
 	saver = tf.train.Saver()
 
@@ -160,7 +161,7 @@ def train():
 			state, info = env.reset()
 			done = False
 
-			brain.linear_epsilon_decay(total_episodes, episode, start=0.4, end=0.05, percentage=0.6)
+			brain.linear_epsilon_decay(total_episodes, episode, start=0.2 , end=0.05, percentage=0.6)
 
 			# brain.linear_alpha_decay(total_episodes, episode)
 
@@ -231,10 +232,10 @@ def train_MetaNetwork():
 
 	print("\n ---- Training the Meta Network ----- \n")
 
-	MODEL_NAME = "meta_local15_input6_tfgraph"
-	DIAMOND_MODEL_NAME = "diamond_local15_input4_tfgraph1"
-	ZOMBIE_MODEL_NAME = "zombie_local15_input4_tfgraph1"
-	EXPLORE_MODEL_NAME = "explore_local15_input4_tfgraph1"
+	MODEL_NAME = "meta_local15_input6_1M"
+	DIAMOND_MODEL_NAME = "diamond_local15_input4_best"
+	ZOMBIE_MODEL_NAME = "zombie_local15_input4_best"
+	EXPLORE_MODEL_NAME = "explore_local15_input4_best"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/Meta/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -267,7 +268,7 @@ def train_MetaNetwork():
 	if RENDER_TO_SCREEN:
 		env.prerender()
 
-	model = MetaNetwork(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True)
+	model = MetaNetwork(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=False)
  
 	diamond_net = Network(local_size=LOCAL_GRID_SIZE, name=DIAMOND_MODEL_NAME, path="./Models/Tensorflow/Dojos/", load=True, trainable = False)
 
@@ -301,7 +302,7 @@ def train_MetaNetwork():
 
 	# Number of episodes
 	print_episode = 1000
-	total_episodes = 100000
+	total_episodes = 1000000
 
 	saver = tf.train.Saver()
 
@@ -342,7 +343,7 @@ def train_MetaNetwork():
 			state, info = env.reset()
 			done = False
 
-			brain.linear_epsilon_decay(total_episodes, episode, start=0.4, end=0.05, percentage=0.5)
+			brain.linear_epsilon_decay(total_episodes, episode, start=1.0, end=0.05, percentage=0.5)
 
 			# brain.linear_alpha_decay(total_episodes, episode)
 
@@ -363,18 +364,18 @@ def train_MetaNetwork():
 					dojo_state = state
 					dojo_state = np.delete(dojo_state, 2, 0)# Take out the zombie layer
 					dojo_state = np.delete(dojo_state, 2, 0)# Take out the history layer
-					action = brain.choose_dojo(dojo_state, sess, diamond_net, env.number_of_actions(), 0.01)
+					action = brain.choose_dojo(dojo_state, sess, diamond_net, env.number_of_actions(), 0.0)
 				elif dojo == 1:
 					# state[1] = 0 # Zero out the diamond layer
 					dojo_state = state
 					dojo_state = np.delete(dojo_state, 1, 0)# Take out the diamond layer
 					dojo_state = np.delete(dojo_state, 2, 0)# Take out the history layer
-					action = brain.choose_dojo(dojo_state, sess, zombie_net, env.number_of_actions(), 0.01)
+					action = brain.choose_dojo(dojo_state, sess, zombie_net, env.number_of_actions(), 0.0)
 				elif dojo == 2:
 					dojo_state = state
 					dojo_state = np.delete(dojo_state, 1, 0)# Take out the diamond layer
 					dojo_state = np.delete(dojo_state, 1, 0)# Take out the zombie layer
-					action = brain.choose_dojo(dojo_state, sess, explore_net, env.number_of_actions(), 0.01)
+					action = brain.choose_dojo(dojo_state, sess, explore_net, env.number_of_actions(), 0.0)
 
 				# print(action)
 
@@ -455,7 +456,7 @@ def train_MetaNetwork():
 # Run the given model
 def run():
 
-	MODEL_NAME = "zombie_local15_input4_300k"
+	MODEL_NAME = "zombie_local15_input4_best"
 
 	FOLDER = "Dojos"
 
@@ -755,9 +756,9 @@ def play():
 # Main function
 if __name__ == '__main__':
 
-	train()
+	# train()
 
-	# train_MetaNetwork()
+	train_MetaNetwork()
 
 	# run()
 
