@@ -19,7 +19,7 @@ class Network():
 		if self.LOCAL_GRID_SIZE == 9:
 			self.scale = 4*4
 
-		self.n_input_channels = 4
+		self.n_input_channels = 6
 
 		self.n_out_channels_conv1 = 16 # changed from 16 -> 32
 		self.n_out_channels_conv2 = 32

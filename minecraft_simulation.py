@@ -456,9 +456,9 @@ def train_MetaNetwork():
 # Run the given model
 def run():
 
-	MODEL_NAME = "zombie_local15_input4_best"
+	MODEL_NAME = "complex_local15_input6_1M"
 
-	FOLDER = "Dojos"
+	FOLDER = "Complex"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -466,7 +466,7 @@ def run():
 
 	USE_SAVED_MODEL_FILE = False
 
-	GRID_SIZE = 10
+	GRID_SIZE = 16
 	LOCAL_GRID_SIZE = 15
 	MAP_NUMBER = 0
 	RANDOMIZE_MAPS = True
@@ -477,18 +477,18 @@ def run():
 	print("\n ---- Running the Deep Q Network ----- \n")
 
 	RENDER_TO_SCREEN = False
-	RENDER_TO_SCREEN = True
+	# RENDER_TO_SCREEN = True
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE, 
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80, 
-					  max_time = 100,
-					  food_count = 0,
+					  max_time = 200,
+					  food_count = 5,
 					  obstacle_count = 0,
 					  lava_count = 0,
 					  zombie_count = 2,
-					  history = 0,
+					  history = 40,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
@@ -505,8 +505,8 @@ def run():
 	avg_score = 0
 
 	# Number of episodes
-	print_episode = 1
-	total_episodes = 10
+	print_episode = 1000
+	total_episodes = 1000
 
 	saver = tf.train.Saver()
 
@@ -529,7 +529,7 @@ def run():
 		for episode in range(total_episodes):
 			
 			if RANDOMIZE_MAPS:
-				MAP_PATH = "./Maps/Grid10/map{}.txt".format(np.random.randint(10))
+				MAP_PATH = "./Maps/Grid16/map{}.txt".format(np.random.randint(10))
 				env.set_map(MAP_PATH)
 
 			state, info = env.reset()
@@ -573,10 +573,10 @@ def run_MetaNetwork():
 
 	print("\n ---- Running the Meta Network ----- \n")
 
-	MODEL_NAME = "meta_local15_input6_tfgraph"
-	DIAMOND_MODEL_NAME = "diamond_local15_input4_tfgraph1"
-	ZOMBIE_MODEL_NAME = "zombie_local15_input4_tfgraph1"
-	EXPLORE_MODEL_NAME = "explore_local15_input4_tfgraph1"
+	MODEL_NAME = "meta_local15_input6_1M"
+	DIAMOND_MODEL_NAME = "diamond_local15_input4_best"
+	ZOMBIE_MODEL_NAME = "zombie_local15_input4_best"
+	EXPLORE_MODEL_NAME = "explore_local15_input4_best"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/Meta/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -584,14 +584,14 @@ def run_MetaNetwork():
 
 	USE_SAVED_MODEL_FILE = False
 
-	GRID_SIZE = 10 
+	GRID_SIZE = 16
 	LOCAL_GRID_SIZE = 15
 	MAP_PATH = None
 
 	RANDOMIZE_MAPS = True
 
 	RENDER_TO_SCREEN = False
-	RENDER_TO_SCREEN = True
+	# RENDER_TO_SCREEN = True
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE,
@@ -609,7 +609,7 @@ def run_MetaNetwork():
 	if RENDER_TO_SCREEN:
 		env.prerender()
 
-	model = MetaNetwork(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True)
+	model = MetaNetwork(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True,  trainable = False)
 
 	diamond_net = Network(local_size=LOCAL_GRID_SIZE, name=DIAMOND_MODEL_NAME, path="./Models/Tensorflow/Dojos/", load=True, trainable = False)
 
@@ -617,7 +617,7 @@ def run_MetaNetwork():
 
 	explore_net = Network(local_size=LOCAL_GRID_SIZE, name=EXPLORE_MODEL_NAME, path="./Models/Tensorflow/Dojos/", load=True, trainable = False)
 
-	brain = Brain(epsilon=0.01, action_space=3)
+	brain = Brain(epsilon=0.005, action_space=3)
 
 	model.setup(brain)
 	diamond_net.setup(brain)
@@ -626,13 +626,12 @@ def run_MetaNetwork():
 
 	avg_time = 0
 	avg_score = 0
-	avg_error = 0
 	avg_reward = 0
 	cumulative_reward = 0
 
 	# Number of episodes
 	print_episode = 1000
-	total_episodes = 200000
+	total_episodes = 1000
 
 	saver = tf.train.Saver()
 
@@ -659,7 +658,7 @@ def run_MetaNetwork():
 
 			if RANDOMIZE_MAPS:
 				# Make a random map 0: lava, 1: obstacle
-				MAP_PATH = "./Maps/Grid10/map{}.txt".format(np.random.randint(10))
+				MAP_PATH = "./Maps/Grid16/map{}.txt".format(np.random.randint(10))
 				env.set_map(MAP_PATH)
 
 			state, info = env.reset()
@@ -676,18 +675,18 @@ def run_MetaNetwork():
 				if dojo == 0:
 					dojo_state = state
 					dojo_state = np.delete(dojo_state, 2, 0)# Take out the zombie layer
-					dojo_state = np.delete(dojo_state, 3, 0)# Take out the history layer
-					action = brain.choose_dojo(dojo_state, sess, diamond_net, env.number_of_actions(), 0.01)
+					dojo_state = np.delete(dojo_state, 2, 0)# Take out the history layer
+					action = brain.choose_dojo(dojo_state, sess, diamond_net, env.number_of_actions(), 0.0)
 				elif dojo == 1:
 					dojo_state = state
 					dojo_state = np.delete(dojo_state, 1, 0)# Take out the diamond layer
-					dojo_state = np.delete(dojo_state, 3, 0)# Take out the history layer
-					action = brain.choose_dojo(dojo_state, sess, zombie_net, env.number_of_actions(), 0.01)
+					dojo_state = np.delete(dojo_state, 2, 0)# Take out the history layer
+					action = brain.choose_dojo(dojo_state, sess, zombie_net, env.number_of_actions(), 0.0)
 				elif dojo == 2:
 					dojo_state = state
 					dojo_state = np.delete(dojo_state, 1, 0)# Take out the diamond layer
-					dojo_state = np.delete(dojo_state, 2, 0)# Take out the zombie layer
-					action = brain.choose_dojo(dojo_state, sess, explore_net, env.number_of_actions(), 0.01)
+					dojo_state = np.delete(dojo_state, 1, 0)# Take out the zombie layer
+					action = brain.choose_dojo(dojo_state, sess, explore_net, env.number_of_actions(), 0.0)
 
 				# print(action)
 
@@ -705,7 +704,6 @@ def run_MetaNetwork():
 				if done:
 					avg_time += info["time"]
 					avg_score += info["score"]
-					avg_error += e
 					avg_reward += cumulative_reward 
 					cumulative_reward = 0
 
@@ -715,7 +713,6 @@ def run_MetaNetwork():
 				print("Ep:", episode,
 					"\tavg t: {0:.3f}".format(avg_time/print_episode),
 					"\tavg score: {0:.3f}".format(avg_score/print_episode),
-					"\tErr {0:.3f}".format(avg_error/print_episode),
 					"\tavg_reward {0:.3f}".format(avg_reward/print_episode), # avg cumulative reward
 					"\tepsilon {0:.3f}".format(brain.EPSILON),
 					end="")
@@ -723,7 +720,6 @@ def run_MetaNetwork():
 
 				avg_time = 0
 				avg_score = 0
-				avg_error = 0
 				avg_reward = 0
 
 
@@ -753,14 +749,14 @@ def play():
 	env.play()
 
 
-# Main function
+# Main function 
 if __name__ == '__main__':
 
-	# train()
+	# train()     
 
-	train_MetaNetwork()
+	# train_MetaNetwork()
 
-	# run()
+	run()
 
 	# run_MetaNetwork()
 

@@ -1,0 +1,2 @@
+model_checkpoint_path: "complex_local9_input4_100k.ckpt"
+all_model_checkpoint_paths: "complex_local9_input4_100k.ckpt"
