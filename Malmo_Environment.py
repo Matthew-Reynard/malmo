@@ -409,7 +409,7 @@ class Environment:
                 reward = reward_in_lava
 
         # Update the position of the zombie 
-        self.zombie.move(self.maze, self.steve, self.steps)
+        # self.zombie.move(self.maze, self.steve, self.steps)
 
 
         # Check if zombie gets steve
@@ -805,11 +805,11 @@ class Environment:
 
         for i in range(10):
 
-            MAP_NUMBER = np.random.randint(10)
+            # MAP_NUMBER = np.random.randint(10)
 
-            MAP_PATH = "./Maps/Grid10/map1{}.txt".format(MAP_NUMBER)
+            # MAP_PATH = "./Maps/Grid10/map1{}.txt".format(MAP_NUMBER)
 
-            self.set_map(MAP_PATH)
+            # self.set_map(MAP_PATH)
 
             self.reset()
 
@@ -827,7 +827,7 @@ class Environment:
                 
                 # print("\n\n\n") # DEBUGGING
                 # print(self.state_vector_3D()) # DEBUGGING
-                print(self.local_state_vector_3D()) # DEBUGGING
+                # print(self.local_state_vector_3D()) # DEBUGGING
                 
                 # print(r)
 

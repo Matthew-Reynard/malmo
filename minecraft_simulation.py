@@ -727,7 +727,7 @@ def run_MetaNetwork():
 def play():
 	print("\n ----- Playing the game -----\n")
 
-	GRID_SIZE = 10
+	GRID_SIZE = 8
 	LOCAL_GRID_SIZE = 15 # for printing out the state
 
 	# MAP_NUMBER = np.random.randint(10)
@@ -738,10 +738,10 @@ def play():
 					  grid_size = GRID_SIZE, 
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 200,
-					  food_count = 5,
+					  food_count = 3,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 2,
+					  zombie_count = 1,
 					  history = 40,
 					  action_space = 5,
 					  map_path = MAP_PATH)
@@ -756,9 +756,9 @@ if __name__ == '__main__':
 
 	# train_MetaNetwork()
 
-	run()
+	# run()
 
 	# run_MetaNetwork()
 
-	# play()
+	play()
  
