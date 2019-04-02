@@ -27,22 +27,6 @@ from utils import print_readable_time
 
 # MODEL_NAME = "explore_dojo_local15"
 
-# meta_local15_input4
-# diamond_local15_input3
-# zombie_local15_input3
-# explore_local15_input3
-
-# complex_local15_10r
-# diamond_local15_input4
-# zombie_local15_input4
-# explore_local15_input4
-# diamond_local15_input4_5f
-# diamond_local15_input4_tfgraph
-# zombie_local15_input4_tfgraph
-# explore_local15_input4_tfgraph
-# complex_local15_input6
-# complex_local15_input6_tfgraph
-
 # BEST DOJOS (w/Lava)
 # diamond_local15_input4_best
 # zombie_local15_input4_best
@@ -54,10 +38,15 @@ from utils import print_readable_time
 
 # diamond_local15_input4_300k_cont
 
+# complex_local15_input6_1M
+# meta_local15_input6_1M
+
+# diamond_local15_input4_1M
+
 # Train
 def train():
 
-	MODEL_NAME = "diamond_local15_input4_best"  
+	MODEL_NAME = "diamond_local15_input4_1M"  
 
 	FOLDER = "Dojos"
 
@@ -84,7 +73,7 @@ def train():
 					  grid_size = GRID_SIZE,
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80,
-					  max_time = 100,
+					  max_time = 50,
 					  food_count = 5,
 					  obstacle_count = 0,
 					  lava_count = 0,
@@ -96,7 +85,7 @@ def train():
 	if RENDER_TO_SCREEN:
 		env.prerender()
 
-	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True, path="./Models/Tensorflow/"+FOLDER+"/")
+	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=False, path="./Models/Tensorflow/"+FOLDER+"/")
 
 	brain = Brain(epsilon=0.05, action_space = env.number_of_actions())
 
@@ -121,7 +110,7 @@ def train():
 
 	# Number of episodes
 	print_episode = 1000
-	total_episodes = 100000 
+	total_episodes = 1000000
 
 	saver = tf.train.Saver()
 
@@ -161,7 +150,7 @@ def train():
 			state, info = env.reset()
 			done = False
 
-			brain.linear_epsilon_decay(total_episodes, episode, start=0.2 , end=0.05, percentage=0.6)
+			brain.linear_epsilon_decay(total_episodes, episode, start=1.0 , end=0.05, percentage=0.5)
 
 			# brain.linear_alpha_decay(total_episodes, episode)
 
@@ -232,7 +221,7 @@ def train_MetaNetwork():
 
 	print("\n ---- Training the Meta Network ----- \n")
 
-	MODEL_NAME = "meta_local15_input6_1M"
+	MODEL_NAME = "meta_local15_input6_1M_linear"
 	DIAMOND_MODEL_NAME = "diamond_local15_input4_best"
 	ZOMBIE_MODEL_NAME = "zombie_local15_input4_best"
 	EXPLORE_MODEL_NAME = "explore_local15_input4_best"
@@ -316,7 +305,7 @@ def train_MetaNetwork():
 	writer = tf.summary.FileWriter(LOGDIR)
 
  	# GPU capabilities
-	gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.3)
+	gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.25)
 
 	# Begin session
 	with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
@@ -343,7 +332,7 @@ def train_MetaNetwork():
 			state, info = env.reset()
 			done = False
 
-			brain.linear_epsilon_decay(total_episodes, episode, start=1.0, end=0.05, percentage=0.5)
+			brain.linear_epsilon_decay(total_episodes, episode, start=1.0, end=0.0, percentage=1.0)
 
 			# brain.linear_alpha_decay(total_episodes, episode)
 
@@ -456,7 +445,7 @@ def train_MetaNetwork():
 # Run the given model
 def run():
 
-	MODEL_NAME = "complex_local15_input6_1M"
+	MODEL_NAME = "complex_local15_input6_1M_linear"
 
 	FOLDER = "Complex"
 
@@ -466,7 +455,7 @@ def run():
 
 	USE_SAVED_MODEL_FILE = False
 
-	GRID_SIZE = 16
+	GRID_SIZE = 10
 	LOCAL_GRID_SIZE = 15
 	MAP_NUMBER = 0
 	RANDOMIZE_MAPS = True
@@ -529,7 +518,7 @@ def run():
 		for episode in range(total_episodes):
 			
 			if RANDOMIZE_MAPS:
-				MAP_PATH = "./Maps/Grid16/map{}.txt".format(np.random.randint(10))
+				MAP_PATH = "./Maps/Grid10/map{}.txt".format(np.random.randint(10))
 				env.set_map(MAP_PATH)
 
 			state, info = env.reset()
@@ -573,7 +562,7 @@ def run_MetaNetwork():
 
 	print("\n ---- Running the Meta Network ----- \n")
 
-	MODEL_NAME = "meta_local15_input6_1M"
+	MODEL_NAME = "meta_local15_input6_1M_linear"
 	DIAMOND_MODEL_NAME = "diamond_local15_input4_best"
 	ZOMBIE_MODEL_NAME = "zombie_local15_input4_best"
 	EXPLORE_MODEL_NAME = "explore_local15_input4_best"
@@ -584,7 +573,7 @@ def run_MetaNetwork():
 
 	USE_SAVED_MODEL_FILE = False
 
-	GRID_SIZE = 16
+	GRID_SIZE = 10
 	LOCAL_GRID_SIZE = 15
 	MAP_PATH = None
 
@@ -658,7 +647,7 @@ def run_MetaNetwork():
 
 			if RANDOMIZE_MAPS:
 				# Make a random map 0: lava, 1: obstacle
-				MAP_PATH = "./Maps/Grid16/map{}.txt".format(np.random.randint(10))
+				MAP_PATH = "./Maps/Grid10/map{}.txt".format(np.random.randint(10))
 				env.set_map(MAP_PATH)
 
 			state, info = env.reset()
@@ -756,9 +745,9 @@ if __name__ == '__main__':
 
 	# train_MetaNetwork()
 
-	run()
+	# run()
 
-	# run_MetaNetwork()
+	run_MetaNetwork()
 
 	# play()
  
