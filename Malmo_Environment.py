@@ -319,7 +319,7 @@ class Environment:
         reward_collecting_diamond = 10.0
         reward_out_of_bounds = -1.0 # not used
         reward_zombie_hit = -10.0
-        # reward_in_lava = -1.0
+        # reward_in_lava = -1.0  
         reward_in_lava = -10.0
  
         # Increment time step

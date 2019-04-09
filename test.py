@@ -11,9 +11,20 @@ import csv
 
 
 
-custom_epsilon(100000, 2, 0.8, 0.05)
+# custom_epsilon(100000, 2, 0.8, 0.05)
+start = 1
+end = 0.00
+percentage = 1
+total = 1000
 
+for episode in range(total+1):
 
+    e = (-(start-end)/ (percentage*total)) * episode + (start)
+        
+    if e < end: 
+        e = end
+
+    print(e)
 
 
 # a = np.array([[[0,0],
