@@ -1,0 +1,2 @@
+model_checkpoint_path: "meta_local9_input4_1M_nodropout.ckpt"
+all_model_checkpoint_paths: "meta_local9_input4_1M_nodropout.ckpt"

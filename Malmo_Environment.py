@@ -409,7 +409,7 @@ class Environment:
                 reward = reward_in_lava
 
         # Update the position of the zombie 
-        # self.zombie.move(self.maze, self.steve, self.steps)
+        self.zombie.move(self.maze, self.steve, self.steps)
 
 
         # Check if zombie gets steve
@@ -729,6 +729,10 @@ class Environment:
         # EXPLORE DOJO
         # state = np.delete(state, 1, 0)
         # state = np.delete(state, 1, 0)  
+
+        # state = np.delete(state, 1, 0)
+        state = np.delete(state, 3, 0)
+        state = np.delete(state, 3, 0)
  
         return state
 

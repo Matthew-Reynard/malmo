@@ -19,7 +19,7 @@ class Network():
 		if self.LOCAL_GRID_SIZE == 9:
 			self.scale = 4*4
 
-		self.n_input_channels = 6
+		self.n_input_channels = 3
 
 		self.n_out_channels_conv1 = 16 # changed from 16 -> 32
 		self.n_out_channels_conv2 = 32
@@ -131,8 +131,8 @@ class Network():
 		fc = tf.reshape(conv2,[-1, self.scale*self.n_out_channels_conv2])
 		print("Reshape:", fc.shape)
 
-		if self.trainable:
-			fc = tf.nn.dropout(fc, 0.9)
+		# if self.trainable:
+		# 	fc = tf.nn.dropout(fc, 0.9)
 
 		fc = tf.nn.relu(tf.matmul(fc, weights['W_fc']) + biases['b_fc'])
 		print("FC:", fc.shape)
@@ -210,7 +210,7 @@ class MetaNetwork():
 		else:
 			self.scale = 4*4 # local = 9, layers = 4
 
-		self.n_input_channels = 6
+		self.n_input_channels = 4
 
 		self.n_out_channels_conv1 = 16
 		self.n_out_channels_conv2 = 32
@@ -219,7 +219,7 @@ class MetaNetwork():
 		self.filter1_size = 3
 		self.filter2_size = 3
 
-		self.n_actions = 3
+		self.n_actions = 2
 
 		# input
 		self.input = tf.placeholder(tf.float32, [self.n_input_channels, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE], name="Input")
@@ -311,8 +311,8 @@ class MetaNetwork():
 		fc = tf.reshape(conv2,[-1, self.scale*self.n_out_channels_conv2])
 		print("Reshape:", fc.shape)
 		
-		if self.trainable:
-			fc = tf.nn.dropout(fc, 0.9)
+		# if self.trainable:
+		# 	fc = tf.nn.dropout(fc, 0.9)
 
 		fc = tf.nn.relu(tf.matmul(fc, weights['W_fc']) + biases['b_fc'])
 		print("FC:", fc.shape)
