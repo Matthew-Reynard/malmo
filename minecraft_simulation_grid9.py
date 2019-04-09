@@ -12,40 +12,17 @@ from Agent import Brain
 from Malmo_Environment import Environment
 from utils import print_readable_time
 
-# MODEL_NAME = "diamond_dojo_local9"
-# MODEL_NAME = "diamond_dojo_local15"
-
-# MODEL_NAME = "zombie_dojo_local9"
-# MODEL_NAME = "zombie_dojo_local15"
-
-# MODEL_NAME = "complex_local9"
-# MODEL_NAME = "complex_local15"
-
-# MODEL_NAME = "meta_network_local9"
-# MODEL_NAME = "meta_network_local15"
-
-# MODEL_NAME = "explore_dojo_local15"
-
-# BEST DOJOS (w/Lava)
-# diamond_local15_input4_best
-# zombie_local15_input4_best
-# explore_local15_input4_best
-
-# complex_local15_input6_1M
-# meta_local15_input6_1M
-
-# diamond_local15_input4_1M
 
 # Train
 def train():
 
-	MODEL_NAME = "complex_local15_input6_2M"
+	MODEL_NAME = "complex_local9_input4_2M"
 
-	FOLDER = "Complex"
+	FOLDER = "Complex9"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
-	LOGDIR = "./Logs/"+MODEL_NAME+"_2M"
+	LOGDIR = "./Logs/"+MODEL_NAME+""
 
 	USE_SAVED_MODEL_FILE = False
 
@@ -66,12 +43,12 @@ def train():
 					  grid_size = GRID_SIZE,
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80,
-					  max_time = 200,
-					  food_count = 5,
+					  max_time = 100,
+					  food_count = 3,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 2,
-					  history = 40,
+					  zombie_count = 1,
+					  history = 0,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
@@ -737,7 +714,7 @@ def play():
 # Main function 
 if __name__ == '__main__':
 
-	# train()
+	train()
 
 	# train_MetaNetwork()
 
@@ -745,5 +722,5 @@ if __name__ == '__main__':
 
 	# run_MetaNetwork()
 
-	play()
+	# play()
  
