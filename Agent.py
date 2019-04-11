@@ -93,3 +93,78 @@ class Brain():
 
 		return e, output_vector
 
+
+	def train_2_dojos(self, model, sess, dojo):
+
+		memory = self.memory[self.memCntr%self.memSize-1]
+
+		if dojo == 0:
+			memory[0] = np.delete(memory[0], 2, 0)# Take out the zombie layer
+			memory[4] = np.delete(memory[4], 2, 0)# Take out the zombie layer
+		if dojo == 1:
+			memory[0] = np.delete(memory[0], 1, 0)# Take out the diamond layer
+			memory[4] = np.delete(memory[4], 1, 0)# Take out the diamond layer
+
+		output_vector = sess.run(model.q_values, feed_dict={model.input: memory[0]})
+
+		if memory[3]:
+			output_vector[:,memory[1]] = memory[2]
+			# print("Reward:", reward)
+		else:
+			# Gathering the now current state's action-value vector
+			y_prime = sess.run(model.q_values, feed_dict={model.input: memory[4]})
+
+			# Equation for training
+			maxq = sess.run(model.y_prime_max, feed_dict={model.actions: y_prime})
+
+			# RL Equation
+			output_vector[:,memory[1]] = memory[2] + (self.GAMMA * maxq)
+
+		_, e = sess.run([model.optimizer, model.error], feed_dict={model.input: memory[0], model.actions: output_vector})
+
+		return e, output_vector
+
+
+	def train_3_dojos(self, model, sess, dojo):
+
+		memory = self.memory[self.memCntr%self.memSize-1]
+
+		if dojo == 0:
+			memory[0] = np.delete(memory[0], 2, 0)# Take out the zombie layer
+			memory[0] = np.delete(memory[0], 2, 0)# Take out the history layer
+
+			memory[4] = np.delete(memory[4], 2, 0)# Take out the zombie layer
+			memory[4] = np.delete(memory[4], 2, 0)# Take out the history layer
+
+		if dojo == 1:
+			memory[0] = np.delete(memory[0], 1, 0)# Take out the diamond layer
+			memory[0] = np.delete(memory[0], 2, 0)# Take out the history layer
+
+			memory[4] = np.delete(memory[4], 1, 0)# Take out the diamond layer
+			memory[4] = np.delete(memory[4], 2, 0)# Take out the history layer
+			
+		if dojo == 2:
+			memory[0] = np.delete(memory[0], 1, 0)# Take out the diamond layer
+			memory[0] = np.delete(memory[0], 1, 0)# Take out the zombie layer
+
+			memory[4] = np.delete(memory[4], 1, 0)# Take out the diamond layer
+			memory[4] = np.delete(memory[4], 1, 0)# Take out the zombie layer
+
+		output_vector = sess.run(model.q_values, feed_dict={model.input: memory[0]})
+
+		if memory[3]:
+			output_vector[:,memory[1]] = memory[2]
+			# print("Reward:", reward)
+		else:
+			# Gathering the now current state's action-value vector
+			y_prime = sess.run(model.q_values, feed_dict={model.input: memory[4]})
+
+			# Equation for training
+			maxq = sess.run(model.y_prime_max, feed_dict={model.actions: y_prime})
+
+			# RL Equation
+			output_vector[:,memory[1]] = memory[2] + (self.GAMMA * maxq)
+
+		_, e = sess.run([model.optimizer, model.error], feed_dict={model.input: memory[0], model.actions: output_vector})
+
+		return e, output_vector

@@ -44,7 +44,8 @@ from math import pi
 
 # import csv
 # import pandas as pd
-# import matplotlib.pyplot as plt 
+# import matplotlib.pyplot as plt
+
 
 class Environment:
 
@@ -730,9 +731,9 @@ class Environment:
         # state = np.delete(state, 1, 0)
         # state = np.delete(state, 1, 0)  
 
-        # state = np.delete(state, 1, 0)
-        state = np.delete(state, 3, 0)
-        state = np.delete(state, 3, 0)
+        # GRID 9 SETUP
+        # state = np.delete(state, 3, 0)
+        # state = np.delete(state, 3, 0)
  
         return state
 

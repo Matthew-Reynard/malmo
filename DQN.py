@@ -18,7 +18,10 @@ class Network():
 		if self.LOCAL_GRID_SIZE == 9:
 			self.scale = 4*4
 
-		self.n_input_channels = 4
+		if self.LOCAL_GRID_SIZE == 9:
+			self.n_input_channels = 3
+		else:
+			self.n_input_channels = 4
 
 		self.n_out_channels_conv1 = 16 # changed from 16 -> 32
 		self.n_out_channels_conv2 = 32
@@ -199,7 +202,7 @@ class Network():
 
 class MetaNetwork():
 
-	def __init__(self, local_size=9, name="test_model", load=False, trainable = True):
+	def __init__(self, local_size=9, name="test_model", path="./Models/Tensorflow/", load=False, trainable = True):
 
 		self.LOCAL_GRID_SIZE = local_size
 
@@ -209,7 +212,11 @@ class MetaNetwork():
 		else:
 			self.scale = 4*4 # local = 9, layers = 4
 
-		self.n_input_channels = 4
+		if self.LOCAL_GRID_SIZE == 9:
+			self.n_input_channels = 4
+		else:
+			self.n_input_channels = 6
+		
 
 		self.n_out_channels_conv1 = 16
 		self.n_out_channels_conv2 = 32
@@ -218,7 +225,11 @@ class MetaNetwork():
 		self.filter1_size = 3
 		self.filter2_size = 3
 
-		self.n_actions = 2
+		if self.LOCAL_GRID_SIZE == 9:
+			self.n_actions = 2
+		else:
+			self.n_actions = 3
+		
 
 		# input
 		self.input = tf.placeholder(tf.float32, [self.n_input_channels, self.LOCAL_GRID_SIZE, self.LOCAL_GRID_SIZE], name="Input")
@@ -235,7 +246,7 @@ class MetaNetwork():
 		self.weights = None
 		self.biases = None
 
-		self.path = "./Models/Tensorflow/Meta/"
+		self.path = path
 		self.name = name
 		self.load = load
 
@@ -356,7 +367,7 @@ class MetaNetwork():
 		path = self.path + self.name + ".npz"
 		
 		try:
-			os.makedirs('./Models/Tensorflow/Meta/', exist_ok=True)
+			os.makedirs(self.path, exist_ok=True)
 		except Exception as e:
 			print(e,'Could not create directory ./Models/Tensorflow/Meta')
 
