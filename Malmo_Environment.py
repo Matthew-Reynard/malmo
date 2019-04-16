@@ -732,8 +732,8 @@ class Environment:
         # state = np.delete(state, 1, 0)  
 
         # GRID 9 SETUP
-        # state = np.delete(state, 3, 0)
-        # state = np.delete(state, 3, 0)
+        state = np.delete(state, 3, 0)
+        state = np.delete(state, 3, 0)
  
         return state
 

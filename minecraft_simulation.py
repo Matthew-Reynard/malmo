@@ -191,14 +191,24 @@ def train_MetaNetwork():
 
 	print("\n ---- Training the Meta Network ----- \n")
 
-	MODEL_NAME = "meta15_input6_1M_random_unfrozen"
-	DIAMOND_MODEL_NAME = "diamond15_input4_1M_random_unfrozen"
-	ZOMBIE_MODEL_NAME = "zombie15_input4_1M_random_unfrozen"
-	EXPLORE_MODEL_NAME = "explore15_input4_1M_random_unfrozen"
+	# MODEL_NAME = "meta15_input6_1M_unfrozen_dojos_noexplore"
+	# DIAMOND_MODEL_NAME = "diamond15_input4_best_unfrozen_1M_noexplore"
+	# ZOMBIE_MODEL_NAME = "zombie15_input4_best_unfrozen_1M_noexplore"
+	# EXPLORE_MODEL_NAME = "explore15_input4_best_unfrozen_1M_noexplore"
+
+	# MODEL_NAME = "meta15_input6_1M_unfrozen_dojos"
+	# DIAMOND_MODEL_NAME = "diamond15_input4_best_unfrozen_at_1M"
+	# ZOMBIE_MODEL_NAME = "zombie15_input4_best_unfrozen_at_1M"
+	# EXPLORE_MODEL_NAME = "explore15_input4_best_unfrozen_at_1M"
+
+	MODEL_NAME = "meta15_input6_1M_random_unfrozen1"
+	DIAMOND_MODEL_NAME = "diamond15_input4_1M_random_unfrozen1"
+	ZOMBIE_MODEL_NAME = "zombie15_input4_1M_random_unfrozen1"
+	EXPLORE_MODEL_NAME = "explore15_input4_1M_random_unfrozen1"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/Meta/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
-	LOGDIR = "./Logs/"+MODEL_NAME
+	LOGDIR = "./Logs/"+MODEL_NAME+""
 
 	USE_SAVED_MODEL_FILE = False
 
@@ -211,7 +221,7 @@ def train_MetaNetwork():
 	RENDER_TO_SCREEN = False
 	# RENDER_TO_SCREEN = True
 
-	env = Environment(wrap = False, 
+	env = Environment(wrap = False,
 					  grid_size = GRID_SIZE,
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80,
@@ -220,7 +230,7 @@ def train_MetaNetwork():
 					  obstacle_count = 0,
 					  lava_count = 0,
 					  zombie_count = 2,
-					  history = 40, 
+					  history = 40,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
@@ -275,7 +285,7 @@ def train_MetaNetwork():
 	writer = tf.summary.FileWriter(LOGDIR)
 
  	# GPU capabilities
-	gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.3)
+	gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.2)
 
 	# Begin session
 	with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
@@ -322,18 +332,19 @@ def train_MetaNetwork():
 					dojo_state = state
 					dojo_state = np.delete(dojo_state, 2, 0)# Take out the zombie layer
 					dojo_state = np.delete(dojo_state, 2, 0)# Take out the history layer
-					action = brain.choose_dojo(dojo_state, sess, diamond_net, env.number_of_actions(), 0.05)
+					action = brain.choose_dojo(dojo_state, sess, diamond_net, env.number_of_actions(), brain.EPSILON)
 
 				elif dojo == 1:
 					dojo_state = state
 					dojo_state = np.delete(dojo_state, 1, 0)# Take out the diamond layer
 					dojo_state = np.delete(dojo_state, 2, 0)# Take out the history layer
-					action = brain.choose_dojo(dojo_state, sess, zombie_net, env.number_of_actions(), 0.05)
+					action = brain.choose_dojo(dojo_state, sess, zombie_net, env.number_of_actions(), brain.EPSILON)
+
 				elif dojo == 2:
 					dojo_state = state
 					dojo_state = np.delete(dojo_state, 1, 0)# Take out the diamond layer
 					dojo_state = np.delete(dojo_state, 1, 0)# Take out the zombie layer
-					action = brain.choose_dojo(dojo_state, sess, explore_net, env.number_of_actions(), 0.05)
+					action = brain.choose_dojo(dojo_state, sess, explore_net, env.number_of_actions(), brain.EPSILON)
 
 				# print(action)
 
@@ -399,6 +410,7 @@ def train_MetaNetwork():
 				diamond_net.save(sess)
 				zombie_net.save(sess)
 				explore_net.save(sess)
+
 				# save_path = saver.save(sess, MODEL_PATH_SAVE)
 
 				s = sess.run(merged_summary, feed_dict={model.input: state, model.actions: Dojo_vector, score:avg_score/print_episode, avg_t:avg_time/print_episode, epsilon:brain.EPSILON, avg_r:avg_reward/print_episode})

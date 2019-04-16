@@ -1,2 +1,0 @@
-model_checkpoint_path: "diamond_local15_input3.ckpt"
-all_model_checkpoint_paths: "diamond_local15_input3.ckpt"

@@ -1,2 +1,0 @@
-model_checkpoint_path: "zombie_local9_input3_100k_nodropout.ckpt"
-all_model_checkpoint_paths: "zombie_local9_input3_100k_nodropout.ckpt"

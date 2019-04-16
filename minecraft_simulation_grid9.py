@@ -191,9 +191,9 @@ def train_MetaNetwork():
 
 	print("\n ---- Training the Meta Network ----- \n")
 
-	MODEL_NAME = "meta9_input4_1M_random_unfrozen"
-	DIAMOND_MODEL_NAME = "diamond9_input3_1M_random_unfrozen"
-	ZOMBIE_MODEL_NAME = "zombie9_input3_1M_random_unfrozen"
+	MODEL_NAME = "meta9_input4_1M_random_unfrozen1"
+	DIAMOND_MODEL_NAME = "diamond9_input3_1M_random_unfrozen1"
+	ZOMBIE_MODEL_NAME = "zombie9_input3_1M_random_unfrozen1"
 	# EXPLORE_MODEL_NAME = "explore9_input3_1M_random_unfrozen"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/Meta9/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
@@ -218,7 +218,7 @@ def train_MetaNetwork():
 					  max_time = 100,
 					  food_count = 3,
 					  obstacle_count = 0,
-					  lava_count = 0,
+					  lava_count = 0, 
 					  zombie_count = 1,
 					  history = 0, 
 					  action_space = 5,
@@ -275,7 +275,7 @@ def train_MetaNetwork():
 	writer = tf.summary.FileWriter(LOGDIR)
 
  	# GPU capabilities
-	gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.3)
+	gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.1)
 
 	# Begin session
 	with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
@@ -416,9 +416,9 @@ def train_MetaNetwork():
 # Run the given model
 def run():
 
-	MODEL_NAME = "complex_local15_input6_1M_linear"
+	MODEL_NAME = "complex_local9_input4_1M"
 
-	FOLDER = "Complex"
+	FOLDER = "Complex9"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -426,10 +426,9 @@ def run():
 
 	USE_SAVED_MODEL_FILE = False
 
-	GRID_SIZE = 10
-	LOCAL_GRID_SIZE = 15
+	GRID_SIZE = 8
+	LOCAL_GRID_SIZE = 9
 	MAP_NUMBER = 0
-	RANDOMIZE_MAPS = True
 
 	# MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
 	MAP_PATH = None
@@ -443,12 +442,12 @@ def run():
 					  grid_size = GRID_SIZE, 
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80, 
-					  max_time = 200,
-					  food_count = 5,
+					  max_time = 100,
+					  food_count = 3,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 2,
-					  history = 40,
+					  zombie_count = 1,
+					  history = 0,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
@@ -487,10 +486,6 @@ def run():
 		print("")
 
 		for episode in range(total_episodes):
-			
-			if RANDOMIZE_MAPS:
-				MAP_PATH = "./Maps/Grid10/map{}.txt".format(np.random.randint(10))
-				env.set_map(MAP_PATH)
 
 			state, info = env.reset()
 			done = False
@@ -533,22 +528,20 @@ def run_MetaNetwork():
 
 	print("\n ---- Running the Meta Network ----- \n")
 
-	MODEL_NAME = "meta_local15_input6_1M_linear"
-	DIAMOND_MODEL_NAME = "diamond_local15_input4_best"
-	ZOMBIE_MODEL_NAME = "zombie_local15_input4_best"
-	EXPLORE_MODEL_NAME = "explore_local15_input4_best"
+	MODEL_NAME = "meta_local9_input4_1M"
+	DIAMOND_MODEL_NAME = "diamond_local9_input3_best"
+	ZOMBIE_MODEL_NAME = "zombie_local9_input3_300k_nodropout"
+	# EXPLORE_MODEL_NAME = "explore_local15_input4_best"
 
-	MODEL_PATH_SAVE = "./Models/Tensorflow/Meta/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
+	MODEL_PATH_SAVE = "./Models/Tensorflow/Meta9/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
 	LOGDIR = "./Logs/"+MODEL_NAME
 
 	USE_SAVED_MODEL_FILE = False
 
-	GRID_SIZE = 10
-	LOCAL_GRID_SIZE = 15
+	GRID_SIZE = 8
+	LOCAL_GRID_SIZE = 9
 	MAP_PATH = None
-
-	RANDOMIZE_MAPS = True
 
 	RENDER_TO_SCREEN = False
 	# RENDER_TO_SCREEN = True
@@ -557,32 +550,30 @@ def run_MetaNetwork():
 					  grid_size = GRID_SIZE,
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80, 
-					  max_time = 200,
-					  food_count = 5,
+					  max_time = 100,
+					  food_count = 3,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 2,
-					  history = 40, 
+					  zombie_count = 1,
+					  history = 0,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
 	if RENDER_TO_SCREEN:
 		env.prerender()
 
-	model = MetaNetwork(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True,  trainable = False)
+	model = MetaNetwork(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, path="./Models/Tensorflow/Meta9/", load=True,  trainable = False)
 
-	diamond_net = Network(local_size=LOCAL_GRID_SIZE, name=DIAMOND_MODEL_NAME, path="./Models/Tensorflow/Dojos/", load=True, trainable = False)
+	diamond_net = Network(local_size=LOCAL_GRID_SIZE, name=DIAMOND_MODEL_NAME, path="./Models/Tensorflow/Dojos9/", load=True, trainable = False)
 
-	zombie_net = Network(local_size=LOCAL_GRID_SIZE, name=ZOMBIE_MODEL_NAME, path="./Models/Tensorflow/Dojos/", load=True, trainable = False)
+	zombie_net = Network(local_size=LOCAL_GRID_SIZE, name=ZOMBIE_MODEL_NAME, path="./Models/Tensorflow/Dojos9/", load=True, trainable = False)
 
-	explore_net = Network(local_size=LOCAL_GRID_SIZE, name=EXPLORE_MODEL_NAME, path="./Models/Tensorflow/Dojos/", load=True, trainable = False)
 
 	brain = Brain(epsilon=0.005, action_space=3)
 
 	model.setup(brain)
 	diamond_net.setup(brain)
 	zombie_net.setup(brain)
-	explore_net.setup(brain)
 
 	avg_time = 0
 	avg_score = 0
@@ -616,11 +607,6 @@ def run_MetaNetwork():
 
 		for episode in range(total_episodes):
 
-			if RANDOMIZE_MAPS:
-				# Make a random map 0: lava, 1: obstacle
-				MAP_PATH = "./Maps/Grid10/map{}.txt".format(np.random.randint(10))
-				env.set_map(MAP_PATH)
-
 			state, info = env.reset()
 			done = False
 
@@ -635,18 +621,11 @@ def run_MetaNetwork():
 				if dojo == 0:
 					dojo_state = state
 					dojo_state = np.delete(dojo_state, 2, 0)# Take out the zombie layer
-					dojo_state = np.delete(dojo_state, 2, 0)# Take out the history layer
 					action = brain.choose_dojo(dojo_state, sess, diamond_net, env.number_of_actions(), 0.0)
 				elif dojo == 1:
 					dojo_state = state
 					dojo_state = np.delete(dojo_state, 1, 0)# Take out the diamond layer
-					dojo_state = np.delete(dojo_state, 2, 0)# Take out the history layer
 					action = brain.choose_dojo(dojo_state, sess, zombie_net, env.number_of_actions(), 0.0)
-				elif dojo == 2:
-					dojo_state = state
-					dojo_state = np.delete(dojo_state, 1, 0)# Take out the diamond layer
-					dojo_state = np.delete(dojo_state, 1, 0)# Take out the zombie layer
-					action = brain.choose_dojo(dojo_state, sess, explore_net, env.number_of_actions(), 0.0)
 
 				# print(action)
 
@@ -714,11 +693,11 @@ if __name__ == '__main__':
 
 	# train()
 
-	train_MetaNetwork()
+	# train_MetaNetwork()
 
 	# run()
 
-	# run_MetaNetwork()
+	run_MetaNetwork()
 
 	# play()
  

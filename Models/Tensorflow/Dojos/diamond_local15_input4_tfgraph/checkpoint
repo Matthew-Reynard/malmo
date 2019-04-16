@@ -1,2 +1,0 @@
-model_checkpoint_path: "diamond_local15_input4_tfgraph.ckpt"
-all_model_checkpoint_paths: "diamond_local15_input4_tfgraph.ckpt"
