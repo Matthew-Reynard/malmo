@@ -1,4 +1,5 @@
 # import random  # used for seeding
+import numpy as np
 import csv
 
 class Lava:
@@ -48,7 +49,7 @@ class Lava:
         # [allowed.remove(pos) for pos in disallowed]
 
         for i in range(self.num_of_random_lava):
-            new_pos = random.choice((allowed))
+            new_pos = allowed[np.random.choice(len(allowed))]
             self.array.append(new_pos)
             self.array_length += 1
             allowed.remove(new_pos)

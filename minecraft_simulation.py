@@ -16,18 +16,18 @@ from utils import print_readable_time
 # Train
 def train():
 
-	MODEL_NAME = "complex_local15_input6_2M"
+	MODEL_NAME = "oscillating_zombie15_input4"
 
 	FOLDER = "Complex"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
-	LOGDIR = "./Logs/"+MODEL_NAME+"_2M"
+	LOGDIR = "./Logs/"+MODEL_NAME+""
 
 	USE_SAVED_MODEL_FILE = False
 
-	GRID_SIZE = 8
-	LOCAL_GRID_SIZE = 9
+	GRID_SIZE = 10
+	LOCAL_GRID_SIZE = 15
 	MAP_NUMBER = 0
 	RANDOMIZE_MAPS = False
 
@@ -44,11 +44,11 @@ def train():
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80,
 					  max_time = 200,
-					  food_count = 5,
+					  food_count = 0,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 2,
-					  history = 40,
+					  zombie_count = 1,
+					  history = 0,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
@@ -80,7 +80,7 @@ def train():
 
 	# Number of episodes
 	print_episode = 1000
-	total_episodes = 1000000 
+	total_episodes = 100000 
 
 	saver = tf.train.Saver()
 
@@ -191,20 +191,20 @@ def train_MetaNetwork():
 
 	print("\n ---- Training the Meta Network ----- \n")
 
-	# MODEL_NAME = "meta15_input6_1M_unfrozen_dojos_noexplore"
-	# DIAMOND_MODEL_NAME = "diamond15_input4_best_unfrozen_1M_noexplore"
-	# ZOMBIE_MODEL_NAME = "zombie15_input4_best_unfrozen_1M_noexplore"
-	# EXPLORE_MODEL_NAME = "explore15_input4_best_unfrozen_1M_noexplore"
+	MODEL_NAME = "meta_local15_input6_2M_unfrozen_fixed"
+	DIAMOND_MODEL_NAME = "diamond15_input4_best_unfrozen_1M_noexplore_fixed"
+	ZOMBIE_MODEL_NAME = "zombie15_input4_best_unfrozen_1M_noexplore_fixed"
+	EXPLORE_MODEL_NAME = "explore15_input4_best_unfrozen_1M_noexplore_fixed"
 
 	# MODEL_NAME = "meta15_input6_1M_unfrozen_dojos"
 	# DIAMOND_MODEL_NAME = "diamond15_input4_best_unfrozen_at_1M"
 	# ZOMBIE_MODEL_NAME = "zombie15_input4_best_unfrozen_at_1M"
 	# EXPLORE_MODEL_NAME = "explore15_input4_best_unfrozen_at_1M"
 
-	MODEL_NAME = "meta15_input6_1M_random_unfrozen1"
-	DIAMOND_MODEL_NAME = "diamond15_input4_1M_random_unfrozen1"
-	ZOMBIE_MODEL_NAME = "zombie15_input4_1M_random_unfrozen1"
-	EXPLORE_MODEL_NAME = "explore15_input4_1M_random_unfrozen1"
+	# MODEL_NAME = "meta15_input6_1M_random_unfrozen_cointoss"
+	# DIAMOND_MODEL_NAME = "diamond15_input4_1M_random_unfrozen_cointoss"
+	# ZOMBIE_MODEL_NAME = "zombie15_input4_1M_random_unfrozen_cointoss"
+	# EXPLORE_MODEL_NAME = "explore15_input4_1M_random_unfrozen_cointoss"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/Meta/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -237,13 +237,13 @@ def train_MetaNetwork():
 	if RENDER_TO_SCREEN:
 		env.prerender()
 
-	model = MetaNetwork(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, path="./Models/Tensorflow/Meta/", load=False,  trainable=True)
+	model = MetaNetwork(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, path="./Models/Tensorflow/Meta/", load=True,  trainable=True)
  
-	diamond_net = Network(local_size=LOCAL_GRID_SIZE, name=DIAMOND_MODEL_NAME, path="./Models/Tensorflow/Dojos/", load=False, trainable=True)
+	diamond_net = Network(local_size=LOCAL_GRID_SIZE, name=DIAMOND_MODEL_NAME, path="./Models/Tensorflow/Dojos/", load=True, trainable=True)
 
-	zombie_net = Network(local_size=LOCAL_GRID_SIZE, name=ZOMBIE_MODEL_NAME, path="./Models/Tensorflow/Dojos/", load=False, trainable=True)
+	zombie_net = Network(local_size=LOCAL_GRID_SIZE, name=ZOMBIE_MODEL_NAME, path="./Models/Tensorflow/Dojos/", load=True, trainable=True)
 
-	explore_net = Network(local_size=LOCAL_GRID_SIZE, name=EXPLORE_MODEL_NAME, path="./Models/Tensorflow/Dojos/", load=False, trainable=True)
+	explore_net = Network(local_size=LOCAL_GRID_SIZE, name=EXPLORE_MODEL_NAME, path="./Models/Tensorflow/Dojos/", load=True, trainable=True)
 
 	brain = Brain(epsilon=0.05, action_space=3)
 
@@ -312,7 +312,7 @@ def train_MetaNetwork():
 			state, info = env.reset()
 			done = False
 
-			brain.linear_epsilon_decay(total_episodes, episode, start=1.0, end=0.05, percentage=0.5)
+			# brain.linear_epsilon_decay(total_episodes, episode, start=1.0, end=0.05, percentage=0.5)
 
 			# brain.linear_alpha_decay(total_episodes, episode)
 
@@ -325,6 +325,8 @@ def train_MetaNetwork():
 				Dojo_vector = sess.run(model.q_values, feed_dict={model.input: state})
 
 				dojo = brain.choose_action(state, sess, model)
+				# dojo = np.random.randint(3)
+				# dojo = 0
 
 				# print(dojo)
 
@@ -353,16 +355,18 @@ def train_MetaNetwork():
 
 				# print(new_state)
 
-				brain.store_transition(state, dojo, reward, done, new_state)
+				brain.store_transition(state, action, reward, done, new_state)
 
 				# print(tf.trainable_variables(scope=None))
 
 				if dojo == 0:
-					_, Q_vector = brain.train_3_dojos(diamond_net, sess, dojo)
-				if dojo == 1:
-					_, Q_vector = brain.train_3_dojos(zombie_net, sess, dojo)
-				if dojo == 2:
-					_, Q_vector = brain.train_3_dojos(explore_net, sess, dojo)
+					e, Q_vector = brain.train_3_dojos(diamond_net, sess, dojo)
+
+				elif dojo == 1:
+					e, Q_vector = brain.train_3_dojos(zombie_net, sess, dojo)
+
+				elif dojo == 2:
+					e, Q_vector = brain.train_3_dojos(explore_net, sess, dojo)
 
 				if done:
 					Dojo_vector[:,dojo] = reward
