@@ -1,0 +1,2 @@
+model_checkpoint_path: "oscillating_zombie15_input4_move2.ckpt"
+all_model_checkpoint_paths: "oscillating_zombie15_input4_move2.ckpt"
