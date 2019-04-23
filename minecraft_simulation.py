@@ -439,7 +439,7 @@ def train_MetaNetwork():
 # Run the given model
 def run():
 
-	MODEL_NAME = "suicide_steve15_input4"
+	MODEL_NAME = "oscillating_zombie15_input4_move2"
 
 	FOLDER = "Other"
 
@@ -452,7 +452,7 @@ def run():
 	GRID_SIZE = 10
 	LOCAL_GRID_SIZE = 15
 	MAP_NUMBER = 0
-	RANDOMIZE_MAPS = True
+	RANDOMIZE_MAPS = False
 
 	# MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
 	MAP_PATH = None
@@ -469,7 +469,7 @@ def run():
 					  max_time = 200,
 					  food_count = 0,
 					  obstacle_count = 0,
-					  lava_count = 1,
+					  lava_count = 0,
 					  zombie_count = 1,
 					  history = 0,
 					  action_space = 5,

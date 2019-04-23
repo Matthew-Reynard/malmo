@@ -16,9 +16,9 @@ from utils import print_readable_time
 # Train
 def train():
 
-	MODEL_NAME = "complex_local9_input4_2M"
+	MODEL_NAME = "diamond9_input4_100k"
 
-	FOLDER = "Complex9"
+	FOLDER = "Dojos9"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -43,11 +43,11 @@ def train():
 					  grid_size = GRID_SIZE,
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80,
-					  max_time = 100,
+					  max_time = 30,
 					  food_count = 3,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 1,
+					  zombie_count = 0,
 					  history = 0,
 					  action_space = 5,
 					  map_path = MAP_PATH)
@@ -55,7 +55,7 @@ def train():
 	if RENDER_TO_SCREEN:
 		env.prerender()
 
-	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=False, path="./Models/Tensorflow/"+FOLDER+"/")
+	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True, path="./Models/Tensorflow/"+FOLDER+"/")
 
 	brain = Brain(epsilon=0.05, action_space = env.number_of_actions())
 
@@ -80,7 +80,7 @@ def train():
 
 	# Number of episodes
 	print_episode = 1000
-	total_episodes = 1000000 
+	total_episodes = 100000
 
 	saver = tf.train.Saver()
 
@@ -120,7 +120,7 @@ def train():
 			state, info = env.reset()
 			done = False
 
-			brain.linear_epsilon_decay(total_episodes, episode, start=1.0, end=0.05, percentage=0.5)
+			brain.linear_epsilon_decay(total_episodes, episode, start=0.4, end=0.05, percentage=0.8)
 
 			# brain.linear_alpha_decay(total_episodes, episode)
 
@@ -168,7 +168,7 @@ def train():
 
 				# Save the model's weights and biases to .npz file
 				model.save(sess)
-				save_path = saver.save(sess, MODEL_PATH_SAVE)
+				# save_path = saver.save(sess, MODEL_PATH_SAVE)
 
 				s = sess.run(merged_summary, feed_dict={model.input: state, model.actions: Q_vector, score:avg_score/print_episode, avg_t:avg_time/print_episode, epsilon:brain.EPSILON, avg_r:avg_reward/print_episode})
 				writer.add_summary(s, episode)
@@ -180,8 +180,8 @@ def train():
 
 		model.save(sess, verbose=True)
 
-		save_path = saver.save(sess, MODEL_PATH_SAVE)
-		print("Model saved in path: %s" % save_path)
+		# save_path = saver.save(sess, MODEL_PATH_SAVE)
+		# print("Model saved in path: %s" % save_path)
 
 		writer.close()
 
@@ -691,13 +691,13 @@ def play():
 # Main function 
 if __name__ == '__main__':
 
-	# train()
+	train()
 
 	# train_MetaNetwork()
 
 	# run()
 
-	run_MetaNetwork()
+	# run_MetaNetwork()
 
 	# play()
  

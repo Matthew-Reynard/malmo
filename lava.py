@@ -2,6 +2,7 @@
 import numpy as np
 import csv
 
+
 class Lava:
 
     def __init__(self, size):

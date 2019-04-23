@@ -20,7 +20,7 @@ class Food:
 
         white = (255,255,255)
         self.food_img = pygame.image.load("./Images/Diamond.png").convert()
-        self.food_img.set_colorkey(white)
+        # self.food_img.set_colorkey(white)
 
         # If the image isn't 20x20 pixels
         self.food_img = pygame.transform.scale(self.food_img, (20, 20))
