@@ -16,9 +16,9 @@ from utils import print_readable_time
 # Train
 def train():
 
-	MODEL_NAME = "oscillating_zombie15_input4"
+	MODEL_NAME = "suicide_steve15_input4_r5"
 
-	FOLDER = "Complex"
+	FOLDER = "Other"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -29,7 +29,7 @@ def train():
 	GRID_SIZE = 10
 	LOCAL_GRID_SIZE = 15
 	MAP_NUMBER = 0
-	RANDOMIZE_MAPS = False
+	RANDOMIZE_MAPS = True
 
 	# MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
 	MAP_PATH = None
@@ -46,7 +46,7 @@ def train():
 					  max_time = 200,
 					  food_count = 0,
 					  obstacle_count = 0,
-					  lava_count = 0,
+					  lava_count = 1,
 					  zombie_count = 1,
 					  history = 0,
 					  action_space = 5,
@@ -433,15 +433,15 @@ def train_MetaNetwork():
 		# save_path = saver.save(sess, MODEL_PATH_SAVE)
 		# print("Model saved in path: %s" % save_path)
 
-		writer.close()  
+		writer.close()
 
 
 # Run the given model
 def run():
 
-	MODEL_NAME = "complex_local15_input6_1M_linear"
+	MODEL_NAME = "suicide_steve15_input4"
 
-	FOLDER = "Complex"
+	FOLDER = "Other"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -460,18 +460,18 @@ def run():
 	print("\n ---- Running the Deep Q Network ----- \n")
 
 	RENDER_TO_SCREEN = False
-	# RENDER_TO_SCREEN = True
+	RENDER_TO_SCREEN = True
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE, 
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80, 
 					  max_time = 200,
-					  food_count = 5,
+					  food_count = 0,
 					  obstacle_count = 0,
-					  lava_count = 0,
-					  zombie_count = 2,
-					  history = 40,
+					  lava_count = 1,
+					  zombie_count = 1,
+					  history = 0,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
@@ -735,9 +735,9 @@ def play():
 # Main function 
 if __name__ == '__main__':
 
-	# train()
+	train()
 
-	train_MetaNetwork()
+	# train_MetaNetwork()
 
 	# run()
 
