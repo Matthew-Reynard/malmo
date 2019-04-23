@@ -191,9 +191,9 @@ def train_MetaNetwork():
 
 	print("\n ---- Training the Meta Network ----- \n")
 
-	MODEL_NAME = "meta9_input4_1M_random_unfrozen1"
-	DIAMOND_MODEL_NAME = "diamond9_input3_1M_random_unfrozen1"
-	ZOMBIE_MODEL_NAME = "zombie9_input3_1M_random_unfrozen1"
+	MODEL_NAME = "meta9_input4_1M_random_unfrozen_fixed"
+	DIAMOND_MODEL_NAME = "diamond9_input3_1M_random_unfrozen_fixed"
+	ZOMBIE_MODEL_NAME = "zombie9_input3_1M_random_unfrozen_fixed"
 	# EXPLORE_MODEL_NAME = "explore9_input3_1M_random_unfrozen"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/Meta9/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
@@ -321,12 +321,12 @@ def train_MetaNetwork():
 				if dojo == 0:
 					dojo_state = state
 					dojo_state = np.delete(dojo_state, 2, 0)# Take out the zombie layer
-					action = brain.choose_dojo(dojo_state, sess, diamond_net, env.number_of_actions(), 0.05)
+					action = brain.choose_dojo(dojo_state, sess, diamond_net, env.number_of_actions(), brain.EPSILON)
 
 				elif dojo == 1:
 					dojo_state = state
 					dojo_state = np.delete(dojo_state, 1, 0)# Take out the diamond layer
-					action = brain.choose_dojo(dojo_state, sess, zombie_net, env.number_of_actions(), 0.05)
+					action = brain.choose_dojo(dojo_state, sess, zombie_net, env.number_of_actions(), brain.EPSILON)
 
 				# print(action)
 
@@ -693,7 +693,7 @@ if __name__ == '__main__':
 
 	train()
 
-	# train_MetaNetwork()
+	train_MetaNetwork()
 
 	# run()
 
