@@ -320,8 +320,13 @@ class Environment:
         reward_collecting_diamond = 10.0
         reward_out_of_bounds = -1.0 # not used
         reward_zombie_hit = -10.0
+<<<<<<< HEAD
         reward_in_lava = -10.0  
         # reward_in_lava = 5.0
+=======
+        # reward_in_lava = -5.0
+        reward_in_lava = -10.0
+>>>>>>> bb91b5fa962fa3e64ce9978ed9de8db4a40db545
  
         # Increment time step
         self.time += 1
@@ -737,7 +742,11 @@ class Environment:
         # state = np.delete(state, 2, 0)
 
         state = np.delete(state, 4, 0)
+<<<<<<< HEAD
 
+=======
+ 
+>>>>>>> bb91b5fa962fa3e64ce9978ed9de8db4a40db545
         return state
 
 

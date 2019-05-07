@@ -226,7 +226,11 @@ class MetaNetwork():
 		self.filter2_size = 3
 
 		if self.LOCAL_GRID_SIZE == 9:
+<<<<<<< HEAD
 			self.n_actions = 3
+=======
+			self.n_actions = 1
+>>>>>>> bb91b5fa962fa3e64ce9978ed9de8db4a40db545
 		else:
 			self.n_actions = 3
 		

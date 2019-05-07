@@ -16,9 +16,9 @@ from utils import print_readable_time
 # Train
 def train():
 
-	MODEL_NAME = "suicide_steve15_input4_r5"
+	MODEL_NAME = "diamond15_input4_1M"
 
-	FOLDER = "Other"
+	FOLDER = "Dojos"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -36,18 +36,18 @@ def train():
 
 	print("\n ---- Training the Deep Neural Network ----- \n")
 
-	RENDER_TO_SCREEN = False 
+	RENDER_TO_SCREEN = False
 	# RENDER_TO_SCREEN = True
 
 	env = Environment(wrap = False,
 					  grid_size = GRID_SIZE,
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80,
-					  max_time = 200,
-					  food_count = 0,
+					  max_time = 50,
+					  food_count = 5,
 					  obstacle_count = 0,
-					  lava_count = 1,
-					  zombie_count = 1,
+					  lava_count = 0,
+					  zombie_count = 0,
 					  history = 0,
 					  action_space = 5,
 					  map_path = MAP_PATH)
@@ -80,7 +80,7 @@ def train():
 
 	# Number of episodes
 	print_episode = 1000
-	total_episodes = 100000 
+	total_episodes = 1000000
 
 	saver = tf.train.Saver()
 
@@ -134,7 +134,7 @@ def train():
 
 				# Update environment by performing action
 				new_state, reward, done, info = env.step(action)
-				# print(new_state)
+				# print(new_state[3], reward)
 
 				brain.store_transition(state, action, reward, done, new_state)
 				
@@ -168,7 +168,7 @@ def train():
 
 				# Save the model's weights and biases to .npz file
 				model.save(sess)
-				save_path = saver.save(sess, MODEL_PATH_SAVE)
+				# save_path = saver.save(sess, MODEL_PATH_SAVE)
 
 				s = sess.run(merged_summary, feed_dict={model.input: state, model.actions: Q_vector, score:avg_score/print_episode, avg_t:avg_time/print_episode, epsilon:brain.EPSILON, avg_r:avg_reward/print_episode})
 				writer.add_summary(s, episode)
@@ -180,8 +180,8 @@ def train():
 
 		model.save(sess, verbose=True)
 
-		save_path = saver.save(sess, MODEL_PATH_SAVE)
-		print("Model saved in path: %s" % save_path)
+		# save_path = saver.save(sess, MODEL_PATH_SAVE)
+		# print("Model saved in path: %s" % save_path)
 
 		writer.close()
 
@@ -439,20 +439,18 @@ def train_MetaNetwork():
 # Run the given model
 def run():
 
-	MODEL_NAME = "oscillating_zombie15_input4_move2"
+	MODEL_NAME = "diamond15_input4_1M"
 
-	FOLDER = "Other"
+	FOLDER = "Dojos"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
-
-	LOGDIR = "./Logs/"+MODEL_NAME
 
 	USE_SAVED_MODEL_FILE = False
 
 	GRID_SIZE = 10
 	LOCAL_GRID_SIZE = 15
 	MAP_NUMBER = 0
-	RANDOMIZE_MAPS = False
+	RANDOMIZE_MAPS = True
 
 	# MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
 	MAP_PATH = None
@@ -460,17 +458,17 @@ def run():
 	print("\n ---- Running the Deep Q Network ----- \n")
 
 	RENDER_TO_SCREEN = False
-	RENDER_TO_SCREEN = True
+	# RENDER_TO_SCREEN = True
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE, 
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80, 
-					  max_time = 200,
-					  food_count = 0,
+					  max_time = 100,
+					  food_count = 5,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 1,
+					  zombie_count = 0,
 					  history = 0,
 					  action_space = 5,
 					  map_path = MAP_PATH)
@@ -488,8 +486,8 @@ def run():
 	avg_score = 0
 
 	# Number of episodes
-	print_episode = 1000
-	total_episodes = 1000
+	print_episode = 100
+	total_episodes = 100
 
 	saver = tf.train.Saver()
 
