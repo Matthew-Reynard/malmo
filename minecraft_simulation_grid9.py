@@ -16,13 +16,13 @@ from utils import print_readable_time
 # Train
 def train():
 
-	MODEL_NAME = "diamond9_input4_100k"
+	MODEL_NAME = "zombie9_input3_best_epgreedy2"
 
 	FOLDER = "Dojos9"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
-	LOGDIR = "./Logs/"+MODEL_NAME+""
+	LOGDIR = "./Logs/"+MODEL_NAME+"2"
 
 	USE_SAVED_MODEL_FILE = False
 
@@ -43,11 +43,11 @@ def train():
 					  grid_size = GRID_SIZE,
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80,
-					  max_time = 30,
-					  food_count = 3,
+					  max_time = 80,
+					  food_count = 0,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 0,
+					  zombie_count = 1,
 					  history = 0,
 					  action_space = 5,
 					  map_path = MAP_PATH)
@@ -57,7 +57,7 @@ def train():
 
 	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True, path="./Models/Tensorflow/"+FOLDER+"/")
 
-	brain = Brain(epsilon=0.05, action_space = env.number_of_actions())
+	brain = Brain(epsilon=0.1, action_space = env.number_of_actions())
 
 	model.setup(brain)
 
@@ -120,7 +120,7 @@ def train():
 			state, info = env.reset()
 			done = False
 
-			brain.linear_epsilon_decay(total_episodes, episode, start=0.4, end=0.05, percentage=0.8)
+			# brain.linear_epsilon_decay(total_episodes, episode, start=0.4, end=0.05, percentage=0.8)
 
 			# brain.linear_alpha_decay(total_episodes, episode)
 
@@ -191,10 +191,11 @@ def train_MetaNetwork():
 
 	print("\n ---- Training the Meta Network ----- \n")
 
-	MODEL_NAME = "meta9_input4_1M_random_unfrozen_fixed"
-	DIAMOND_MODEL_NAME = "diamond9_input3_1M_random_unfrozen_fixed"
-	ZOMBIE_MODEL_NAME = "zombie9_input3_1M_random_unfrozen_fixed"
-	# EXPLORE_MODEL_NAME = "explore9_input3_1M_random_unfrozen"
+	MODEL_NAME = "meta9_one_dojo"
+	DIAMOND_MODEL_NAME = "test9_input5"
+	# ZOMBIE_MODEL_NAME = "zombie9_input3_best_200k"
+	# EXPLORE_MODEL_NAME = "explore9_input3_best_200k"
+	# DOJO_MODEL_NAME = "test9_input5"diamond9_input3_best_200k
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/Meta9/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -216,11 +217,11 @@ def train_MetaNetwork():
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80, 
 					  max_time = 100,
-					  food_count = 3,
+					  food_count = 5,
 					  obstacle_count = 0,
 					  lava_count = 0, 
 					  zombie_count = 1,
-					  history = 0, 
+					  history = 40, 
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
@@ -231,15 +232,15 @@ def train_MetaNetwork():
  
 	diamond_net = Network(local_size=LOCAL_GRID_SIZE, name=DIAMOND_MODEL_NAME, path="./Models/Tensorflow/Dojos9/", load=False, trainable=True)
 
-	zombie_net = Network(local_size=LOCAL_GRID_SIZE, name=ZOMBIE_MODEL_NAME, path="./Models/Tensorflow/Dojos9/", load=False, trainable=True)
+	# zombie_net = Network(local_size=LOCAL_GRID_SIZE, name=ZOMBIE_MODEL_NAME, path="./Models/Tensorflow/Dojos9/", load=True, trainable=False)
 
-	# explore_net = Network(local_size=LOCAL_GRID_SIZE, name=EXPLORE_MODEL_NAME, path="./Models/Tensorflow/Dojos9/", load=False, trainable=True)
+	# explore_net = Network(local_size=LOCAL_GRID_SIZE, name=EXPLORE_MODEL_NAME, path="./Models/Tensorflow/Dojos9/", load=True, trainable=False)
 
-	brain = Brain(epsilon=0.05, action_space=2)
+	brain = Brain(epsilon=0.1, action_space=1)
 
 	model.setup(brain)
 	diamond_net.setup(brain)
-	zombie_net.setup(brain)
+	# zombie_net.setup(brain)
 	# explore_net.setup(brain)
 
 	score = tf.placeholder(tf.float32, [])
@@ -261,7 +262,7 @@ def train_MetaNetwork():
 
 	# Number of episodes
 	print_episode = 1000
-	total_episodes = 1000000
+	total_episodes = 100000
 
 	saver = tf.train.Saver()
 
@@ -302,7 +303,7 @@ def train_MetaNetwork():
 			state, info = env.reset()
 			done = False
 
-			brain.linear_epsilon_decay(total_episodes, episode, start=1.0, end=0.05, percentage=0.5)
+			# brain.linear_epsilon_decay(total_episodes, episode, start=1.0, end=0.05, percentage=0.5)
 
 			# brain.linear_alpha_decay(total_episodes, episode)
 
@@ -320,13 +321,21 @@ def train_MetaNetwork():
 
 				if dojo == 0:
 					dojo_state = state
-					dojo_state = np.delete(dojo_state, 2, 0)# Take out the zombie layer
+					# dojo_state = np.delete(dojo_state, 2, 0)# Take out the zombie layer
+					# dojo_state = np.delete(dojo_state, 2, 0)# Take out the zombie layer
 					action = brain.choose_dojo(dojo_state, sess, diamond_net, env.number_of_actions(), brain.EPSILON)
 
-				elif dojo == 1:
-					dojo_state = state
-					dojo_state = np.delete(dojo_state, 1, 0)# Take out the diamond layer
-					action = brain.choose_dojo(dojo_state, sess, zombie_net, env.number_of_actions(), brain.EPSILON)
+				# elif dojo == 1:
+				# 	dojo_state = state
+				# 	dojo_state = np.delete(dojo_state, 1, 0)# Take out the diamond layer
+				# 	dojo_state = np.delete(dojo_state, 2, 0)# Take out the zombie layer
+				# 	action = brain.choose_dojo(dojo_state, sess, zombie_net, env.number_of_actions(), brain.EPSILON)
+
+				# elif dojo == 2:
+				# 	dojo_state = state
+				# 	dojo_state = np.delete(dojo_state, 1, 0)# Take out the diamond layer
+				# 	dojo_state = np.delete(dojo_state, 1, 0)# Take out the zombie layer
+				# 	action = brain.choose_dojo(dojo_state, sess, explore_net, env.number_of_actions(), brain.EPSILON)
 
 				# print(action)
 
@@ -343,9 +352,10 @@ def train_MetaNetwork():
 				# TRAIN DOJOS
 				# e, Q_vector = brain.train(model, sess)
 				if dojo == 0:
-					_, Q_vector = brain.train_2_dojos(diamond_net, sess, dojo)
-				if dojo == 1:
-					_, Q_vector = brain.train_2_dojos(zombie_net, sess, dojo)
+					# _, Q_vector = brain.train_2_dojos(diamond_net, sess, dojo)
+					_, Q_vector = brain.train(diamond_net, sess)
+				# if dojo == 1:
+				# 	_, Q_vector = brain.train_2_dojos(zombie_net, sess, dojo)
 				
 				# TRAIN META NETWORK
 				if done:
@@ -392,7 +402,7 @@ def train_MetaNetwork():
 				# Save the model's weights and biases to .npz file
 				model.save(sess)
 				diamond_net.save(sess)
-				zombie_net.save(sess)
+				# zombie_net.save(sess)
 				# save_path = saver.save(sess, MODEL_PATH_SAVE)
 
 				s = sess.run(merged_summary, feed_dict={model.input: state, model.actions: Dojo_vector, score:avg_score/print_episode, avg_t:avg_time/print_episode, epsilon:brain.EPSILON, avg_r:avg_reward/print_episode})
@@ -405,7 +415,7 @@ def train_MetaNetwork():
 
 		model.save(sess, verbose=True)
 		diamond_net.save(sess, verbose=True)
-		zombie_net.save(sess, verbose=True)
+		# zombie_net.save(sess, verbose=True)
 
 		# save_path = saver.save(sess, MODEL_PATH_SAVE)
 		# print("Model saved in path: %s" % save_path)
@@ -416,9 +426,9 @@ def train_MetaNetwork():
 # Run the given model
 def run():
 
-	MODEL_NAME = "complex_local9_input4_1M"
+	MODEL_NAME = "zombie9_input3_best_200k"
 
-	FOLDER = "Complex9"
+	FOLDER = "Dojos9"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -436,14 +446,14 @@ def run():
 	print("\n ---- Running the Deep Q Network ----- \n")
 
 	RENDER_TO_SCREEN = False
-	# RENDER_TO_SCREEN = True
+	RENDER_TO_SCREEN = True
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE, 
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80, 
-					  max_time = 100,
-					  food_count = 3,
+					  max_time = 80,
+					  food_count = 0,
 					  obstacle_count = 0,
 					  lava_count = 0,
 					  zombie_count = 1,
@@ -456,7 +466,7 @@ def run():
 
 	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True, path="./Models/Tensorflow/"+FOLDER+"/", trainable = False)
 
-	brain = Brain(epsilon=0.005, action_space = env.number_of_actions())
+	brain = Brain(epsilon=0.0, action_space = env.number_of_actions())
 
 	model.setup(brain)
 
@@ -691,7 +701,7 @@ def play():
 # Main function 
 if __name__ == '__main__':
 
-	train()
+	# train()
 
 	train_MetaNetwork()
 

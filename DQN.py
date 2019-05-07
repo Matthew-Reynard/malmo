@@ -19,7 +19,7 @@ class Network():
 			self.scale = 4*4
 
 		if self.LOCAL_GRID_SIZE == 9:
-			self.n_input_channels = 4
+			self.n_input_channels = 5
 		else:
 			self.n_input_channels = 4
 
@@ -213,7 +213,7 @@ class MetaNetwork():
 			self.scale = 4*4 # local = 9, layers = 4
 
 		if self.LOCAL_GRID_SIZE == 9:
-			self.n_input_channels = 4
+			self.n_input_channels = 5
 		else:
 			self.n_input_channels = 6
 		
@@ -226,7 +226,7 @@ class MetaNetwork():
 		self.filter2_size = 3
 
 		if self.LOCAL_GRID_SIZE == 9:
-			self.n_actions = 2
+			self.n_actions = 1
 		else:
 			self.n_actions = 3
 		
