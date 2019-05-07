@@ -25,14 +25,16 @@ class Brain():
 			self.memory[self.memCntr%self.memSize] = [state, action, reward, terminal, state_]
 		self.memCntr += 1
 
+		# print(self.memory[self.memCntr%self.memSize])
+
 
 	def choose_action(self, state, sess, model):
-		Q_vector = sess.run(model.q_values, feed_dict={model.input: state})
-		
+				
 		# Deciding one which action to take
 		if np.random.rand() <= self.EPSILON:
 			action = np.random.choice(self.action_space)
 		else:
+			Q_vector = sess.run(model.q_values, feed_dict={model.input: state})
 			action = sess.run(model.action_t, feed_dict={model.actions: Q_vector})
 			action = action.item()
 		self.steps += 1
@@ -70,15 +72,47 @@ class Brain():
 			self.ALPHA = end
 
 
+	def train_batch(self, batch_size, model, sess):
+
+		mini_batch_indicies = np.random.choice(self.memSize, batch_size, replace=False)
+		# print(mini_batch)
+
+		# creating a mini batch
+		mini_batch = []
+		for i in mini_batch_indicies:
+			mini_batch.append(self.memory[i])
+
+		for memory in mini_batch:
+			output_vector = sess.run(model.q_values, feed_dict={model.input: memory[0]})
+
+			if memory[3]:
+				output_vector[:,memory[1]] = memory[2]
+				# print("Reward:", reward)
+			else:
+				# Gathering the now current state's action-value vector
+				y_prime = sess.run(model.q_values, feed_dict={model.input: memory[4]})
+
+				# Equation for training
+				maxq = sess.run(model.y_prime_max, feed_dict={model.actions: y_prime})
+
+				# RL Equation
+				output_vector[:,memory[1]] = memory[2] + (self.GAMMA * maxq)
+
+			_, e = sess.run([model.optimizer, model.error], feed_dict={model.input: memory[0], model.actions: output_vector})
+
+		return e, output_vector
+
+
 	def train(self, model, sess):
 
 		memory = self.memory[self.memCntr%self.memSize-1]
 
 		output_vector = sess.run(model.q_values, feed_dict={model.input: memory[0]})
 
+		# print(output_vector)
+
 		if memory[3]:
 			output_vector[:,memory[1]] = memory[2]
-			# print("Reward:", reward)
 		else:
 			# Gathering the now current state's action-value vector
 			y_prime = sess.run(model.q_values, feed_dict={model.input: memory[4]})
@@ -86,10 +120,12 @@ class Brain():
 			# Equation for training
 			maxq = sess.run(model.y_prime_max, feed_dict={model.actions: y_prime})
 
-			# RL Equation
+			# RL (Bellman) Equation
 			output_vector[:,memory[1]] = memory[2] + (self.GAMMA * maxq)
 
 		_, e = sess.run([model.optimizer, model.error], feed_dict={model.input: memory[0], model.actions: output_vector})
+
+		# print(output_vector)
 
 		return e, output_vector
 

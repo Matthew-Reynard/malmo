@@ -10,21 +10,57 @@ import matplotlib.pyplot as plt
 import csv
 
 
+t = []
+
+size = 10
+
+cntr = 0
+
+# for i in range(100):
+# 	print(t)
+# 	if cntr < size:
+# 		t.append(i**2)
+# 	else:
+# 		t[cntr%size] = i**2
+# 	print(t[cntr%size])
+# 	cntr = cntr + 1
+
+# 	print(t[cntr%size-1])
+	
+# 	print()
+
+b = [1,3,0]
+
+a = [[10,20],[30,40],[50,60],[70,80],[90,0]]
+c = []
+for each in b:
+	c.append(a[each])
+# c = a[b]
+
+print(c)
+
+print(np.random.choice(a[:], 5, replace=False))
+
+
+
+
+
+
 
 # custom_epsilon(100000, 2, 0.8, 0.05)
-start = 1
-end = 0.00
-percentage = 1
-total = 1000
+# start = 1
+# end = 0.00
+# percentage = 1
+# total = 1000
 
-for episode in range(total+1):
+# for episode in range(total+1):
 
-    e = (-(start-end)/ (percentage*total)) * episode + (start)
+#     e = (-(start-end)/ (percentage*total)) * episode + (start)
         
-    if e < end: 
-        e = end
+#     if e < end: 
+#         e = end
 
-    print(e)
+#     print(e)
 
 
 # a = np.array([[[0,0],

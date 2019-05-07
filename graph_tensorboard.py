@@ -25,7 +25,7 @@ episode2 = []
 # 			episode.append(float(row[1]))
 
 # Avg score
-with open("Data/meta15_input6_1M_random_unfrozen/run_.-tag-score.csv", 'r') as csvfile:
+with open("Data/default9_input5_best_epgreedy/run_.-tag-score.csv", 'r') as csvfile:
 	matrixreader = csv.reader(csvfile, delimiter=',')
 	for i, row in enumerate(matrixreader):
 		if i > 0:
@@ -34,7 +34,7 @@ with open("Data/meta15_input6_1M_random_unfrozen/run_.-tag-score.csv", 'r') as c
 			amount_of_episodes = 1+float(row[1])
 
 # Epsilon
-with open("Data/meta15_input6_1M_random_unfrozen/run_.-tag-epsilon.csv", 'r') as csvfile:
+with open("Data/default9_input5_best_epgreedy/run_.-tag-epsilon.csv", 'r') as csvfile:
 	matrixreader = csv.reader(csvfile, delimiter=',')
 	for i, row in enumerate(matrixreader):
 		if i > 0:
@@ -66,7 +66,7 @@ blue1 = 'tab:blue'
 red2 = 'red'
 blue2 = 'blue'
 
-ax1.set_ylim(0, 3.0)
+ax1.set_ylim(0, 10.0)
 ax1.set_xlabel('episode')
 ax1.set_ylabel('average score per episode', color=red2)
 p1 = ax1.plot(episode, score, color=red2)
@@ -90,5 +90,5 @@ plt.legend((p1[0], p2[0]), ("score", "epsilon"), loc="upper right")
 
 fig.tight_layout()  # otherwise the right y-label is slightly clipped
 # fig.autofmt_xdate()
-plt.savefig("Graphs/test4.pdf")
+plt.savefig("Graphs/testing.pdf")
 plt.show()

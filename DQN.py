@@ -162,8 +162,8 @@ class Network():
 		# Gradient descent optimizer - minimizes error/loss function
 		if self.trainable:
 			with tf.name_scope('Optimizer'):
-				self.optimizer = tf.train.GradientDescentOptimizer(brain.ALPHA).minimize(self.error)
-				# optimizer = tf.train.AdamOptimizer(alpha).minimize(error)
+				# self.optimizer = tf.train.GradientDescentOptimizer(brain.ALPHA).minimize(self.error)
+				self.optimizer = tf.train.AdamOptimizer(brain.ALPHA).minimize(self.error)
 
 		# The next states action-value [1,4] tensor, reduced to a scalar of the max value
 		with tf.name_scope('Max_y_prime'):
@@ -175,9 +175,12 @@ class Network():
 
 
 	# Save the models weights and biases
-	def save(self, sess, verbose = False):
+	def save(self, sess, verbose = False, name = None):
 
-		path = self.path + self.name + ".npz"
+		if name == None:
+			path = self.path + self.name + ".npz"
+		else:
+			path = self.path + name + ".npz"
 		
 		try:
 			os.makedirs(self.path, exist_ok=True)
@@ -226,11 +229,7 @@ class MetaNetwork():
 		self.filter2_size = 3
 
 		if self.LOCAL_GRID_SIZE == 9:
-<<<<<<< HEAD
 			self.n_actions = 3
-=======
-			self.n_actions = 1
->>>>>>> bb91b5fa962fa3e64ce9978ed9de8db4a40db545
 		else:
 			self.n_actions = 3
 		
