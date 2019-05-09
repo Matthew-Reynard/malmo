@@ -150,7 +150,7 @@ class Network():
 
 	# Setup the model architecture (used for tensorboard)
 	def setup(self, brain):
-
+		# NEED TO HAVE A WAY TO DISTINGUISH BETWEEN DQN AND TARGET NETWORK FOR DDQN
 		with tf.name_scope('Model'):
 			self.q_values, self.weights, self.biases = self.create(self.input)
 
@@ -162,8 +162,8 @@ class Network():
 		# Gradient descent optimizer - minimizes error/loss function
 		if self.trainable:
 			with tf.name_scope('Optimizer'):
-				# self.optimizer = tf.train.GradientDescentOptimizer(brain.ALPHA).minimize(self.error)
-				self.optimizer = tf.train.AdamOptimizer(brain.ALPHA).minimize(self.error)
+				self.optimizer = tf.train.GradientDescentOptimizer(brain.ALPHA).minimize(self.error)
+				# self.optimizer = tf.train.AdamOptimizer(brain.ALPHA).minimize(self.error)
 
 		# The next states action-value [1,4] tensor, reduced to a scalar of the max value
 		with tf.name_scope('Max_y_prime'):
@@ -172,6 +172,10 @@ class Network():
 		# Action at time t, the index of the max value in the action-value tensor (Made a global variable)
 		with tf.name_scope('Max_action'):
 			self.action_t = tf.argmax(self.actions, axis=1)
+
+		# Argmax best action in the next state
+		# with tf.name_scope('Argmax_y_prime'):
+		# 	self.y_prime_argmax = tf.argmax(self.actions, axis=1)
 
 
 	# Save the models weights and biases

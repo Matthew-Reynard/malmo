@@ -315,8 +315,8 @@ class Environment:
         self.steps += 1
 
         # Rewards:
-        reward_each_time_step = 1.0
-        # reward_each_time_step = -0.1
+        # reward_each_time_step = 1.0
+        reward_each_time_step = -0.1
         reward_collecting_diamond = 10.0
         reward_out_of_bounds = -1.0 # not used
         reward_zombie_hit = -10.0
@@ -719,8 +719,8 @@ class Environment:
         # state = np.delete(state, o_pos, 0)
 
         # DIAMOND DOJO
-        # state = np.delete(state, 2, 0)
-        # state = np.delete(state, 2, 0)
+        state = np.delete(state, 2, 0)
+        state = np.delete(state, 2, 0)
 
         # ZOMBIE DOJO
         # state = np.delete(state, 1, 0)
@@ -735,7 +735,7 @@ class Environment:
         # state = np.delete(state, 2, 0)
         # state = np.delete(state, 2, 0)
 
-        state = np.delete(state, 4, 0)
+        # state = np.delete(state, 4, 0)
 
         return state
 

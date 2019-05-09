@@ -103,6 +103,75 @@ class Brain():
 		return e, output_vector
 
 
+	# Train with fixed target
+	def train_batch_fixed_target(self, batch_size, model, target, sess):
+
+		mini_batch_indicies = np.random.choice(self.memSize, batch_size, replace=False)
+		# print(mini_batch)
+
+		# creating a mini batch
+		mini_batch = []
+		for i in mini_batch_indicies:
+			mini_batch.append(self.memory[i])
+
+		for memory in mini_batch:
+			output_vector = sess.run(model.q_values, feed_dict={model.input: memory[0]})
+
+			if memory[3]:
+				output_vector[:,memory[1]] = memory[2]
+				# print("Reward:", reward)
+			else:
+				# Gathering the now current state's action-value vector
+				y_prime = sess.run(target.q_values, feed_dict={target.input: memory[4]})
+
+				# Equation for training
+				maxq = sess.run(target.y_prime_max, feed_dict={target.actions: y_prime})
+
+				# RL Equation
+				output_vector[:,memory[1]] = memory[2] + (self.GAMMA * maxq)
+
+			_, e = sess.run([model.optimizer, model.error], feed_dict={model.input: memory[0], model.actions: output_vector})
+
+		return e, output_vector
+
+
+	# Train with double DQN
+	def train_batch_double_DQN(self, batch_size, model, target, sess):
+
+		mini_batch_indicies = np.random.choice(self.memSize, batch_size, replace=False)
+		# print(mini_batch)
+
+		# creating a mini batch
+		mini_batch = []
+		for i in mini_batch_indicies:
+			mini_batch.append(self.memory[i])
+
+		for memory in mini_batch:
+			output_vector = sess.run(model.q_values, feed_dict={model.input: memory[0]})
+
+			if memory[3]:
+				output_vector[:,memory[1]] = memory[2]
+				# print("Reward:", reward)
+			else:
+				# Gathering the now current state's action-value vector
+				y_prime = sess.run(model.q_values, feed_dict={model.input: memory[4]})
+
+				# Equation for training
+				argmaxq = sess.run(model.y_prime_argmax, feed_dict={model.actions: y_prime})
+
+				# Gathering the now current state's action-value vector
+				target_y_prime = sess.run(target.q_values, feed_dict={target.input: memory[4]})
+
+				argmax_action_q = target_y_prime[:,argmaxq]
+
+				# RL Equation
+				output_vector[:,memory[1]] = memory[2] + (self.GAMMA * argmax_action_q)
+
+			_, e = sess.run([model.optimizer, model.error], feed_dict={model.input: memory[0], model.actions: output_vector})
+
+		return e, output_vector
+
+
 	def train(self, model, sess):
 
 		memory = self.memory[self.memCntr%self.memSize-1]
@@ -204,3 +273,22 @@ class Brain():
 		_, e = sess.run([model.optimizer, model.error], feed_dict={model.input: memory[0], model.actions: output_vector})
 
 		return e, output_vector
+
+
+
+	# Used for DDQN
+	def update_target_graph(self):
+	
+		# Get the parameters of our DQNNetwork
+		from_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, "Model")
+
+		# Get the parameters of our Target_network
+		to_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, "Target")
+
+		op_holder = []
+
+		# Update our target_network parameters with DQNNetwork parameters
+		for from_var,to_var in zip(from_vars,to_vars):
+			op_holder.append(to_var.assign(from_var))
+
+		return op_holder

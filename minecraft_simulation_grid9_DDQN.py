@@ -16,10 +16,10 @@ from utils import print_readable_time
 # Train
 def train():
 
-	MODEL_NAME = "zombie9_input5"
-	MODEL_NAME_save = "zombie9_input5"
+	MODEL_NAME = "test"
+	MODEL_NAME_save = "test"
 
-	FOLDER = "Best_Dojos9"
+	FOLDER = "Other"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -44,11 +44,11 @@ def train():
 					  grid_size = GRID_SIZE,
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80,
-					  max_time = 100,
-					  food_count = 0,
+					  max_time = 30,
+					  food_count = 5,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 1,
+					  zombie_count = 0,
 					  history = 0,
 					  action_space = 5,
 					  map_path = MAP_PATH)
@@ -56,11 +56,14 @@ def train():
 	if RENDER_TO_SCREEN:
 		env.prerender()
 
-	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True, path="./Models/Tensorflow/"+FOLDER+"/")
+	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=False, path="./Models/Tensorflow/"+FOLDER+"/")
+
+	targetNetwork = Network(local_size=LOCAL_GRID_SIZE)
 
 	brain = Brain(epsilon=0.1, action_space = env.number_of_actions())
 
-	model.setup(brain)
+	model.setup(brain, "Model")
+	targetNetwork.setup(brain, "Target")
 
 	score = tf.placeholder(tf.float32, [])
 	avg_t = tf.placeholder(tf.float32, [])
@@ -78,10 +81,12 @@ def train():
 	avg_error = 0
 	avg_reward = 0
 	cumulative_reward = 0
+	tau = 0
+	max_tau = 2000
 
 	# Number of episodes
-	print_episode = 100
-	total_episodes = 10000
+	print_episode = 1000
+	total_episodes = 100000
 
 	saver = tf.train.Saver()
 
@@ -160,14 +165,24 @@ def train():
 				# print(new_state)
 
 				brain.store_transition(state, action, reward, done, new_state)
+
+				e, Q_vector = brain.train_batch_double_DQN(4, model, targetNetwork, sess)
 				
-				e, Q_vector = brain.train_batch(4, model, sess)
+				# e, Q_vector = brain.train_batch(4, model, sess)
 
 				# e, Q_vector = brain.train(model, sess)
 
 				state = new_state
 
 				cumulative_reward += reward
+
+				tau = tau + 1
+				if tau > max_tau:
+					# Update the parameters of our TargetNetwork with DQN_weights
+					update_target = brain.update_target_graph()
+					sess.run(update_target)
+					tau = 0
+					# print("Model updated")
 
 				if RENDER_TO_SCREEN:
 					env.render()
@@ -452,9 +467,9 @@ def train_MetaNetwork():
 # Run the given model
 def run():
 
-	MODEL_NAME = "explore9_input5_2"
+	MODEL_NAME = "diamond9_input5_batch_test"
 
-	FOLDER = "Best_Dojos9"
+	FOLDER = "Other"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -478,12 +493,12 @@ def run():
 					  grid_size = GRID_SIZE, 
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80, 
-					  max_time = 100,
-					  food_count = 0,
+					  max_time = 50,
+					  food_count = 10,
 					  obstacle_count = 0,
 					  lava_count = 0,
 					  zombie_count = 0,
-					  history = 50,
+					  history = 0,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
@@ -727,11 +742,11 @@ def play():
 # Main function 
 if __name__ == '__main__':
 
-	# train()
+	train()
 
 	# train_MetaNetwork()
 
-	run()
+	# run()
 
 	# run_MetaNetwork()
 

@@ -16,9 +16,9 @@ from utils import print_readable_time
 # Train
 def train():
 
-	MODEL_NAME = "diamond15_input4_1M"
+	MODEL_NAME = "diamond15_input4_1"
 
-	FOLDER = "Dojos"
+	FOLDER = "Best_Dojos"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -44,7 +44,7 @@ def train():
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80,
 					  max_time = 50,
-					  food_count = 5,
+					  food_count = 10,
 					  obstacle_count = 0,
 					  lava_count = 0,
 					  zombie_count = 0,
@@ -57,7 +57,7 @@ def train():
 
 	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=False, path="./Models/Tensorflow/"+FOLDER+"/")
 
-	brain = Brain(epsilon=0.05, action_space = env.number_of_actions())
+	brain = Brain(epsilon=0.1, action_space = env.number_of_actions())
 
 	model.setup(brain)
 
@@ -80,7 +80,7 @@ def train():
 
 	# Number of episodes
 	print_episode = 1000
-	total_episodes = 1000000
+	total_episodes = 100000
 
 	saver = tf.train.Saver()
 
@@ -120,7 +120,7 @@ def train():
 			state, info = env.reset()
 			done = False
 
-			brain.linear_epsilon_decay(total_episodes, episode, start=1.0, end=0.05, percentage=0.5)
+			# brain.linear_epsilon_decay(total_episodes, episode, start=1.0, end=0.05, percentage=0.5)
 
 			# brain.linear_alpha_decay(total_episodes, episode)
 
@@ -439,9 +439,9 @@ def train_MetaNetwork():
 # Run the given model
 def run():
 
-	MODEL_NAME = "diamond15_input4_1M"
+	MODEL_NAME = "diamond15_input4"
 
-	FOLDER = "Dojos"
+	FOLDER = "Best_Dojos"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -458,14 +458,14 @@ def run():
 	print("\n ---- Running the Deep Q Network ----- \n")
 
 	RENDER_TO_SCREEN = False
-	# RENDER_TO_SCREEN = True
+	RENDER_TO_SCREEN = True
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE, 
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80, 
 					  max_time = 100,
-					  food_count = 5,
+					  food_count = 10,
 					  obstacle_count = 0,
 					  lava_count = 0,
 					  zombie_count = 0,
@@ -478,7 +478,7 @@ def run():
 
 	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True, path="./Models/Tensorflow/"+FOLDER+"/", trainable = False)
 
-	brain = Brain(epsilon=0.005, action_space = env.number_of_actions())
+	brain = Brain(epsilon=0.0, action_space = env.number_of_actions())
 
 	model.setup(brain)
 
