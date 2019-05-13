@@ -21,7 +21,7 @@ class Network():
 		if self.LOCAL_GRID_SIZE == 9:
 			self.n_input_channels = 5
 		else:
-			self.n_input_channels = 4
+			self.n_input_channels = 6
 
 		self.n_out_channels_conv1 = 16 # changed from 16 -> 32
 		self.n_out_channels_conv2 = 32
@@ -162,8 +162,8 @@ class Network():
 		# Gradient descent optimizer - minimizes error/loss function
 		if self.trainable:
 			with tf.name_scope('Optimizer'):
-				self.optimizer = tf.train.GradientDescentOptimizer(brain.ALPHA).minimize(self.error)
-				# self.optimizer = tf.train.AdamOptimizer(brain.ALPHA).minimize(self.error)
+				# self.optimizer = tf.train.GradientDescentOptimizer(brain.ALPHA).minimize(self.error)
+				self.optimizer = tf.train.AdamOptimizer(brain.ALPHA).minimize(self.error)
 
 		# The next states action-value [1,4] tensor, reduced to a scalar of the max value
 		with tf.name_scope('Max_y_prime'):
@@ -235,7 +235,7 @@ class MetaNetwork():
 		if self.LOCAL_GRID_SIZE == 9:
 			self.n_actions = 3
 		else:
-			self.n_actions = 3
+			self.n_actions = 2
 		
 
 		# input
@@ -357,7 +357,7 @@ class MetaNetwork():
 		# Gradient descent optimizer - minimizes error/loss function
 		with tf.name_scope('Optimizer'):
 			self.optimizer = tf.train.GradientDescentOptimizer(brain.ALPHA).minimize(self.error)
-			# optimizer = tf.train.AdamOptimizer(alpha).minimize(error)
+			# self.optimizer = tf.train.AdamOptimizer(brain.ALPHA).minimize(self.error)
 
 		# The next states action-value [1,4] tensor, reduced to a scalar of the max value
 		with tf.name_scope('Max_y_prime'):

@@ -7,7 +7,7 @@ import os
 
 class Brain():
 
-	def __init__(self, gamma=0.99, epsilon=0.1, alpha=0.01, maxMemorySize=100, action_space=5):
+	def __init__(self, gamma=0.99, epsilon=0.1, alpha=0.005, maxMemorySize=100, action_space=5):
 		self.ALPHA = alpha
 		self.GAMMA = gamma
 		self.EPSILON = epsilon

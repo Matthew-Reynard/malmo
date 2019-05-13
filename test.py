@@ -10,11 +10,22 @@ import matplotlib.pyplot as plt
 import csv
 
 
-t = []
+s = np.array([[[0,0],
+      [0,0]],
+     [[1,1],
+      [1,1]],
+     [[2,2],
+      [2,2]]])
 
-size = 10
+s[0] = 1
 
-cntr = 0
+print(s)
+
+# t = []
+
+# size = 10
+
+# cntr = 0
 
 # for i in range(100):
 # 	print(t)
@@ -29,17 +40,17 @@ cntr = 0
 	
 # 	print()
 
-b = [1,3,0]
+# b = [1,3,0]
 
-a = [[10,20],[30,40],[50,60],[70,80],[90,0]]
-c = []
-for each in b:
-	c.append(a[each])
-# c = a[b]
+# a = [[10,20],[30,40],[50,60],[70,80],[90,0]]
+# c = []
+# for each in b:
+# 	c.append(a[each])
+# # c = a[b]
 
-print(c)
+# print(c)
 
-print(np.random.choice(a[:], 5, replace=False))
+# print(np.random.choice(a[:], 5, replace=False))
 
 
 
