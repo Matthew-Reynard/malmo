@@ -16,14 +16,14 @@ from utils import print_readable_time
 # Train
 def train():
 
-	MODEL_NAME = "zombie9_input5"
-	MODEL_NAME_save = "zombie9_input5"
+	MODEL_NAME = "testing_softmax_delete"
+	MODEL_NAME_save = "testing_softmax_delete"
 
-	FOLDER = "Best_Dojos9"
+	FOLDER = "Other"
 
-	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
+	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME_save+"/"+MODEL_NAME_save+".ckpt"
 
-	LOGDIR = "./Logs/"+FOLDER+"/"+MODEL_NAME+""
+	LOGDIR = "./Logs/"+FOLDER+"/"+MODEL_NAME_save+""
 
 	USE_SAVED_MODEL_FILE = False
 
@@ -44,11 +44,11 @@ def train():
 					  grid_size = GRID_SIZE,
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80,
-					  max_time = 100,
-					  food_count = 0,
+					  max_time = 50,
+					  food_count = 10,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 1,
+					  zombie_count = 0,
 					  history = 0,
 					  action_space = 5,
 					  map_path = MAP_PATH)
@@ -56,7 +56,7 @@ def train():
 	if RENDER_TO_SCREEN:
 		env.prerender()
 
-	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True, path="./Models/Tensorflow/"+FOLDER+"/")
+	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=False, path="./Models/Tensorflow/"+FOLDER+"/")
 
 	brain = Brain(epsilon=0.1, action_space = env.number_of_actions())
 
@@ -106,27 +106,27 @@ def train():
 		else:
 			sess.run(init)
 
-		for episode in range(50):
-			state, info = env.reset()
-			done = False
+		# for episode in range(50):
+		# 	state, info = env.reset()
+		# 	done = False
 
-			if RENDER_TO_SCREEN:
-				env.render()
+		# 	if RENDER_TO_SCREEN:
+		# 		env.render()
 
-			while not done:
-				action = brain.choose_action(state, sess, model)
+		# 	while not done:
+		# 		action = brain.choose_action(state, sess, model)
 
-				new_state, reward, done, info = env.step(action)
+		# 		new_state, reward, done, info = env.step(action)
 
-				brain.store_transition(state, action, reward, done, new_state)
+		# 		brain.store_transition(state, action, reward, done, new_state)
 
-				state = new_state
+		# 		state = new_state
 
-				if RENDER_TO_SCREEN:
-					env.render()
+		# 		if RENDER_TO_SCREEN:
+		# 			env.render()
 
-		print("\nREPLAY MEMORY INITIALISED")
-		print(brain.memCntr)
+		# print("\nREPLAY MEMORY INITIALISED")
+		# print(brain.memCntr)
 
 		writer.add_graph(sess.graph)
 
@@ -161,9 +161,9 @@ def train():
 
 				brain.store_transition(state, action, reward, done, new_state)
 				
-				e, Q_vector = brain.train_batch(4, model, sess)
+				# e, Q_vector = brain.train_batch(4, model, sess)
 
-				# e, Q_vector = brain.train(model, sess)
+				e, Q_vector = brain.train(model, sess)
 
 				state = new_state
 
@@ -727,11 +727,11 @@ def play():
 # Main function 
 if __name__ == '__main__':
 
-	# train()
+	train()
 
 	# train_MetaNetwork()
 
-	run()
+	# run()
 
 	# run_MetaNetwork()
 

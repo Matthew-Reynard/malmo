@@ -143,6 +143,7 @@ class Network():
 		print("Actions:", actions.shape)
 
 		actions = tf.nn.l2_normalize(actions)
+		# actions = tf.nn.softmax(actions)
 		print("")
 
 		return actions, weights, biases

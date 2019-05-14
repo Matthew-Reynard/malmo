@@ -45,6 +45,7 @@ class Brain():
 			action = np.random.choice(self.action_space)
 		else:
 			Q_vector = sess.run(model.q_values, feed_dict={model.input: state})
+			# print(Q_vector)
 			action = sess.run(model.action_t, feed_dict={model.actions: Q_vector})
 			action = action.item()
 		self.steps += 1

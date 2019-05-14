@@ -10,16 +10,16 @@ import matplotlib.pyplot as plt
 import csv
 
 
-s = np.array([[[0,0],
-      [0,0]],
-     [[1,1],
-      [1,1]],
-     [[2,2],
-      [2,2]]])
+# s = np.array([[[0,0],
+#       [0,0]],
+#      [[1,1],
+#       [1,1]],
+#      [[2,2],
+#       [2,2]]])
 
-s[0] = 1
+# s[0] = 1
 
-print(s)
+# print(s)
 
 # t = []
 
@@ -167,45 +167,55 @@ print(s)
 # plt.plot(b,a)
 # plt.show()
 
-# import tensorflow as tf
+import tensorflow as tf
 
-# x = tf.placeholder(tf.float32, [])
+x = tf.placeholder(tf.float32, [])
 
-# # output
-# y = tf.placeholder(tf.float32, [])
+# output
+y = tf.placeholder(tf.float32, [4, ])
 
-# # a=tf.Variable(1.0)
+# a=tf.Variable(1.0)
 
-# b=tf.Variable(0.0)
+b=tf.Variable(0.0)
 
-# # error = tf.losses.mean_squared_error(labels=a, predictions=b)
+# error = tf.losses.mean_squared_error(labels=a, predictions=b)
 
-# tf.summary.scalar('a', y)
+tf.summary.scalar('a', y)
 
-# # tf.summary.scalar('b', b)
+# tf.summary.scalar('b', b)
 
 # merged_summary = tf.summary.merge_all()
-# init = tf.global_variables_initializer()
+init = tf.global_variables_initializer()
 # writer = tf.summary.FileWriter("./Logs/test/")
 
-# gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.2)
-# start = 0.5
-# end = 0.05
-# percentage = 0.5
-# total = 1000
-#     # Begin session
-# with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
-#     sess.run(init)
+gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.2)
+start = 0.5
+end = 0.05
+percentage = 0.5
+total = 100
+    # Begin session
+with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
+    sess.run(init)
 
-#     writer.add_graph(sess.graph)
-#     a = 0
-#     for episode in range(total):
+    # writer.add_graph(sess.graph)
+    a = 0
 
-#         a = (-(start-end)/ (percentage*total)) * episode + (start)
-#         if a < end:
-#             a = end
-#         # b = b + 2
-#         s = sess.run(merged_summary, feed_dict={y: a})
-#         writer.add_summary(s, episode)
+    actions = [0.1, 1.8, 0.1, 0.0]
 
-#     writer.close()
+    a = tf.nn.l2_normalize(actions)
+
+    a_ = sess.run(a, feed_dict={y: actions})
+
+    print(a_)
+    # for episode in range(total):
+
+    	# a = tf.nn.softmax()
+
+        # a = (-(start-end)/ (percentage*total)) * episode + (start)
+        # if a < end:
+        #     a = end
+        # b = b + 2
+        # s = sess.run(merged_summary, feed_dict={y: a})
+        # writer.add_summary(s, episode)
+
+    # writer.close()
