@@ -235,7 +235,7 @@ class MetaNetwork():
 		if self.LOCAL_GRID_SIZE == 9:
 			self.n_actions = 3
 		else:
-			self.n_actions = 2
+			self.n_actions = 3
 		
 
 		# input
@@ -369,9 +369,12 @@ class MetaNetwork():
 
 
 	# Save the models weights and biases
-	def save(self, sess, verbose = False):
+	def save(self, sess, verbose = False, name = None):
 
-		path = self.path + self.name + ".npz"
+		if name == None:
+			path = self.path + self.name + ".npz"
+		else:
+			path = self.path + name + ".npz"
 		
 		try:
 			os.makedirs(self.path, exist_ok=True)

@@ -25,7 +25,7 @@ episode2 = []
 # 			episode.append(float(row[1]))
 
 # Avg score
-with open("Data/default9_input5_best_epgreedy/run_.-tag-score.csv", 'r') as csvfile:
+with open("Data/meta15_input6_same_states/run_.-tag-score.csv", 'r') as csvfile:
 	matrixreader = csv.reader(csvfile, delimiter=',')
 	for i, row in enumerate(matrixreader):
 		if i > 0:
@@ -34,7 +34,7 @@ with open("Data/default9_input5_best_epgreedy/run_.-tag-score.csv", 'r') as csvf
 			amount_of_episodes = 1+float(row[1])
 
 # Epsilon
-with open("Data/default9_input5_best_epgreedy/run_.-tag-epsilon.csv", 'r') as csvfile:
+with open("Data/meta15_input6_same_states/run_.-tag-epsilon.csv", 'r') as csvfile:
 	matrixreader = csv.reader(csvfile, delimiter=',')
 	for i, row in enumerate(matrixreader):
 		if i > 0:
@@ -90,5 +90,5 @@ plt.legend((p1[0], p2[0]), ("score", "epsilon"), loc="upper right")
 
 fig.tight_layout()  # otherwise the right y-label is slightly clipped
 # fig.autofmt_xdate()
-plt.savefig("Graphs/testing.pdf")
+plt.savefig("Graphs/testing2.pdf")
 plt.show()
