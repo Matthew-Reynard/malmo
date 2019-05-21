@@ -16,14 +16,14 @@ from utils import print_readable_time
 # Train
 def train():
 
-	MODEL_NAME = "testing_softmax_delete"
-	MODEL_NAME_save = "testing_softmax_delete"
+	MODEL_NAME = "diamond9_input5"
+	MODEL_NAME_save = "diamond9_input5"
 
-	FOLDER = "Other"
+	FOLDER = "Best_Dojos9"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME_save+"/"+MODEL_NAME_save+".ckpt"
 
-	LOGDIR = "./Logs/"+FOLDER+"/"+MODEL_NAME_save+""
+	LOGDIR = "./Logs/"+FOLDER+"/"+MODEL_NAME_save+"_2"
 
 	USE_SAVED_MODEL_FILE = False
 

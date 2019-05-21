@@ -331,7 +331,6 @@ class Brain():
 		return e, output_vector
 
 
-
 	# Used for DDQN
 	def update_target_graph(self):
 	

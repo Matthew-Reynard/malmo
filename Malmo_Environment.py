@@ -316,7 +316,7 @@ class Environment:
 
         # Rewards:
         # reward_each_time_step = 1.0
-        reward_each_time_step = -0.1 
+        reward_each_time_step = -0.1
         reward_collecting_diamond = 10.0
         reward_out_of_bounds = -1.0 # not used
         reward_zombie_hit = -10.0

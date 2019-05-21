@@ -16,10 +16,10 @@ from utils import print_readable_time
 # Train
 def train():
 
-	MODEL_NAME = "test_without_zombies"
-	MODEL_NAME_save = "test_without_zombies"
+	MODEL_NAME = "explore15_input4"
+	MODEL_NAME_save = "explore15_input4"
 
-	FOLDER = "Other"
+	FOLDER = "Best_Dojos"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -44,8 +44,8 @@ def train():
 					  grid_size = GRID_SIZE,
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80,
-					  max_time = 100,
-					  food_count = 10,
+					  max_time = 80,
+					  food_count = 0,
 					  obstacle_count = 0,
 					  lava_count = 0,
 					  zombie_count = 0,
@@ -192,12 +192,12 @@ def train_MetaNetwork():
 
 	print("\n ---- Training the Meta Network ----- \n")
 
-	MODEL_NAME = "meta15_input6_3"
-	MODEL_NAME_save = "meta15_input6_3_unfrozen"
+	MODEL_NAME = "meta15_input6_unfrozen_300k_cointoss"
+	MODEL_NAME_save = "meta15_input6_unfrozen_300k_cointoss"
 
-	DIAMOND_MODEL_NAME = "diamond15_input6_best"
-	ZOMBIE_MODEL_NAME = "zombie15_input6_best"
-	EXPLORE_MODEL_NAME = "explore15_input6_best"
+	DIAMOND_MODEL_NAME = "diamond15_input6_best_unfrozen_cointoss"
+	ZOMBIE_MODEL_NAME = "zombie15_input6_best_unfrozen_cointoss"
+	EXPLORE_MODEL_NAME = "explore15_input6_best_unfrozen_cointoss"
 
 	# MODEL_NAME = "meta15_input6_1M_unfrozen_dojos"
 	# DIAMOND_MODEL_NAME = "diamond15_input4_best_unfrozen_at_1M"
@@ -277,7 +277,7 @@ def train_MetaNetwork():
 
 	# Number of episodes
 	print_episode = 1000
-	total_episodes = 100000
+	total_episodes = 200000
 
 	saver = tf.train.Saver()
 
@@ -342,7 +342,7 @@ def train_MetaNetwork():
 					# dojo_state[3]=0
 					# dojo_state = np.delete(dojo_state, 2, 0)# Take out the zombie layer
 					# dojo_state = np.delete(dojo_state, 2, 0)# Take out the history layer
-					action = brain.choose_dojo(dojo_state, sess, diamond_net, env.number_of_actions(), 0.0)
+					action = brain.choose_dojo(dojo_state, sess, diamond_net, env.number_of_actions(), 0.05)
 
 				elif dojo == 1:
 					dojo_state = state
@@ -350,7 +350,7 @@ def train_MetaNetwork():
 					# dojo_state[3]=0
 					# dojo_state = np.delete(dojo_state, 1, 0)# Take out the diamond layer
 					# dojo_state = np.delete(dojo_state, 2, 0)# Take out the history layer
-					action = brain.choose_dojo(dojo_state, sess, zombie_net, env.number_of_actions(), 0.0)
+					action = brain.choose_dojo(dojo_state, sess, zombie_net, env.number_of_actions(), 0.05)
 
 				elif dojo == 2:
 					dojo_state = state
@@ -358,7 +358,7 @@ def train_MetaNetwork():
 					# dojo_state[2]=0
 					# dojo_state = np.delete(dojo_state, 1, 0)# Take out the diamond layer
 					# dojo_state = np.delete(dojo_state, 1, 0)# Take out the zombie layer
-					action = brain.choose_dojo(dojo_state, sess, explore_net, env.number_of_actions(), 0.0)
+					action = brain.choose_dojo(dojo_state, sess, explore_net, env.number_of_actions(), 0.05)
 
 				# print(action)
 
@@ -425,9 +425,9 @@ def train_MetaNetwork():
 
 				# Save the model's weights and biases to .npz file
 				model.save(sess, name=MODEL_NAME_save)
-				diamond_net.save(sess, name=DIAMOND_MODEL_NAME+"_unfrozen3")
-				zombie_net.save(sess, name=ZOMBIE_MODEL_NAME+"_unfrozen3")
-				explore_net.save(sess, name=EXPLORE_MODEL_NAME+"_unfrozen3")
+				diamond_net.save(sess, name=DIAMOND_MODEL_NAME+"")
+				zombie_net.save(sess, name=ZOMBIE_MODEL_NAME+"")
+				explore_net.save(sess, name=EXPLORE_MODEL_NAME+"")
 
 				# save_path = saver.save(sess, MODEL_PATH_SAVE)
 
@@ -440,9 +440,9 @@ def train_MetaNetwork():
 				avg_reward = 0
 
 		model.save(sess, verbose=True, name=MODEL_NAME_save)
-		diamond_net.save(sess, verbose=True, name=DIAMOND_MODEL_NAME+"_unfrozen3")
-		zombie_net.save(sess, verbose=True, name=ZOMBIE_MODEL_NAME+"_unfrozen3")
-		explore_net.save(sess, verbose=True, name=EXPLORE_MODEL_NAME+"_unfroze3")
+		diamond_net.save(sess, verbose=True, name=DIAMOND_MODEL_NAME+"")
+		zombie_net.save(sess, verbose=True, name=ZOMBIE_MODEL_NAME+"")
+		explore_net.save(sess, verbose=True, name=EXPLORE_MODEL_NAME+"")
 
 		# save_path = saver.save(sess, MODEL_PATH_SAVE)
 		# print("Model saved in path: %s" % save_path)
@@ -453,7 +453,7 @@ def train_MetaNetwork():
 # Run the given model
 def run():
 
-	MODEL_NAME = "diamond15_input6_1"
+	MODEL_NAME = "diamond15_input4"
 
 	FOLDER = "Best_Dojos"
 
@@ -747,9 +747,9 @@ def play():
 # Main function 
 if __name__ == '__main__':
 
-	# train()
+	train()
 
-	train_MetaNetwork()
+	# train_MetaNetwork()
 
 	# run()
 
