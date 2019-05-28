@@ -16,12 +16,12 @@ epsilon2 = []
 episode2 = []
 moves2 = []
 
-DATA_FOLDER = "default15_input6_100k"
-DATA_FOLDER_cont = "default15_input6_200k"
-DATA_FOLDER_cont_again = "default15_input6_300k"
+DATA_FOLDER = "default9_input5_adam_10k"
+DATA_FOLDER_cont = "default9_input5_adam_20k"
+DATA_FOLDER_cont_again = "default9_input5_adam_30k"
 
-ADDITIONAL_DATA_FOLDER = "meta15_input6_unfrozen_100k_cointoss"
-ADDITIONAL_DATA_FOLDER_cont = "meta15_input6_unfrozen_300k_cointoss"
+ADDITIONAL_DATA_FOLDER = "meta9_input5to3_actions3"
+ADDITIONAL_DATA_FOLDER_cont = "meta9_input5to3_actions3_unfrozen_30k_2"
 # ADDITIONAL_DATA_FOLDER_cont_again = "meta15_input6_4_unfrozen_300k"
 
 # Avg score
@@ -236,13 +236,13 @@ ax1.tick_params(axis='y', labelcolor=red2)
 
 ax1.set_xlabel('episode')
 
-plt.title("Standard and Dojo (cointoss) Networks (complex env, unfrozen)", fontsize=12)
+plt.title("Standard and Dojo Networks (simple env, unfrozen, 3 input dojos)", fontsize=12)
 
 plt.legend((p1[0], p2[0]), ("Standard", "Dojo cointoss"), loc="upper right")
 
 fig.tight_layout()  # otherwise the right y-label is slightly clipped
 # fig.autofmt_xdate()
-plt.savefig("Graphs/Comparison_300k_cointoss_vs_standard.pdf")
+plt.savefig("Graphs/Comparison_30k_meta_vs_standard_unfrozen_5to3actions.pdf")
 plt.show()
 
 # '''
