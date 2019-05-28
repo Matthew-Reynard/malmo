@@ -453,15 +453,15 @@ def train_MetaNetwork():
 # Run the given model
 def run():
 
-	MODEL_NAME = "diamond15_input4"
+	MODEL_NAME = "default15_input6_adam_300k"
 
-	FOLDER = "Best_Dojos"
+	FOLDER = "Best_Default"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
 	USE_SAVED_MODEL_FILE = False
 
-	GRID_SIZE = 10
+	GRID_SIZE = 16
 	LOCAL_GRID_SIZE = 15
 	MAP_NUMBER = 0
 	RANDOMIZE_MAPS = True
@@ -472,7 +472,7 @@ def run():
 	print("\n ---- Running the Deep Q Network ----- \n")
 
 	RENDER_TO_SCREEN = False
-	RENDER_TO_SCREEN = True
+	# RENDER_TO_SCREEN = True
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE, 
@@ -482,8 +482,8 @@ def run():
 					  food_count = 10,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 0,
-					  history = 0,
+					  zombie_count = 1,
+					  history = 40,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
@@ -524,7 +524,7 @@ def run():
 		for episode in range(total_episodes):
 			
 			if RANDOMIZE_MAPS:
-				MAP_PATH = "./Maps/Grid10/map{}.txt".format(np.random.randint(10))
+				MAP_PATH = "./Maps/Grid16/map{}.txt".format(np.random.randint(10))
 				env.set_map(MAP_PATH)
 
 			state, info = env.reset()
@@ -568,10 +568,10 @@ def run_MetaNetwork():
 
 	print("\n ---- Running the Meta Network ----- \n")
 
-	MODEL_NAME = "meta_local15_input6_1M_linear"
-	DIAMOND_MODEL_NAME = "diamond_local15_input4_best"
-	ZOMBIE_MODEL_NAME = "zombie_local15_input4_best"
-	EXPLORE_MODEL_NAME = "explore_local15_input4_best"
+	MODEL_NAME = "meta15_input6_4_unfrozen"
+	DIAMOND_MODEL_NAME = "diamond15_input6_best_unfrozen4_300k"
+	ZOMBIE_MODEL_NAME = "zombie15_input6_best_unfrozen4_300k"
+	EXPLORE_MODEL_NAME = "explore15_input6_best_unfrozen4_300k"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/Meta/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -586,14 +586,14 @@ def run_MetaNetwork():
 	RANDOMIZE_MAPS = True
 
 	RENDER_TO_SCREEN = False
-	# RENDER_TO_SCREEN = True
+	RENDER_TO_SCREEN = True
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE,
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80, 
-					  max_time = 200,
-					  food_count = 5,
+					  max_time = 100,
+					  food_count = 10,
 					  obstacle_count = 0,
 					  lava_count = 0,
 					  zombie_count = 2,
@@ -604,15 +604,15 @@ def run_MetaNetwork():
 	if RENDER_TO_SCREEN:
 		env.prerender()
 
-	model = MetaNetwork(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True,  trainable = False)
+	model = MetaNetwork(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, path="./Models/Tensorflow/Best_Meta/", load=True,  trainable = False)
 
-	diamond_net = Network(local_size=LOCAL_GRID_SIZE, name=DIAMOND_MODEL_NAME, path="./Models/Tensorflow/Dojos/", load=True, trainable = False)
+	diamond_net = Network(local_size=LOCAL_GRID_SIZE, name=DIAMOND_MODEL_NAME, path="./Models/Tensorflow/Best_Dojos/", load=True, trainable = False)
 
-	zombie_net = Network(local_size=LOCAL_GRID_SIZE, name=ZOMBIE_MODEL_NAME, path="./Models/Tensorflow/Dojos/", load=True, trainable = False)
+	zombie_net = Network(local_size=LOCAL_GRID_SIZE, name=ZOMBIE_MODEL_NAME, path="./Models/Tensorflow/Best_Dojos/", load=True, trainable = False)
 
-	explore_net = Network(local_size=LOCAL_GRID_SIZE, name=EXPLORE_MODEL_NAME, path="./Models/Tensorflow/Dojos/", load=True, trainable = False)
+	explore_net = Network(local_size=LOCAL_GRID_SIZE, name=EXPLORE_MODEL_NAME, path="./Models/Tensorflow/Best_Dojos/", load=True, trainable = False)
 
-	brain = Brain(epsilon=0.005, action_space=3)
+	brain = Brain(epsilon=0.0, action_space=3)
 
 	model.setup(brain)
 	diamond_net.setup(brain)
@@ -625,8 +625,8 @@ def run_MetaNetwork():
 	cumulative_reward = 0
 
 	# Number of episodes
-	print_episode = 1000
-	total_episodes = 1000
+	print_episode = 100
+	total_episodes = 100
 
 	saver = tf.train.Saver()
 
@@ -669,18 +669,18 @@ def run_MetaNetwork():
 
 				if dojo == 0:
 					dojo_state = state
-					dojo_state = np.delete(dojo_state, 2, 0)# Take out the zombie layer
-					dojo_state = np.delete(dojo_state, 2, 0)# Take out the history layer
+					# dojo_state = np.delete(dojo_state, 2, 0)# Take out the zombie layer
+					# dojo_state = np.delete(dojo_state, 2, 0)# Take out the history layer
 					action = brain.choose_dojo(dojo_state, sess, diamond_net, env.number_of_actions(), 0.0)
 				elif dojo == 1:
 					dojo_state = state
-					dojo_state = np.delete(dojo_state, 1, 0)# Take out the diamond layer
-					dojo_state = np.delete(dojo_state, 2, 0)# Take out the history layer
+					# dojo_state = np.delete(dojo_state, 1, 0)# Take out the diamond layer
+					# dojo_state = np.delete(dojo_state, 2, 0)# Take out the history layer
 					action = brain.choose_dojo(dojo_state, sess, zombie_net, env.number_of_actions(), 0.0)
 				elif dojo == 2:
 					dojo_state = state
-					dojo_state = np.delete(dojo_state, 1, 0)# Take out the diamond layer
-					dojo_state = np.delete(dojo_state, 1, 0)# Take out the zombie layer
+					# dojo_state = np.delete(dojo_state, 1, 0)# Take out the diamond layer
+					# dojo_state = np.delete(dojo_state, 1, 0)# Take out the zombie layer
 					action = brain.choose_dojo(dojo_state, sess, explore_net, env.number_of_actions(), 0.0)
 
 				# print(action)
@@ -747,13 +747,13 @@ def play():
 # Main function 
 if __name__ == '__main__':
 
-	train()
+	# train()
 
 	# train_MetaNetwork()
 
 	# run()
 
-	# run_MetaNetwork()
+	run_MetaNetwork()
 
 	# play() 
  

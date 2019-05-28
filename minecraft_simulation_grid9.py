@@ -452,9 +452,9 @@ def train_MetaNetwork():
 # Run the given model
 def run():
 
-	MODEL_NAME = "explore9_input5_2"
+	MODEL_NAME = "default9_input5_best_50k"
 
-	FOLDER = "Best_Dojos9"
+	FOLDER = "Best_Default9"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -472,18 +472,18 @@ def run():
 	print("\n ---- Running the Deep Q Network ----- \n")
 
 	RENDER_TO_SCREEN = False
-	RENDER_TO_SCREEN = True
+	# RENDER_TO_SCREEN = True
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE, 
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80, 
 					  max_time = 100,
-					  food_count = 0,
+					  food_count = 10,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 0,
-					  history = 50,
+					  zombie_count = 1,
+					  history = 40,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
@@ -500,8 +500,8 @@ def run():
 	avg_score = 0
 
 	# Number of episodes
-	print_episode = 1000
-	total_episodes = 1000
+	print_episode = 100
+	total_episodes = 100
 
 	saver = tf.train.Saver()
 
@@ -727,11 +727,11 @@ def play():
 # Main function 
 if __name__ == '__main__':
 
-	train()
+	# train()
 
 	# train_MetaNetwork()
 
-	# run()
+	run()
 
 	# run_MetaNetwork()
 

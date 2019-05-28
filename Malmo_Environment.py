@@ -736,7 +736,7 @@ class Environment:
         # state = np.delete(state, 2, 0)
 
         # state = np.delete(state, 3, 0)
-        state = np.delete(state, 4, 0)
+        # state = np.delete(state, 4, 0)
 
         return state
 
