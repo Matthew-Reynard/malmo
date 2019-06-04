@@ -16,8 +16,8 @@ from utils import print_readable_time
 # Train
 def train():
 
-	MODEL_NAME = "default15_input6_video_barrier_16"
-	MODEL_NAME_save = "default15_input6_video_barrier_16"
+	MODEL_NAME = "default15_input6_video_test"
+	MODEL_NAME_save = "default15_input6_video_test"
 
 	FOLDER = "Other"
 
@@ -27,7 +27,7 @@ def train():
 
 	USE_SAVED_MODEL_FILE = False
 
-	GRID_SIZE = 16
+	GRID_SIZE = 10
 	LOCAL_GRID_SIZE = 15
 	MAP_NUMBER = 0
 	RANDOMIZE_MAPS = True
@@ -45,7 +45,7 @@ def train():
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80,
 					  max_time = 100,
-					  food_count = 20,
+					  food_count = 10,
 					  obstacle_count = 0,
 					  lava_count = 0,
 					  zombie_count = 2,
@@ -56,7 +56,7 @@ def train():
 	if RENDER_TO_SCREEN:
 		env.prerender()
 
-	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True, path="./Models/Tensorflow/"+FOLDER+"/")
+	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=False, path="./Models/Tensorflow/"+FOLDER+"/")
 
 	brain = Brain(epsilon=0.1, action_space = env.number_of_actions())
 
@@ -453,7 +453,7 @@ def train_MetaNetwork():
 # Run the given model
 def run():
 
-	MODEL_NAME = "default15_input6_video2"
+	MODEL_NAME = "default15_input6_adam_300k"
 
 	FOLDER = "Other"
 
@@ -483,7 +483,7 @@ def run():
 					  obstacle_count = 0,
 					  lava_count = 0,
 					  zombie_count = 2,
-					  history = 40,
+					  history = 0,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
@@ -748,7 +748,7 @@ def play():
 # Main function 
 if __name__ == '__main__':
 
-	# train()
+	train()
 
 	# train_MetaNetwork()
 
@@ -756,5 +756,5 @@ if __name__ == '__main__':
 
 	# run_MetaNetwork()
 
-	play() 
+	# play()
  

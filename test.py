@@ -9,6 +9,10 @@ import matplotlib.pyplot as plt
 # import getch
 import csv
 
+import my_mission
+
+print(my_mission.missionXML)
+
 # s = np.array([[[0,0],
 #       [0,0]],
 #      [[1,1],

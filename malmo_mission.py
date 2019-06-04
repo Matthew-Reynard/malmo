@@ -46,12 +46,12 @@ if sys.platform == 'win32':
     pass
 
 
-MODEL_NAME = "default15_input6_video"
+MODEL_NAME = "default15_input6_adam_300k"
 # DIAMOND_MODEL_NAME = "diamond15"
 # ZOMBIE_MODEL_NAME = "zombie15"
 # EXPLORE_MODEL_NAME = "explore15"
 
-FOLDER = "Other"
+FOLDER = "Best_Default"
 
 MODEL_CHECKPOINT = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -64,6 +64,7 @@ LOCAL_GRID_SIZE = 15
 MAP_NUMBER = 7
 MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
 # MAP_PATH = None
+
 
 def get_state(steve, diamonds, zombies, grid):
     '''
@@ -193,7 +194,7 @@ def setupMinecraft():
         my_mission = MalmoPython.MissionSpec(mission_xml, True)
 
     # Force reset of the environment, generate a brand new world every episode
-    # my_mission.forceWorldReset()
+    my_mission.forceWorldReset()
 
     # Python code for alterations to the environment
     my_mission.drawCuboid(-1, 106, -1, GRID_SIZE, 106, GRID_SIZE, "lava")
@@ -260,7 +261,7 @@ def runMission(train = False, load_model = False):
 
     USE_SAVED_MODEL_FILE = False
 
-    agent_host, my_mission, my_mission_record, action_space = setupMinecraft()
+    # agent_host, my_mission, my_mission_record, action_space = setupMinecraft()
 
     model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, path="./Models/Tensorflow/"+FOLDER+"/", load=load_model, trainable=train)
 
@@ -313,6 +314,7 @@ def runMission(train = False, load_model = False):
 
         # Running mission
         for episode in range(total_episodes):
+            agent_host, my_mission, my_mission_record, action_space = setupMinecraft()
             world_state = reset(agent_host, my_mission, my_mission_record)
             score = 0
             done = False
@@ -351,7 +353,7 @@ def runMission(train = False, load_model = False):
             world_state = agent_host.getWorldState()
             while world_state.is_mission_running and not done: 
                 print("-", end="")
-                time.sleep(0.15)
+                time.sleep(0.01)
 
                 action = brain.choose_action(state, sess, model)
                 # print("action:", action_space[action])
@@ -361,6 +363,8 @@ def runMission(train = False, load_model = False):
                     done = True
                 else:
                     agent_host.sendCommand(action_space[action])
+
+                time.sleep(0.2)
                 
                 world_state = agent_host.getWorldState()
 
@@ -390,7 +394,11 @@ def runMission(train = False, load_model = False):
                         if entity["name"] == "Zombie":
                             zombies.append((entity["x"], entity["z"]))
 
-                    # print(state)
+                    # Debugging - print the state
+                    for i in range(6):
+                        print(state[i])
+                        print()
+
                     new_state = get_state(steve_pos, diamonds, zombies, grid)
 
                     # reward = world_state.rewards[-1].getValue()
@@ -512,7 +520,8 @@ def play():
         time.sleep(0.1)
 
         steve_pos = player_controls(agent_host, steve_pos=steve_pos)
-        # time.sleep(0.05)
+        print(steve_pos)
+        time.sleep(0.15)
 
         world_state = agent_host.getWorldState()
 
@@ -520,6 +529,7 @@ def play():
             print("Error:", error.text)
 
         # Have we received any observations
+        # print(world_state.number_of_observations_since_last_state)
         if world_state.number_of_observations_since_last_state > 0:
         # if world_state.number_of_observations_since_last_state > 0 and world_state.number_of_rewards_since_last_state > 0:
 
@@ -540,13 +550,13 @@ def play():
                 if entity["name"] == "diamond":
                     diamonds.append((entity["x"], entity["z"]))
                 if entity["name"] == "Steve":
-                    # steve_pos = ((entity["x"], entity["z"]))
+                    steve_pos2 = ((entity["x"], entity["z"]))
                     steve_life = entity["life"]
                 if entity["name"] == "Zombie":
                     zombies.append((entity["x"], entity["z"]))
 
-            # print(steve_pos)
-            # print()
+            print(steve_pos2)
+            print()
 
             # Get new_state & reward
             new_state = get_state(steve_pos, diamonds, zombies, grid)

@@ -142,25 +142,36 @@ class Zombie:
 
             # 2nd zombie moves randomly
             random_steps = 2
-            # print(self.array)
+            
             if self.amount > 1 and steps%random_steps == 0:
+                start = tuple([int(x/20) for x in self.array[1]])
+                path = self.astar(maze, start, end)
+
                 self.array[1] = list(self.array[1])
-                random_move = np.random.randint(0,4)
-                if random_move == 0 and maze[int(self.array[1][0]/20)+1][int(self.array[1][1]/20)] == 0:
-                    self.array[1][0] += 1*20
-                if random_move == 1 and maze[int(self.array[1][0]/20)-1][int(self.array[1][1]/20)] == 0:
-                    self.array[1][0] -= 1*20
-                if random_move == 2 and maze[int(self.array[1][0]/20)][int(self.array[1][1]/20)+1] == 0:
-                    self.array[1][1] += 1*20
-                if random_move == 3 and maze[int(self.array[1][0]/20)][int(self.array[1][1]/20)-1] == 0:
-                    self.array[1][1] -= 1*20
+                
+                if path != None and True:
+                    if len(path) > 1 and steps%star_steps == 0:
+                        # print("move")
+                        self.array[1][0] += (path[1][0] - path[0][0])*20
+                        self.array[1][1] += (path[1][1] - path[0][1])*20
+
+                else:
+                    random_move = np.random.randint(0,4)
+                    if random_move == 0 and maze[int(self.array[1][0]/20)+1][int(self.array[1][1]/20)] == 0:
+                        self.array[1][0] += 1*20
+                    if random_move == 1 and maze[int(self.array[1][0]/20)-1][int(self.array[1][1]/20)] == 0:
+                        self.array[1][0] -= 1*20
+                    if random_move == 2 and maze[int(self.array[1][0]/20)][int(self.array[1][1]/20)+1] == 0:
+                        self.array[1][1] += 1*20
+                    if random_move == 3 and maze[int(self.array[1][0]/20)][int(self.array[1][1]/20)-1] == 0:
+                        self.array[1][1] -= 1*20
 
                 self.array[1] = tuple(self.array[1])
 
                 maze = self.updateMaze(maze, 1)
 
 
-            # 2nd zombie moves randomly
+            # 3rd zombie moves according to the a* algorithm
             star_steps_2 = 2
             # print(self.array)
             if self.amount > 2 and steps%star_steps_2 == 0:
@@ -174,6 +185,18 @@ class Zombie:
                         # print("move")
                         self.array[2][0] += (path[1][0] - path[0][0])*20
                         self.array[2][1] += (path[1][1] - path[0][1])*20
+
+                else:
+                    # print(maze,"\nNeed to implement taking a random action")
+                    random_move = np.random.randint(0,4)
+                    if random_move == 0 and maze[int(self.array[2][0]/20)+1][int(self.array[2][1]/20)] == 0:
+                        self.array[0][0] += 1*20
+                    if random_move == 1 and maze[int(self.array[2][0]/20)-1][int(self.array[2][1]/20)] == 0:
+                        self.array[0][0] -= 1*20
+                    if random_move == 2 and maze[int(self.array[2][0]/20)][int(self.array[2][1]/20)+1] == 0:
+                        self.array[0][1] += 1*20
+                    if random_move == 3 and maze[int(self.array[2][0]/20)][int(self.array[2][1]/20)-1] == 0:
+                        self.array[0][1] -= 1*20
 
                 self.array[2] = tuple(self.array[2])
 

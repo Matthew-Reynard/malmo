@@ -44,7 +44,7 @@ missionXML='''<?xml version="1.0" encoding="UTF-8"?>
             <door>0</door>
             <puzzle>0</puzzle>
             <jump>0</jump>
-          </horizontalObstacles>
+          </horizontalOqbstacles>
           <verticalObstacles>
             <stairs>0</stairs>
             <ladder>0</ladder>

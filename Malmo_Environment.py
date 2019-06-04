@@ -415,7 +415,7 @@ class Environment:
                 reward = reward_in_lava
 
         # Update the position of the zombie 
-        # self.zombie.move(self.maze, self.steve, self.steps)
+        self.zombie.move(self.maze, self.steve, self.steps)
 
 
         # Check if zombie gets steve
