@@ -278,7 +278,7 @@ class Zombie:
                 open_list.append(child)
 
             # This count might influence performance a bit
-            if count > 300:
+            if count > 500:
                 # print(count)
                 # return None
                 break

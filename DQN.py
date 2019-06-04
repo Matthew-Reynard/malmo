@@ -7,6 +7,7 @@ import tensorflow as tf
 import numpy as np
 import sys, os
 
+
 class Network():
 
 	def __init__(self, local_size=9, name="test_model", path="./Models/Tensorflow/", load=False, trainable = True):

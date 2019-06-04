@@ -16,10 +16,10 @@ from utils import print_readable_time
 # Train
 def train():
 
-	MODEL_NAME = "explore15_input4"
-	MODEL_NAME_save = "explore15_input4"
+	MODEL_NAME = "default15_input6_video_barrier_16"
+	MODEL_NAME_save = "default15_input6_video_barrier_16"
 
-	FOLDER = "Best_Dojos"
+	FOLDER = "Other"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -27,7 +27,7 @@ def train():
 
 	USE_SAVED_MODEL_FILE = False
 
-	GRID_SIZE = 10
+	GRID_SIZE = 16
 	LOCAL_GRID_SIZE = 15
 	MAP_NUMBER = 0
 	RANDOMIZE_MAPS = True
@@ -44,19 +44,19 @@ def train():
 					  grid_size = GRID_SIZE,
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80,
-					  max_time = 80,
-					  food_count = 0,
+					  max_time = 100,
+					  food_count = 20,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 0,
-					  history = 40,
+					  zombie_count = 2,
+					  history = 0,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
 	if RENDER_TO_SCREEN:
 		env.prerender()
 
-	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=False, path="./Models/Tensorflow/"+FOLDER+"/")
+	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True, path="./Models/Tensorflow/"+FOLDER+"/")
 
 	brain = Brain(epsilon=0.1, action_space = env.number_of_actions())
 
@@ -115,7 +115,7 @@ def train():
 		for episode in range(total_episodes):
 
 			if RANDOMIZE_MAPS:
-				MAP_PATH = "./Maps/Grid10/map{}.txt".format(np.random.randint(10))
+				MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, np.random.randint(10))
 				env.set_map(MAP_PATH)
 
 			state, info = env.reset()
@@ -161,7 +161,7 @@ def train():
 				print("Ep:", episode,
 					"\tavg t: {0:.3f}".format(avg_time/print_episode),
 					"\tavg score: {0:.3f}".format(avg_score/print_episode),
-					"\tErr {0:.3f}".format(avg_error/print_episode),
+					"\terr {0:.3f}".format(avg_error/print_episode),
 					"\tavg_reward {0:.3f}".format(avg_reward/print_episode), # avg cumulative reward
 					"\tepsilon {0:.3f}".format(brain.EPSILON),
 					end="")
@@ -453,15 +453,15 @@ def train_MetaNetwork():
 # Run the given model
 def run():
 
-	MODEL_NAME = "default15_input6_adam_300k"
+	MODEL_NAME = "default15_input6_video2"
 
-	FOLDER = "Best_Default"
+	FOLDER = "Other"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
 	USE_SAVED_MODEL_FILE = False
 
-	GRID_SIZE = 16
+	GRID_SIZE = 10
 	LOCAL_GRID_SIZE = 15
 	MAP_NUMBER = 0
 	RANDOMIZE_MAPS = True
@@ -472,7 +472,7 @@ def run():
 	print("\n ---- Running the Deep Q Network ----- \n")
 
 	RENDER_TO_SCREEN = False
-	# RENDER_TO_SCREEN = True
+	RENDER_TO_SCREEN = True
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE, 
@@ -482,7 +482,7 @@ def run():
 					  food_count = 10,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 1,
+					  zombie_count = 2,
 					  history = 40,
 					  action_space = 5,
 					  map_path = MAP_PATH)
@@ -524,7 +524,7 @@ def run():
 		for episode in range(total_episodes):
 			
 			if RANDOMIZE_MAPS:
-				MAP_PATH = "./Maps/Grid16/map{}.txt".format(np.random.randint(10))
+				MAP_PATH = "./Maps/Grid10/map{}.txt".format(np.random.randint(10))
 				env.set_map(MAP_PATH)
 
 			state, info = env.reset()
@@ -726,17 +726,18 @@ def play():
 	LOCAL_GRID_SIZE = 15 # for printing out the state
 
 	# MAP_NUMBER = np.random.randint(10)
-	# MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
-	MAP_PATH = None
+	MAP_NUMBER = 1
+	MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
+	# MAP_PATH = None
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE, 
 					  local_size = LOCAL_GRID_SIZE,
-					  rate = 500,
-					  food_count = 5,
+					  rate = 100,
+					  food_count = 8,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 0,
+					  zombie_count = 2,
 					  history = 40,
 					  action_space = 5,
 					  map_path = MAP_PATH)
@@ -753,7 +754,7 @@ if __name__ == '__main__':
 
 	# run()
 
-	run_MetaNetwork()
+	# run_MetaNetwork()
 
-	# play() 
+	play() 
  
