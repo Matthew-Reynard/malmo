@@ -2,6 +2,7 @@ import numpy as np
 
 # custom imports
 from utils import Node
+import math
 
 
 class Zombie:
@@ -149,7 +150,7 @@ class Zombie:
 
                 self.array[1] = list(self.array[1])
                 
-                if path != None and True:
+                if path != None and False:
                     if len(path) > 1 and steps%star_steps == 0:
                         # print("move")
                         self.array[1][0] += (path[1][0] - path[0][0])*20
@@ -201,6 +202,54 @@ class Zombie:
                 self.array[2] = tuple(self.array[2])
 
                 maze = self.updateMaze(maze, 2)
+
+
+    # Move the zombie by a* or random movement
+    def range_move(self, maze, steve, steps):
+        """After a certain amount of charater steps, the zombie takes a step"""
+
+        goal = tuple([int(x/20) for x in steve.pos])
+
+        star_steps = [3,4,5]
+
+        for z in range(self.amount):
+            start = tuple([int(x/20) for x in self.array[z]])
+
+            distance = math.sqrt((goal[0] - start[0])**2 + (goal[1] - start[1])**2)
+            # print(z, distance)
+
+            # if self.amount > 1:
+            #     maze = self.updateMaze(maze, z-1)
+
+            # print(maze)
+            
+            path = None
+            if distance < 8:
+                path = self.astar(maze, start, goal)
+            self.array[z] = list(self.array[z])
+
+            if path != None:
+                if len(path) > 1 and steps%star_steps[z] == 0:
+                    self.array[z][0] += (path[1][0] - path[0][0])*20
+                    self.array[z][1] += (path[1][1] - path[0][1])*20
+                    # self.pos = (self.x, self.y)
+                    # self.array[0] = self.pos
+            else:
+                if steps%star_steps[z] == 0:
+                    random_move = np.random.randint(0,4)
+                    if random_move == 0 and maze[int(self.array[z][0]/20)+1][int(self.array[z][1]/20)] == 0:
+                        self.array[z][0] += 1*20
+                    if random_move == 1 and maze[int(self.array[z][0]/20)-1][int(self.array[z][1]/20)] == 0:
+                        self.array[z][0] -= 1*20
+                    if random_move == 2 and maze[int(self.array[z][0]/20)][int(self.array[z][1]/20)+1] == 0:
+                        self.array[z][1] += 1*20
+                    if random_move == 3 and maze[int(self.array[z][0]/20)][int(self.array[z][1]/20)-1] == 0:
+                        self.array[z][1] -= 1*20
+
+            self.array[z] = tuple(self.array[z])
+
+            # maze = self.updateMaze(maze, z)
+        # print()
 
 
     # Draw the zombie
@@ -301,7 +350,7 @@ class Zombie:
                 open_list.append(child)
 
             # This count might influence performance a bit
-            if count > 500:
+            if count > 300:
                 # print(count)
                 # return None
                 break
@@ -312,6 +361,6 @@ class Zombie:
 
         new_maze = maze.copy() # copy it, dont make it equal to each other
 
-        new_maze[int(self.array[zombie_index][0]/20)][int(self.array[zombie_index][1]/20)] = 1
+        new_maze[int(self.array[zombie_index][1]/20)][int(self.array[zombie_index][0]/20)] = 1
 
         return new_maze

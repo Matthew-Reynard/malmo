@@ -340,14 +340,14 @@ class Environment:
         reward = reward_each_time_step
 
         # Negetive exponential distance rewards
-        if len(self.zombie.array) > 0:
-            distance_list = []
-            for i, z in enumerate(self.zombie.array):
-                distance_list.append((math.sqrt((self.steve.x - z[0])**2 + (self.steve.y - z[1])**2)/self.GRID_SIZE)/2)
-            # print(distance_list)
+        # if len(self.zombie.array) > 0:
+        #     distance_list = []
+        #     for i, z in enumerate(self.zombie.array):
+                # distance_list.append((math.sqrt((self.steve.x - z[0])**2 + (self.steve.y - z[1])**2)/self.GRID_SIZE)/2)
+        #     # print(distance_list)
 
-            if min(distance_list) < 1.6:
-                reward = reward_barrier
+        #     if min(distance_list) < 1.6:
+        #         reward = reward_barrier
             
             # normal_distance = ((distance/self.GRID_SIZE)*(pi/2))-pi/4
             # normal_distance = ((distance/self.GRID_SIZE)*(1.0))-0.4
@@ -415,7 +415,8 @@ class Environment:
                 reward = reward_in_lava
 
         # Update the position of the zombie 
-        self.zombie.move(self.maze, self.steve, self.steps)
+        # self.zombie.move(self.maze, self.steve, self.steps)
+        self.zombie.range_move(self.maze, self.steve, self.steps)
 
 
         # Check if zombie gets steve
@@ -819,12 +820,12 @@ class Environment:
 
         for i in range(10):
 
-            # MAP_NUMBER = np.random.randint(10)
+            MAP_NUMBER = np.random.randint(10)
 
             # MAP_PATH = "./Maps/Grid10/map{}.txt".format(np.random.randint(10))
 
-            MAP_NUMBER = 7
-            MAP_PATH = "./Maps/Grid{}/map{}.txt".format(10, MAP_NUMBER)
+            # MAP_NUMBER = 5
+            MAP_PATH = "./Maps/Grid{}/map{}.txt".format(self.GRID_SIZE-2, MAP_NUMBER)
             self.set_map(MAP_PATH)
 
             self.reset()

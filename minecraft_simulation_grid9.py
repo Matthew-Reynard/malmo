@@ -222,7 +222,10 @@ def train_MetaNetwork():
 	EXPLORE_MODEL_NAME = "explore9_input3_best_200k"
 	# DOJO_MODEL_NAME = "test9_input5"diamond9_input3_best_200k
 
-	MODEL_PATH_SAVE = "./Models/Tensorflow/Meta9/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
+	FOLDER = "Best_Meta9"
+	DOJO_FOLDER = "Best_Dojos9"
+
+	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
 	LOGDIR = "./Logs/"+MODEL_NAME
 
@@ -253,13 +256,13 @@ def train_MetaNetwork():
 	if RENDER_TO_SCREEN:
 		env.prerender()
 
-	model = MetaNetwork(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, path="./Models/Tensorflow/Meta9/", load=False,  trainable=True)
+	model = MetaNetwork(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, path="./Models/Tensorflow/"+FOLDER+"/", load=False,  trainable=True)
  
-	diamond_net = Network(local_size=LOCAL_GRID_SIZE, name=DIAMOND_MODEL_NAME, path="./Models/Tensorflow/Dojos9/", load=True, trainable=False)
+	diamond_net = Network(local_size=LOCAL_GRID_SIZE, name=DIAMOND_MODEL_NAME, path="./Models/Tensorflow/"+DOJO_FOLDER+"/", load=True, trainable=False)
 
-	zombie_net = Network(local_size=LOCAL_GRID_SIZE, name=ZOMBIE_MODEL_NAME, path="./Models/Tensorflow/Dojos9/", load=True, trainable=False)
+	zombie_net = Network(local_size=LOCAL_GRID_SIZE, name=ZOMBIE_MODEL_NAME, path="./Models/Tensorflow/"+DOJO_FOLDER+"/", load=True, trainable=False)
 
-	explore_net = Network(local_size=LOCAL_GRID_SIZE, name=EXPLORE_MODEL_NAME, path="./Models/Tensorflow/Dojos9/", load=True, trainable=False)
+	explore_net = Network(local_size=LOCAL_GRID_SIZE, name=EXPLORE_MODEL_NAME, path="./Models/Tensorflow/"+DOJO_FOLDER+"/", load=True, trainable=False)
 
 	brain = Brain(epsilon=0.1, action_space=3)
 
@@ -346,18 +349,24 @@ def train_MetaNetwork():
 
 				if dojo == 0:
 					dojo_state = state
+					# dojo_state[2] = 0 
+					dojo_state[3] = 0 
 					dojo_state = np.delete(dojo_state, 2, 0)# Take out the zombie layer
 					dojo_state = np.delete(dojo_state, 2, 0)# Take out the zombie layer
 					action = brain.choose_dojo(dojo_state, sess, diamond_net, env.number_of_actions(), brain.EPSILON)
 
 				elif dojo == 1:
 					dojo_state = state
+					# dojo_state[1] = 0 
+					# dojo_state[3] = 0 
 					dojo_state = np.delete(dojo_state, 1, 0)# Take out the diamond layer
 					dojo_state = np.delete(dojo_state, 2, 0)# Take out the diamond layer
 					action = brain.choose_dojo(dojo_state, sess, zombie_net, env.number_of_actions(), brain.EPSILON)
 
 				elif dojo == 2:
 					dojo_state = state
+					dojo_state[1] = 0 
+					dojo_state[2] = 0 
 					dojo_state = np.delete(dojo_state, 1, 0)# Take out the diamond layer
 					dojo_state = np.delete(dojo_state, 1, 0)# Take out the diamond layer
 					action = brain.choose_dojo(dojo_state, sess, explore_net, env.number_of_actions(), brain.EPSILON)
@@ -368,7 +377,7 @@ def train_MetaNetwork():
 				new_state, reward, done, info = env.step(action)
 				# print(new_state)
 
-				brain.store_transition(state, action, reward, done, new_state)
+				brain.store_transition_dojo(state, action, reward, done, new_state, dojo)
 
 				# print("")
 				# print(tf.trainable_variables(scope=None))
@@ -377,11 +386,13 @@ def train_MetaNetwork():
 				# TRAIN DOJOS
 				# e, Q_vector = brain.train(model, sess)
 
-				if dojo == 0:
-					_, Q_vector = brain.train_2_dojos(diamond_net, sess, dojo)
+				# if dojo == 0:
+				# 	_, Q_vector = brain.train_2_dojos(diamond_net, sess, dojo)
 
-				if dojo == 1:
-					_, Q_vector = brain.train_2_dojos(zombie_net, sess, dojo)
+				# if dojo == 1:
+				# 	_, Q_vector = brain.train_2_dojos(zombie_net, sess, dojo)
+
+				_, Q_vector = brain.train_3(sess, diamond_net, zombie_net, explore_net)
 				
 				# TRAIN META NETWORK
 				if done:
@@ -429,6 +440,7 @@ def train_MetaNetwork():
 				model.save(sess)
 				# diamond_net.save(sess)
 				# zombie_net.save(sess)
+				# explore_net.save(sess)
 				# save_path = saver.save(sess, MODEL_PATH_SAVE)
 
 				s = sess.run(merged_summary, feed_dict={model.input: state, model.actions: Dojo_vector, score:avg_score/print_episode, avg_t:avg_time/print_episode, epsilon:brain.EPSILON, avg_r:avg_reward/print_episode})
@@ -442,6 +454,7 @@ def train_MetaNetwork():
 		model.save(sess, verbose=True)
 		# diamond_net.save(sess, verbose=True)
 		# zombie_net.save(sess, verbose=True)
+		# explore_net.save(sess, verbose=True)
 
 		# save_path = saver.save(sess, MODEL_PATH_SAVE)
 		# print("Model saved in path: %s" % save_path)
