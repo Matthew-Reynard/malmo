@@ -16,8 +16,8 @@ from utils import print_readable_time
 # Train
 def train():
 
-	MODEL_NAME = "default15_input6_test16"
-	MODEL_NAME_save = "default15_input6_test16"
+	MODEL_NAME = "explore15_input6_test16"
+	MODEL_NAME_save = "explore15_input6_test16"
 
 	FOLDER = "Other"
 
@@ -45,11 +45,11 @@ def train():
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80,
 					  max_time = 100,
-					  food_count = 10,
+					  food_count = 0,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 3,
-					  history = 40,
+					  zombie_count = 0,
+					  history = 60,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
@@ -192,12 +192,12 @@ def train_MetaNetwork():
 
 	print("\n ---- Training the Meta Network ----- \n")
 
-	MODEL_NAME = "meta15_input6_zeroed_fixed_300k"
-	MODEL_NAME_save = "meta15_input6_zeroed_fixed_300k"
+	MODEL_NAME = "meta15_input6_test_100k_16"
+	MODEL_NAME_save = "meta15_input6_test_100k_16"
 
-	DIAMOND_MODEL_NAME = "diamond15_input6"
-	ZOMBIE_MODEL_NAME = "zombie15_input6"
-	EXPLORE_MODEL_NAME = "explore15_input6"
+	DIAMOND_MODEL_NAME = "diamond15_input6_test16"
+	ZOMBIE_MODEL_NAME = "zombie15_input6_test16"
+	EXPLORE_MODEL_NAME = "explore15_input6_test16"
 
 	# MODEL_NAME = "meta15_input6_1M_unfrozen_dojos"
 	# DIAMOND_MODEL_NAME = "diamond15_input4_best_unfrozen_at_1M"
@@ -209,8 +209,8 @@ def train_MetaNetwork():
 	# ZOMBIE_MODEL_NAME = "zombie15_input4_1M_random_unfrozen_cointoss"
 	# EXPLORE_MODEL_NAME = "explore15_input4_1M_random_unfrozen_cointoss"
 
-	FOLDER = "Best_Meta"
-	DOJO_FOLDER = "Best_Dojos"
+	FOLDER = "Other"
+	DOJO_FOLDER = "Other"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -218,7 +218,7 @@ def train_MetaNetwork():
 
 	USE_SAVED_MODEL_FILE = False
 
-	GRID_SIZE = 10 
+	GRID_SIZE = 16
 	LOCAL_GRID_SIZE = 15
 	MAP_PATH = None
 
@@ -235,7 +235,7 @@ def train_MetaNetwork():
 					  food_count = 10,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 2,
+					  zombie_count = 3,
 					  history = 40,
 					  action_space = 5,
 					  map_path = MAP_PATH)
@@ -277,7 +277,7 @@ def train_MetaNetwork():
 
 	# Number of episodes
 	print_episode = 1000
-	total_episodes = 300000
+	total_episodes = 100000
 
 	saver = tf.train.Saver()
 
@@ -312,7 +312,7 @@ def train_MetaNetwork():
 
 			if RANDOMIZE_MAPS:
 				# Make a random map 0: lava, 1: obstacle
-				MAP_PATH = "./Maps/Grid10/map{}.txt".format(np.random.randint(10))
+				MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, np.random.randint(10))
 				env.set_map(MAP_PATH)
 
 			state, info = env.reset()
@@ -453,15 +453,15 @@ def train_MetaNetwork():
 # Run the given model
 def run():
 
-	MODEL_NAME = "diamond15_input6_best"
+	MODEL_NAME = "explore15_input6_test16"
 
-	FOLDER = "Best_Dojos"
+	FOLDER = "Other"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
 	USE_SAVED_MODEL_FILE = False
 
-	GRID_SIZE = 10
+	GRID_SIZE = 16
 	LOCAL_GRID_SIZE = 15
 	MAP_NUMBER = 0
 	RANDOMIZE_MAPS = True
@@ -472,18 +472,18 @@ def run():
 	print("\n ---- Running the Deep Q Network ----- \n")
 
 	RENDER_TO_SCREEN = False
-	# RENDER_TO_SCREEN = True
+	RENDER_TO_SCREEN = True
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE, 
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80, 
 					  max_time = 50,
-					  food_count = 10,
+					  food_count = 0,
 					  obstacle_count = 0,
 					  lava_count = 0,
 					  zombie_count = 0,
-					  history = 0,
+					  history = 40,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
@@ -524,7 +524,7 @@ def run():
 		for episode in range(total_episodes):
 			
 			if RANDOMIZE_MAPS:
-				MAP_PATH = "./Maps/Grid10/map{}.txt".format(np.random.randint(10))
+				MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, np.random.randint(10))
 				env.set_map(MAP_PATH)
 
 			state, info = env.reset()
@@ -748,9 +748,9 @@ def play():
 # Main function 
 if __name__ == '__main__':
 
-	train()
+	# train()
 
-	# train_MetaNetwork()
+	train_MetaNetwork()
 
 	# run()
 
