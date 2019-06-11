@@ -11,7 +11,18 @@ import csv
 
 import my_mission
 
-print(my_mission.missionXML)
+from utils import print_readable_time, Histogram
+
+histogram = Histogram(3, 4, 1000)
+
+for i in range(1000):
+    histogram.add(np.random.randint(3))
+
+histogram.plot()
+
+
+
+# print(my_mission.missionXML)
 
 # s = np.array([[[0,0],
 #       [0,0]],

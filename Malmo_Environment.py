@@ -36,10 +36,11 @@ with contextlib.redirect_stdout(None):
 # custom imports
 from steve import Steve
 from food import Food
+from stick import Stick
 from obstacle import Obstacle
 from lava import Lava
 from zombie import Zombie
-from utils import createGrid
+from utils import createGrid, reset_impossible_map
 from math import pi
 
 # import csv
@@ -49,7 +50,7 @@ from math import pi
 
 class Environment:
 
-    def __init__(self, wrap=False, grid_size=10, local_size=9, rate=100, max_time=math.inf, action_space=5, food_count=1, obstacle_count=0, lava_count=0, zombie_count=0, history=30, map_path=None):
+    def __init__(self, wrap=False, grid_size=10, local_size=9, rate=100, max_time=math.inf, action_space=5, food_count=1, stick_count=1, obstacle_count=0, lava_count=0, zombie_count=0, history=30, map_path=None):
         """
         Initialise the Game Environment with default values
         """
@@ -77,6 +78,9 @@ class Environment:
         # Create Food
         self.NUM_OF_FOOD = food_count
         self.food = Food(self.NUM_OF_FOOD)
+
+        self.NUM_OF_STICKS = stick_count
+        self.stick = Stick(self.NUM_OF_STICKS)
 
         # Create Obstacles
         self.NUM_OF_OBSTACLES = obstacle_count
@@ -135,6 +139,9 @@ class Environment:
         # Creates visual Food 
         self.food.create(pygame)
 
+        # Creates visual Food 
+        self.stick.create(pygame)
+
         # Creates visual Obstacles 
         self.obstacle.create(pygame)
 
@@ -145,7 +152,7 @@ class Environment:
         self.zombie.create(pygame)
 
         # Creates the grid background
-        self.bg = pygame.image.load("./Images/Grid50.png").convert()
+        self.bg = pygame.image.load("./Images/Grid100.png").convert()
 
 
     def reset(self):
@@ -155,6 +162,8 @@ class Environment:
 
         # Reset the score to 0
         self.score = 0
+
+        self.steve.health = 1
   
         # Positions on the grid that are not allowed to spawn things
         disallowed = []
@@ -237,6 +246,79 @@ class Environment:
         return self.state, info
 
 
+    def quick_reset(self):
+        """Reset the environment"""
+
+        self.steps = 0
+
+        # Reset the score to 0
+        self.score = 0
+
+        self.steve.health = 5
+  
+        # Positions on the grid that are not allowed to spawn things
+        disallowed = []
+
+        # Create obstacles and lava in the environment
+        self.obstacle.array.clear()
+        self.obstacle.array_length = 0
+        self.lava.array.clear()
+        self.lava.array_length = 0
+
+        self.zombie.array.clear()
+        self.zombie.amount = 0
+
+        self.steve.pos, self.food.array, self.stick.array, self.zombie.array = reset_impossible_map(self.GRID_SIZE, self.MAP_PATH)
+
+        self.zombie.prev_array =  self.zombie.array
+
+        # self.steve.pos = (0,0)
+        self.steve.x = self.steve.pos[0][0]
+        self.steve.y = self.steve.pos[0][1]
+
+        self.steve.history.clear()
+        self.steve.history.append((self.steve.x, self.steve.y))
+
+        self.steve.hasSword = False
+
+        self.obstacle.reset_map(self.GRID_SIZE, self.MAP_PATH, self.ENABLE_WRAP)
+        self.lava.reset_map(self.GRID_SIZE, self.MAP_PATH, self.ENABLE_WRAP)
+
+        self.obstacle.create_border(self.GRID_SIZE, self.SCALE)
+
+        [disallowed.append(grid_pos) for grid_pos in self.obstacle.array]
+        [disallowed.append(grid_pos) for grid_pos in self.lava.array]
+
+
+        self.maze = createGrid(self.GRID_SIZE, disallowed, self.SCALE)
+
+        # Initialise the movement to not moving
+        if self.ACTION_SPACE == 5:
+            self.steve.dx = 0
+            self.steve.dy = 0
+
+        self.spawn_new_food = False
+
+        self.zombie.amount = len(self.zombie.array)
+
+        self.food.amount = len(self.food.array)
+
+        self.stick.amount = len(self.stick.array)
+
+        # Fill the state array with the appropriate state representation
+        # self.state = self.state_array()
+        # self.state = self.state_vector_3D()
+        self.state = self.local_state_vector_3D()
+
+        # Reset the time
+        self.time = 0
+
+        # A dictionary of information that can be useful
+        info = {"time": self.time, "score": self.score}
+
+        return self.state, info
+
+
     def render(self):
         """Renders ONLY the CURRENT state"""
 
@@ -251,8 +333,11 @@ class Environment:
         self.obstacle.draw(self.display)
         self.lava.draw(self.display)
         self.food.draw(self.display)
+        self.stick.draw(self.display)
         self.zombie.draw(self.display)
         self.steve.draw(self.display)
+
+        self.steve.draw_health(self.display)
 
         # Text on screen
         text = self.font.render("Score: "+str(int(self.score)), True, (240, 240, 240, 0))
@@ -315,8 +400,8 @@ class Environment:
         self.steps += 1
 
         # Rewards:
-        reward_each_time_step = 1.0
-        # reward_each_time_step = -0.1
+        # reward_each_time_step = 1.0
+        reward_each_time_step = -0.1
         reward_collecting_diamond = 10.0
         reward_out_of_bounds = -1.0 # not used
         reward_zombie_hit = -10.0
@@ -426,9 +511,13 @@ class Environment:
                 zombie_hit = True
             else:
                 zombie_hit = False
+                self.steve.isHit = False
 
             if zombie_hit:
-                done = True
+                self.zombie.move_back(i)
+                self.steve.isHit = True
+                self.steve.health = self.steve.health - 1
+                # done = True
                 reward = reward_zombie_hit
                 break
 
@@ -475,6 +564,23 @@ class Environment:
         else:
             self.spawn_new_food = False
 
+        # If Steve collects a stick, increment score
+        collected_stick, stick_index = self.stick.collect(self.steve)
+
+        if collected_stick:
+            self.score += 1
+
+            # Create a piece of food that is not within Steve
+            disallowed = []
+            [disallowed.append(grid_pos) for grid_pos in self.obstacle.array]
+            self.stick.make(self.grid, disallowed, index = stick_index)
+
+            # Only collect 1 food item at a time
+            # done = True
+
+            # Reward functions
+            reward = reward_collecting_diamond
+
         # For fun
         if self.score == 2:
             self.steve.hasSword = True
@@ -486,6 +592,9 @@ class Environment:
             if self.NUM_OF_FOOD != 0:
                 done = True
                 pass
+
+        if self.steve.health <= 0:
+            done = True
 
         # If the episode takes longer than the max time, it ends
         if self.time == self.MAX_TIME_PER_EPISODE:
@@ -820,15 +929,16 @@ class Environment:
 
         for i in range(10):
 
-            MAP_NUMBER = np.random.randint(10)
+            # MAP_NUMBER = np.random.randint(10)
 
             # MAP_PATH = "./Maps/Grid10/map{}.txt".format(np.random.randint(10))
 
             # MAP_NUMBER = 5
-            MAP_PATH = "./Maps/Grid{}/map{}.txt".format(self.GRID_SIZE-2, MAP_NUMBER)
-            self.set_map(MAP_PATH)
+            # MAP_PATH = "./Maps/Grid{}/map{}.txt".format(self.GRID_SIZE-2, MAP_NUMBER)
+            # self.set_map(MAP_PATH)
 
-            self.reset()
+            # self.reset()
+            self.quick_reset()
 
             GAME_OVER = False
 

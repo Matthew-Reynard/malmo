@@ -10,7 +10,8 @@ import math
 from DQN import Network, MetaNetwork
 from Agent import Brain
 from Malmo_Environment import Environment
-from utils import print_readable_time
+from utils import print_readable_time, Histogram
+
 
 
 # Train
@@ -192,8 +193,8 @@ def train_MetaNetwork():
 
 	print("\n ---- Training the Meta Network ----- \n")
 
-	MODEL_NAME = "meta15_input6_test_100k_16"
-	MODEL_NAME_save = "meta15_input6_test_100k_16"
+	MODEL_NAME = "histogram_test"
+	MODEL_NAME_save = "histogram_test"
 
 	DIAMOND_MODEL_NAME = "diamond15_input6_test16"
 	ZOMBIE_MODEL_NAME = "zombie15_input6_test16"
@@ -207,7 +208,7 @@ def train_MetaNetwork():
 	# MODEL_NAME = "meta15_input6_1M_random_unfrozen_cointoss"
 	# DIAMOND_MODEL_NAME = "diamond15_input4_1M_random_unfrozen_cointoss"
 	# ZOMBIE_MODEL_NAME = "zombie15_input4_1M_random_unfrozen_cointoss"
-	# EXPLORE_MODEL_NAME = "explore15_input4_1M_random_unfrozen_cointoss"
+	# EXPLORE_MODEL_NAME = "explore15_input4_1M_random_unfrozen_cointoss"k
 
 	FOLDER = "Other"
 	DOJO_FOLDER = "Other"
@@ -226,6 +227,8 @@ def train_MetaNetwork():
 
 	RENDER_TO_SCREEN = False
 	# RENDER_TO_SCREEN = True
+
+	histogram = Histogram(3, 4, 1000)
 
 	env = Environment(wrap = False,
 					  grid_size = GRID_SIZE,
@@ -276,8 +279,8 @@ def train_MetaNetwork():
 	cumulative_reward = 0
 
 	# Number of episodes
-	print_episode = 1000
-	total_episodes = 100000
+	print_episode = 100
+	total_episodes = 1000
 
 	saver = tf.train.Saver()
 
@@ -331,6 +334,8 @@ def train_MetaNetwork():
 				Dojo_vector = sess.run(model.q_values, feed_dict={model.input: state})
 
 				dojo = brain.choose_action(state, sess, model)
+				histogram.check_section(episode)
+				histogram.add(dojo)
 				# dojo = np.random.randint(3)
 				# dojo = 0
 
@@ -448,6 +453,7 @@ def train_MetaNetwork():
 		# print("Model saved in path: %s" % save_path)
 
 		writer.close()
+		histogram.plot()
 
 
 # Run the given model
@@ -722,13 +728,14 @@ def run_MetaNetwork():
 def play():
 	print("\n ----- Playing the game -----\n")
 
-	GRID_SIZE = 16
+	GRID_SIZE = 50
 	LOCAL_GRID_SIZE = 15 # for printing out the state
 
 	# MAP_NUMBER = np.random.randint(10)
 	MAP_NUMBER = 1
 	MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
 	# MAP_PATH = None
+	MAP_PATH = "./Maps/Grid{}/impossible_map0.txt".format(GRID_SIZE, MAP_NUMBER)
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE, 

@@ -10,6 +10,8 @@ import numpy as np
 import matplotlib.pyplot as plt 
 import time
 import math
+import csv
+import matplotlib.pyplot as plt
 
 
 # Used for zombie A* algorithm
@@ -153,3 +155,108 @@ def custom_epsilon(episodes, peaks, scale, end):
     plt.plot(t, x)
 
     plt.show()
+
+
+
+class Histogram():
+    
+    def __init__(self, number_of_choices, number_of_sections, total_episodes):
+
+        self.choices = np.zeros((number_of_choices, number_of_sections))
+        self.num_choices = number_of_choices
+        self.sections = number_of_sections
+        self.total = total_episodes
+
+        self.current_sec = 0
+        self.max_sec = self.total/self.sections
+        self.count = 1
+
+
+    def add(self, dojo_choice):
+        # print(self.current_sec)
+        # if self.count > self.max_sec:
+            # self.count = 0
+            # self.current_sec = self.current_sec + 1
+
+        self.choices[dojo_choice][self.current_sec] = self.choices[dojo_choice][self.current_sec] + 1
+
+        # self.count = self.count + 1
+
+
+    def check_section(self, episode):
+        if episode > self.max_sec * self.count:
+            self.current_sec = self.current_sec + 1
+            self.count = self.count + 1
+
+
+    def plot(self):
+        print(self.choices)
+
+        # self.choices = [[10,5,7,3],[4,6,11,14],[7,7,6,5],[0,16,3,6]]
+
+        # x = np.array(self.choices)
+
+        # the histogram of the data
+        colors = ['red', 'green', 'yellow', 'blue']
+
+        ind = np.arange(self.sections)  # the x locations for the groups
+        width = 0.2  # the width of the bars
+
+        fig, ax = plt.subplots()
+        rects1 = ax.bar(ind - 3*width/2, self.choices[0], width, label='Dojo 1')
+        rects2 = ax.bar(ind - width/2, self.choices[1], width, label='Dojo 2')
+        rects3 = ax.bar(ind + width/2, self.choices[2], width, label='Dojo 3')
+        # rects4 = ax.bar(ind + 3*width/2, self.choices[3], width, label='Dojo 4')
+
+        # Add some text for labels, title and custom x-axis tick labels, etc.
+        ax.set_ylabel('Scores')
+        ax.set_title('Scores by group and gender')
+        ax.set_xticks(ind)
+        ax.set_xticklabels(('25', '50', '75', '100', 'G5'))
+        ax.legend()
+
+        fig.tight_layout()
+
+        plt.show()  
+
+
+def reset_impossible_map(grid_size, map_path):
+
+    map1 = []
+
+    steve = []
+    diamond = []
+    stick = []
+    zombie = []
+
+    # Read the map in from the text file
+    with open(map_path, 'r') as csvfile:
+        matrixreader = csv.reader(csvfile, delimiter=' ')
+        row = []
+        for i in range(grid_size):
+            row.insert(i,"0")
+        map1.append(row)
+        
+        for row in matrixreader:
+            row.insert(grid_size, "0")
+            row.insert(0, "0")
+            map1.append(row)
+        
+        row = []
+        for i in range(grid_size):
+            row.insert(i,"0")
+        map1.append(row)
+
+    for j in range(grid_size):
+        for i in range(grid_size):
+            if map1[j][i] == '3':
+                steve.append((i*20,j*20))
+            if map1[j][i] == '4':
+                diamond.append((i*20,j*20))
+            if map1[j][i] == '5':
+                stick.append((i*20,j*20))
+            if map1[j][i] == '6':
+                zombie.append((i*20,j*20))
+
+    return steve, diamond, stick, zombie
+

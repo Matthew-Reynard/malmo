@@ -22,6 +22,9 @@ class Steve:
         self.score_multiplier = 1
 
         self.hasSword = False
+        self.isHit = False
+
+        self.health = 5
 
 
     # Load steve image for better visuals 
@@ -32,6 +35,7 @@ class Steve:
         white = (255,255,255)
         self.steve_img = pygame.image.load("./Images/steve_head.png").convert()
         self.steve_img2 = pygame.image.load("./Images/steve_sword.png").convert()
+        self.steve_img_red = pygame.image.load("./Images/steve_red.png").convert()
         # self.steve_img.set_colorkey(white) # sets white to alpha
 
         # self.steve_img = pygame.transform.flip(self.steve_img, False, True) #
@@ -40,6 +44,12 @@ class Steve:
         # If the images arent 20x20 pixels, scales down or up
         self.steve_img = pygame.transform.scale(self.steve_img, (20, 20))
         self.steve_img2 = pygame.transform.scale(self.steve_img2, (20, 20))
+        self.steve_img_red = pygame.transform.scale(self.steve_img_red, (20, 20))
+
+        # Creates the health icons
+        self.heart = pygame.image.load("./Images/heart.png").convert()
+        self.heart = pygame.transform.scale(self.heart, (20, 20))
+        # self.heart.set_colorkey(white) # sets white to alpha
 
 
     # Reset steve at a specific/random location in env
@@ -120,8 +130,20 @@ class Steve:
     # Draw steve
     def draw(self, display):
 
-        if self.hasSword:
+        if self.hasSword and self.isHit:
             display.blit(self.steve_img2, self.pos)
+        elif self.hasSword and not self.isHit:
+            display.blit(self.steve_img2, self.pos)
+        elif not self.hasSword and self.isHit:
+            display.blit(self.steve_img_red, self.pos)
         else:
             display.blit(self.steve_img, self.pos)
+
+
+    # Draw steves health
+    def draw_health(self, display):
+
+        for i in range(self.health):
+            display.blit(self.heart, (120+i*20,0))
+
         

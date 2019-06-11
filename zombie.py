@@ -15,6 +15,8 @@ class Zombie:
         self.zombie_img = None
 
         self.array = [self.pos]
+        self.prev_array = []
+
         self.amount = number
 
         self.amount_eaten = 0
@@ -212,7 +214,9 @@ class Zombie:
 
         star_steps = [3,4,5,6]
 
-        max_distances = [7,8,9,10]
+        max_distances = [17,18,19,110]
+
+        self.prev_array = self.array.copy()
 
         for z in range(self.amount):
             start = tuple([int(x/20) for x in self.array[z]])
@@ -262,9 +266,11 @@ class Zombie:
                         self.array[z][1] -= 1*20
 
             self.array[z] = tuple(self.array[z])
-
         # print()
 
+
+    def move_back(self, index):
+        self.array[index] = self.prev_array[index]
 
     # Draw the zombie
     def draw(self, display):
@@ -364,7 +370,7 @@ class Zombie:
                 open_list.append(child)
 
             # This count might influence performance a bit
-            if count > 300:
+            if count > 100:
                 # print(count)
                 # return None
                 break
