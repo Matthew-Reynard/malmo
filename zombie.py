@@ -269,8 +269,10 @@ class Zombie:
         # print()
 
 
+    # Once a zombie "hits" steve, it moves back to its previous position
     def move_back(self, index):
         self.array[index] = self.prev_array[index]
+
 
     # Draw the zombie
     def draw(self, display):

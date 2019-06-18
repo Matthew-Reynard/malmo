@@ -17,18 +17,18 @@ from utils import print_readable_time, Histogram
 # Train
 def train():
 
-	MODEL_NAME = "explore15_input6_test16"
-	MODEL_NAME_save = "explore15_input6_test16"
+	MODEL_NAME = "zombie15_input6_health5"
+	MODEL_NAME_save = "zombie15_input6_health5"
 
-	FOLDER = "Other"
+	FOLDER = "Best_Dojos"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
-	LOGDIR = "./Logs/"+MODEL_NAME_save+""
+	LOGDIR = "./Logs/"+FOLDER+"/"+MODEL_NAME_save+""
 
 	USE_SAVED_MODEL_FILE = False
 
-	GRID_SIZE = 16
+	GRID_SIZE = 10
 	LOCAL_GRID_SIZE = 15
 	MAP_NUMBER = 0
 	RANDOMIZE_MAPS = True
@@ -47,10 +47,11 @@ def train():
 					  rate = 80,
 					  max_time = 100,
 					  food_count = 0,
+					  stick_count = 0,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 0,
-					  history = 60,
+					  zombie_count = 2,
+					  history = 0,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
@@ -193,12 +194,13 @@ def train_MetaNetwork():
 
 	print("\n ---- Training the Meta Network ----- \n")
 
-	MODEL_NAME = "histogram_test"
-	MODEL_NAME_save = "histogram_test"
+	MODEL_NAME = "meta15_input6_100k_2"
+	MODEL_NAME_save = "meta15_input6_100k_2"
 
-	DIAMOND_MODEL_NAME = "diamond15_input6_test16"
-	ZOMBIE_MODEL_NAME = "zombie15_input6_test16"
-	EXPLORE_MODEL_NAME = "explore15_input6_test16"
+	DIAMOND_MODEL_NAME = "diamond15_input6_best"
+	ZOMBIE_MODEL_NAME = "zombie15_input6"
+	EXPLORE_MODEL_NAME = "explore15_input6"
+	# EXTRA_MODEL_NAME = "extra15_input6_2"
 
 	# MODEL_NAME = "meta15_input6_1M_unfrozen_dojos"
 	# DIAMOND_MODEL_NAME = "diamond15_input4_best_unfrozen_at_1M"
@@ -210,16 +212,16 @@ def train_MetaNetwork():
 	# ZOMBIE_MODEL_NAME = "zombie15_input4_1M_random_unfrozen_cointoss"
 	# EXPLORE_MODEL_NAME = "explore15_input4_1M_random_unfrozen_cointoss"k
 
-	FOLDER = "Other"
-	DOJO_FOLDER = "Other"
+	FOLDER = "Best_Meta"
+	DOJO_FOLDER = "Best_Dojos"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
-	LOGDIR = "./Logs/"+MODEL_NAME_save+""
+	LOGDIR = "./Logs/"+FOLDER+"/"+MODEL_NAME_save+""
 
 	USE_SAVED_MODEL_FILE = False
 
-	GRID_SIZE = 16
+	GRID_SIZE = 10
 	LOCAL_GRID_SIZE = 15
 	MAP_PATH = None
 
@@ -227,8 +229,6 @@ def train_MetaNetwork():
 
 	RENDER_TO_SCREEN = False
 	# RENDER_TO_SCREEN = True
-
-	histogram = Histogram(3, 4, 1000)
 
 	env = Environment(wrap = False,
 					  grid_size = GRID_SIZE,
@@ -238,7 +238,7 @@ def train_MetaNetwork():
 					  food_count = 10,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 3,
+					  zombie_count = 2,
 					  history = 40,
 					  action_space = 5,
 					  map_path = MAP_PATH)
@@ -254,12 +254,15 @@ def train_MetaNetwork():
 
 	explore_net = Network(local_size=LOCAL_GRID_SIZE, name=EXPLORE_MODEL_NAME, path="./Models/Tensorflow/"+DOJO_FOLDER+"/", load=True, trainable=False)
 
+	# extra_net = Network(local_size=LOCAL_GRID_SIZE, name=EXTRA_MODEL_NAME, path="./Models/Tensorflow/"+DOJO_FOLDER+"/", load=False, trainable=True)
+
 	brain = Brain(epsilon=0.05, action_space=3)
 
 	model.setup(brain)
 	diamond_net.setup(brain)
 	zombie_net.setup(brain)
 	explore_net.setup(brain)
+	# extra_net.setup(brain)
 
 	score = tf.placeholder(tf.float32, [])
 	avg_t = tf.placeholder(tf.float32, [])
@@ -279,8 +282,8 @@ def train_MetaNetwork():
 	cumulative_reward = 0
 
 	# Number of episodes
-	print_episode = 100
-	total_episodes = 1000
+	print_episode = 1000
+	total_episodes = 100000
 
 	saver = tf.train.Saver()
 
@@ -293,8 +296,11 @@ def train_MetaNetwork():
 	# Tensorboard capabilties
 	writer = tf.summary.FileWriter(LOGDIR)
 
+	# Histogram
+	histogram = Histogram(3, 10, total_episodes)
+
  	# GPU capabilities
-	gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.2)
+	gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.3)
 
 	# Begin session
 	with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
@@ -334,8 +340,10 @@ def train_MetaNetwork():
 				Dojo_vector = sess.run(model.q_values, feed_dict={model.input: state})
 
 				dojo = brain.choose_action(state, sess, model)
+				
 				histogram.check_section(episode)
 				histogram.add(dojo)
+
 				# dojo = np.random.randint(3)
 				# dojo = 0
 
@@ -365,6 +373,10 @@ def train_MetaNetwork():
 					# dojo_state = np.delete(dojo_state, 1, 0)# Take out the zombie layer
 					action = brain.choose_dojo(dojo_state, sess, explore_net, env.number_of_actions(), 0.05)
 
+				# elif dojo == 3:
+				# 	dojo_state = state
+				# 	action = brain.choose_dojo(dojo_state, sess, extra_net, env.number_of_actions(), 0.05)
+
 				# print(action)
 
 				# Update environment with by performing action
@@ -386,6 +398,8 @@ def train_MetaNetwork():
 				# 	e, Q_vector = brain.train_3_dojos(explore_net, sess, dojo)
 
 				# e, Q_vector = brain.train_3(sess, diamond_net, zombie_net, explore_net)
+
+				# e, Q_vector = brain.train(extra_net, sess)
 
 				if done:
 					Dojo_vector[:,dojo] = reward
@@ -433,6 +447,7 @@ def train_MetaNetwork():
 				# diamond_net.save(sess, name=DIAMOND_MODEL_NAME+"")
 				# zombie_net.save(sess, name=ZOMBIE_MODEL_NAME+"")
 				# explore_net.save(sess, name=EXPLORE_MODEL_NAME+"")
+				# extra_net.save(sess, name=EXTRA_MODEL_NAME+"")
 
 				# save_path = saver.save(sess, MODEL_PATH_SAVE)
 
@@ -448,6 +463,7 @@ def train_MetaNetwork():
 		# diamond_net.save(sess, verbose=True, name=DIAMOND_MODEL_NAME+"")
 		# zombie_net.save(sess, verbose=True, name=ZOMBIE_MODEL_NAME+"")
 		# explore_net.save(sess, verbose=True, name=EXPLORE_MODEL_NAME+"")
+		# extra_net.save(sess, verbose=True, name=EXTRA_MODEL_NAME+"")
 
 		# save_path = saver.save(sess, MODEL_PATH_SAVE)
 		# print("Model saved in path: %s" % save_path)
@@ -459,15 +475,15 @@ def train_MetaNetwork():
 # Run the given model
 def run():
 
-	MODEL_NAME = "explore15_input6_test16"
+	MODEL_NAME = "explore15_input6"
 
-	FOLDER = "Other"
+	FOLDER = "Best_Dojos"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
 	USE_SAVED_MODEL_FILE = False
 
-	GRID_SIZE = 16
+	GRID_SIZE = 10
 	LOCAL_GRID_SIZE = 15
 	MAP_NUMBER = 0
 	RANDOMIZE_MAPS = True
@@ -478,13 +494,13 @@ def run():
 	print("\n ---- Running the Deep Q Network ----- \n")
 
 	RENDER_TO_SCREEN = False
-	RENDER_TO_SCREEN = True
+	# RENDER_TO_SCREEN = True
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE, 
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80, 
-					  max_time = 50,
+					  max_time = 60,
 					  food_count = 0,
 					  obstacle_count = 0,
 					  lava_count = 0,
@@ -504,6 +520,8 @@ def run():
 
 	avg_time = 0
 	avg_score = 0
+	avg_reward = 0
+	cumulative_reward = 0
 
 	# Number of episodes
 	print_episode = 100
@@ -550,23 +568,29 @@ def run():
 
 				state = new_state
 
+				cumulative_reward += reward
+
 				if RENDER_TO_SCREEN:
 					env.render()
 
 				if done:
 					avg_time += info["time"]
 					avg_score += info["score"]
+					avg_reward += cumulative_reward 
+					cumulative_reward = 0
 
 			if (episode%print_episode == 0 and episode != 0) or (episode == total_episodes-1):
 				
 				print("Ep:", episode,
 					"\tavg t: {0:.3f}".format(avg_time/print_episode),
 					"\tavg score: {0:.3f}".format(avg_score/print_episode),
+					"\tavg_reward {0:.3f}".format(avg_reward/print_episode), # avg cumulative reward
 					"\tepsilon {0:.3f}".format(brain.EPSILON),
 					end="\n")
 
 				avg_time = 0
 				avg_score = 0
+				avg_reward = 0
 
 
 # Run Meta Network with fixed Dojo networks
@@ -731,9 +755,9 @@ def play():
 	GRID_SIZE = 50
 	LOCAL_GRID_SIZE = 15 # for printing out the state
 
-	# MAP_NUMBER = np.random.randint(10)
-	MAP_NUMBER = 1
-	MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
+	# MAP_NUMBER = 1
+	MAP_NUMBER = np.random.randint(10)
+	# MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
 	# MAP_PATH = None
 	MAP_PATH = "./Maps/Grid{}/impossible_map0.txt".format(GRID_SIZE, MAP_NUMBER)
 
@@ -741,7 +765,8 @@ def play():
 					  grid_size = GRID_SIZE, 
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 100,
-					  food_count = 8,
+					  food_count = 10,
+					  stick_count=0,
 					  obstacle_count = 0,
 					  lava_count = 0,
 					  zombie_count = 3,
