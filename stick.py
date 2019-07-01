@@ -14,7 +14,7 @@ class Stick:
 
 
     # Create the Pygame sections of the food to render it
-    def create(self, pygame):
+    def create(self, pygame, scale):
 
         # PYGAME STUFF
 
@@ -23,7 +23,7 @@ class Stick:
         # self.food_img.set_colorkey(white)
 
         # If the image isn't 20x20 pixels
-        self.food_img = pygame.transform.scale(self.food_img, (20, 20))
+        self.food_img = pygame.transform.scale(self.food_img, (scale, scale))
 
 
     # Reset the food

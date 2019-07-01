@@ -752,14 +752,14 @@ def run_MetaNetwork():
 def play():
 	print("\n ----- Playing the game -----\n")
 
-	GRID_SIZE = 50
+	GRID_SIZE = 10
 	LOCAL_GRID_SIZE = 15 # for printing out the state
 
 	# MAP_NUMBER = 1
 	MAP_NUMBER = np.random.randint(10)
 	# MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
-	# MAP_PATH = None
-	MAP_PATH = "./Maps/Grid{}/impossible_map0.txt".format(GRID_SIZE, MAP_NUMBER)
+	MAP_PATH = None
+	# MAP_PATH = "./Maps/Grid{}/impossible_map0.txt".format(GRID_SIZE, MAP_NUMBER)
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE, 
@@ -769,7 +769,7 @@ def play():
 					  stick_count=0,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 3,
+					  zombie_count = 4,
 					  history = 40,
 					  action_space = 5,
 					  map_path = MAP_PATH)
@@ -782,11 +782,11 @@ if __name__ == '__main__':
 
 	# train()
 
-	train_MetaNetwork()
+	# train_MetaNetwork()
 
 	# run()
 
 	# run_MetaNetwork()
 
-	# play()
+	play()
  

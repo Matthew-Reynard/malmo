@@ -28,7 +28,7 @@ class Steve:
 
 
     # Load steve image for better visuals 
-    def create(self, pygame):
+    def create(self, pygame, scale):
 
         # PYGAME STUFF
 
@@ -42,13 +42,13 @@ class Steve:
         # self.steve_img = pygame.transform.rotate(self.steve_img, 90) # Start facing right
 
         # If the images arent 20x20 pixels, scales down or up
-        self.steve_img = pygame.transform.scale(self.steve_img, (20, 20))
-        self.steve_img2 = pygame.transform.scale(self.steve_img2, (20, 20))
-        self.steve_img_red = pygame.transform.scale(self.steve_img_red, (20, 20))
+        self.steve_img = pygame.transform.scale(self.steve_img, (scale, scale))
+        self.steve_img2 = pygame.transform.scale(self.steve_img2, (scale, scale))
+        self.steve_img_red = pygame.transform.scale(self.steve_img_red, (scale, scale))
 
         # Creates the health icons
         self.heart = pygame.image.load("./Images/heart.png").convert()
-        self.heart = pygame.transform.scale(self.heart, (20, 20))
+        self.heart = pygame.transform.scale(self.heart, (scale, scale))
         # self.heart.set_colorkey(white) # sets white to alpha
 
 

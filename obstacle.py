@@ -17,13 +17,13 @@ class Obstacle:
         self.random_objects = []
     
     
-    def create(self, pygame):
+    def create(self, pygame, scale):
         """Set the image for the obstacles"""
 
         white = (255,255,255)
         self.obstacle_img = pygame.image.load("./Images/stone.png").convert()
         self.obstacle_img.set_colorkey(white)
-        self.obstacle_img = pygame.transform.scale(self.obstacle_img, (20, 20))
+        self.obstacle_img = pygame.transform.scale(self.obstacle_img, (scale, scale))
         
         for i in range(8):
             self.random_objects.append(pygame.image.load("./Images/Object{}.png".format(i+1)).convert())

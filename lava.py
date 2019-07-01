@@ -19,13 +19,13 @@ class Lava:
         self.random_objects = []
     
 
-    def create(self, pygame):
+    def create(self, pygame, scale):
         """Set the image for the obstacles"""
 
         white = (255,255,255)
         self.lava_img = pygame.image.load("./Images/lava.png").convert()
         self.lava_img.set_colorkey(white)
-        self.lava_img = pygame.transform.scale(self.lava_img, (20, 20))
+        self.lava_img = pygame.transform.scale(self.lava_img, (scale, scale))
 
         for i in range(8):
             self.random_objects.append(pygame.image.load("./Images/Object{}.png".format(i+1)).convert())

@@ -134,25 +134,26 @@ class Environment:
         self.font = pygame.font.SysFont('Default', 32, bold=False)
 
         # Creates a visual steve 
-        self.steve.create(pygame)
+        self.steve.create(pygame, self.SCALE)
 
         # Creates visual Food 
-        self.food.create(pygame)
+        self.food.create(pygame, self.SCALE)
 
         # Creates visual Food 
-        self.stick.create(pygame)
+        self.stick.create(pygame, self.SCALE)
 
         # Creates visual Obstacles 
-        self.obstacle.create(pygame)
+        self.obstacle.create(pygame, self.SCALE)
 
         # Creates visual Lava 
-        self.lava.create(pygame)
+        self.lava.create(pygame, self.SCALE)
 
         # Creates visual Multipliers 
-        self.zombie.create(pygame)
+        self.zombie.create(pygame, self.SCALE)
 
         # Creates the grid background
         self.bg = pygame.image.load("./Images/Grid100.png").convert()
+        self.bg = pygame.transform.scale(self.bg, (self.SCALE*100, self.SCALE*100))
 
 
     def reset(self):
@@ -500,8 +501,8 @@ class Environment:
                 reward = reward_in_lava
 
         # Update the position of the zombie 
-        # self.zombie.move(self.maze, self.steve, self.steps)
-        self.zombie.range_move(self.maze, self.steve, self.steps)
+        # self.zombie.move(self.maze, self.steve, self.steps, self.SCALE)
+        self.zombie.range_move(self.maze, self.steve, self.steps, self.SCALE)
 
 
         # Check if zombie gets steve
@@ -935,8 +936,8 @@ class Environment:
             # MAP_PATH = "./Maps/Grid{}/map{}.txt".format(self.GRID_SIZE-2, MAP_NUMBER)
             # self.set_map(MAP_PATH)
 
-            # self.reset()
-            self.quick_reset()
+            self.reset()
+            # self.quick_reset()
 
             GAME_OVER = False
 
