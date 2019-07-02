@@ -212,9 +212,9 @@ class Zombie:
 
         goal = tuple([int(x/scale) for x in steve.pos])
 
-        star_steps = [3,4,5,6]
+        star_steps = [4,5,6,7]
 
-        max_distances = [17,18,19,110]
+        max_distances = [10,10,10,10]
 
         self.prev_array = self.array.copy()
 

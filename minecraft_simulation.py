@@ -17,10 +17,10 @@ from utils import print_readable_time, Histogram
 # Train
 def train():
 
-	MODEL_NAME = "zombie15_input6_health5"
-	MODEL_NAME_save = "zombie15_input6_health5"
+	MODEL_NAME = "test_impossiblemap32"
+	MODEL_NAME_save = "test_impossiblemap32"
 
-	FOLDER = "Best_Dojos"
+	FOLDER = "Other"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -28,13 +28,14 @@ def train():
 
 	USE_SAVED_MODEL_FILE = False
 
-	GRID_SIZE = 10
+	GRID_SIZE = 32
 	LOCAL_GRID_SIZE = 15
 	MAP_NUMBER = 0
-	RANDOMIZE_MAPS = True
+	RANDOMIZE_MAPS = False
 
 	# MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
-	MAP_PATH = None
+	# MAP_PATH = None
+	MAP_PATH = "./Maps/Grid{}/impossible_map0.txt".format(GRID_SIZE, MAP_NUMBER)
 
 	print("\n ---- Training the Deep Neural Network ----- \n")
 
@@ -45,12 +46,12 @@ def train():
 					  grid_size = GRID_SIZE,
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80,
-					  max_time = 100,
+					  max_time = 200,
 					  food_count = 0,
 					  stick_count = 0,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 2,
+					  zombie_count = 0,
 					  history = 0,
 					  action_space = 5,
 					  map_path = MAP_PATH)
@@ -82,8 +83,8 @@ def train():
 	cumulative_reward = 0
 
 	# Number of episodes
-	print_episode = 1000
-	total_episodes = 100000
+	print_episode = 100
+	total_episodes = 10000
 
 	saver = tf.train.Saver()
 
@@ -120,7 +121,8 @@ def train():
 				MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, np.random.randint(10))
 				env.set_map(MAP_PATH)
 
-			state, info = env.reset()
+			# state, info = env.reset()
+			state, info = env.quick_reset()
 			done = False
 
 			# brain.linear_epsilon_decay(total_episodes, episode, start=1.0, end=0.05, percentage=0.5)
@@ -483,18 +485,19 @@ def run():
 
 	USE_SAVED_MODEL_FILE = False
 
-	GRID_SIZE = 10
+	GRID_SIZE = 32
 	LOCAL_GRID_SIZE = 15
 	MAP_NUMBER = 0
-	RANDOMIZE_MAPS = True
+	RANDOMIZE_MAPS = False
 
 	# MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
 	MAP_PATH = None
+	MAP_PATH = "./Maps/Grid{}/impossible_map1.txt".format(GRID_SIZE, MAP_NUMBER)
 
 	print("\n ---- Running the Deep Q Network ----- \n")
 
 	RENDER_TO_SCREEN = False
-	# RENDER_TO_SCREEN = True
+	RENDER_TO_SCREEN = True
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE, 
@@ -551,7 +554,8 @@ def run():
 				MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, np.random.randint(10))
 				env.set_map(MAP_PATH)
 
-			state, info = env.reset()
+			# state, info = env.reset()
+			state, info = env.quick_reset()
 			done = False
 
 			if RENDER_TO_SCREEN:
@@ -752,14 +756,14 @@ def run_MetaNetwork():
 def play():
 	print("\n ----- Playing the game -----\n")
 
-	GRID_SIZE = 10
+	GRID_SIZE = 32
 	LOCAL_GRID_SIZE = 15 # for printing out the state
 
 	# MAP_NUMBER = 1
 	MAP_NUMBER = np.random.randint(10)
 	# MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
-	MAP_PATH = None
-	# MAP_PATH = "./Maps/Grid{}/impossible_map0.txt".format(GRID_SIZE, MAP_NUMBER)
+	# MAP_PATH = None
+	MAP_PATH = "./Maps/Grid{}/impossible_map2.txt".format(GRID_SIZE, MAP_NUMBER)
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE, 
@@ -784,9 +788,9 @@ if __name__ == '__main__':
 
 	# train_MetaNetwork()
 
-	# run()
+	run()
 
 	# run_MetaNetwork()
 
-	play()
+	# play()
  

@@ -157,6 +157,7 @@ def custom_epsilon(episodes, peaks, scale, end):
     plt.show()
 
 
+
 class Histogram():
     
     def __init__(self, number_of_choices, number_of_sections, total_episodes):
@@ -208,17 +209,14 @@ class Histogram():
         # rects4 = ax.bar(ind + 3*width/2, self.choices[3], width, label='Dojo 4')
 
         # Add some text for labels, title and custom x-axis tick labels, etc.
-        ax.set_ylabel('Number of times chosen')
-        ax.set_xlabel('Episode stage (in percentage)')
-        ax.set_title('Number of times each dojo was chosen during training')
+        ax.set_ylabel('Scores')
+        ax.set_title('Scores by group and gender')
         ax.set_xticks(ind)
-        # ax.set_xticklabels(('25', '50', '75', '100', 'G5'))
-        ax.set_xticklabels(('10', '20', '30', '40', '50', '60', '70', '80', '90', '100'))
+        ax.set_xticklabels(('25', '50', '75', '100', 'G5'))
         ax.legend()
 
         fig.tight_layout()
 
-        plt.savefig("histogram_2.pdf")
         plt.show()  
 
 

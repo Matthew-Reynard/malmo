@@ -277,6 +277,10 @@ class Environment:
         self.steve.x = self.steve.pos[0][0]
         self.steve.y = self.steve.pos[0][1]
 
+        # quick fix for something silly
+        self.steve.pos[0] = self.steve.x
+        self.steve.pos.append(self.steve.y)
+
         self.steve.history.clear()
         self.steve.history.append((self.steve.x, self.steve.y))
 
@@ -405,7 +409,7 @@ class Environment:
         reward_each_time_step = -0.1
         reward_collecting_diamond = 10.0
         reward_out_of_bounds = -1.0 # not used
-        reward_zombie_hit = -5.0
+        reward_zombie_hit = -10.0
         reward_in_lava = -10.0
         reward_barrier = -2.0
  
@@ -936,8 +940,8 @@ class Environment:
             # MAP_PATH = "./Maps/Grid{}/map{}.txt".format(self.GRID_SIZE-2, MAP_NUMBER)
             # self.set_map(MAP_PATH)
 
-            self.reset()
-            # self.quick_reset()
+            # self.reset()
+            self.quick_reset()
 
             GAME_OVER = False
 
