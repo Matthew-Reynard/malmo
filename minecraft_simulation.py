@@ -17,8 +17,8 @@ from utils import print_readable_time, Histogram
 # Train
 def train():
 
-	MODEL_NAME = "test_impossiblemap32"
-	MODEL_NAME_save = "test_impossiblemap32"
+	MODEL_NAME = "test_impossiblemap16"
+	MODEL_NAME_save = "test_impossiblemap16"
 
 	FOLDER = "Other"
 
@@ -28,7 +28,7 @@ def train():
 
 	USE_SAVED_MODEL_FILE = False
 
-	GRID_SIZE = 32
+	GRID_SIZE = 16
 	LOCAL_GRID_SIZE = 15
 	MAP_NUMBER = 0
 	RANDOMIZE_MAPS = False
@@ -40,7 +40,7 @@ def train():
 	print("\n ---- Training the Deep Neural Network ----- \n")
 
 	RENDER_TO_SCREEN = False
-	# RENDER_TO_SCREEN = True
+	RENDER_TO_SCREEN = True
 
 	env = Environment(wrap = False,
 					  grid_size = GRID_SIZE,
@@ -59,7 +59,7 @@ def train():
 	if RENDER_TO_SCREEN:
 		env.prerender()
 
-	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=False, path="./Models/Tensorflow/"+FOLDER+"/")
+	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True, path="./Models/Tensorflow/"+FOLDER+"/")
 
 	brain = Brain(epsilon=0.1, action_space = env.number_of_actions())
 
@@ -756,21 +756,21 @@ def run_MetaNetwork():
 def play():
 	print("\n ----- Playing the game -----\n")
 
-	GRID_SIZE = 32
+	GRID_SIZE = 16
 	LOCAL_GRID_SIZE = 15 # for printing out the state
 
 	# MAP_NUMBER = 1
 	MAP_NUMBER = np.random.randint(10)
 	# MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
 	# MAP_PATH = None
-	MAP_PATH = "./Maps/Grid{}/impossible_map2.txt".format(GRID_SIZE, MAP_NUMBER)
+	MAP_PATH = "./Maps/Grid{}/impossible_map3.txt".format(GRID_SIZE, MAP_NUMBER)
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE, 
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 100,
 					  food_count = 10,
-					  stick_count=0,
+					  stick_count = 0,
 					  obstacle_count = 0,
 					  lava_count = 0,
 					  zombie_count = 4,
@@ -784,11 +784,11 @@ def play():
 # Main function 
 if __name__ == '__main__':
 
-	# train()
+	train()
 
 	# train_MetaNetwork()
 
-	run()
+	# run()
 
 	# run_MetaNetwork()
 

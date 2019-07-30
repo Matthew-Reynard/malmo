@@ -228,6 +228,7 @@ def reset_impossible_map(grid_size, map_path):
     diamond = []
     stick = []
     zombie = []
+    barrier = []
 
     # Read the map in from the text file
     with open(map_path, 'r') as csvfile:
@@ -257,6 +258,8 @@ def reset_impossible_map(grid_size, map_path):
                 stick.append((i*20,j*20))
             if map1[j][i] == '6':
                 zombie.append((i*20,j*20))
+            if map1[j][i] == '9':
+                barrier.append((i*20,j*20))
 
-    return steve, diamond, stick, zombie
+    return steve, diamond, stick, zombie, barrier
 

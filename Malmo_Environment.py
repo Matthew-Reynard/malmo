@@ -269,7 +269,7 @@ class Environment:
         self.zombie.array.clear()
         self.zombie.amount = 0
 
-        self.steve.pos, self.food.array, self.stick.array, self.zombie.array = reset_impossible_map(self.GRID_SIZE, self.MAP_PATH)
+        self.steve.pos, self.food.array, self.stick.array, self.zombie.array, barrier = reset_impossible_map(self.GRID_SIZE, self.MAP_PATH)
 
         self.zombie.prev_array =  self.zombie.array
 
@@ -293,6 +293,7 @@ class Environment:
 
         [disallowed.append(grid_pos) for grid_pos in self.obstacle.array]
         [disallowed.append(grid_pos) for grid_pos in self.lava.array]
+        [disallowed.append(grid_pos) for grid_pos in barrier]
 
 
         self.maze = createGrid(self.GRID_SIZE, disallowed, self.SCALE)
