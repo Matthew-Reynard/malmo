@@ -164,7 +164,7 @@ class Environment:
         # Reset the score to 0
         self.score = 0
 
-        self.steve.health = 1
+        self.steve.health = 3
   
         # Positions on the grid that are not allowed to spawn things
         disallowed = []
@@ -588,8 +588,9 @@ class Environment:
             reward = reward_collecting_diamond
 
         # For fun
-        if self.score == 2:
+        if self.score == 5:
             self.steve.hasSword = True
+            done = True
 
         # To make it compatible with malmo
         if self.score == self.NUM_OF_FOOD:
@@ -935,14 +936,15 @@ class Environment:
 
         for i in range(10):
 
-            # MAP_NUMBER = np.random.randint(10)
-            # MAP_NUMBER = 5
+            MAP_NUMBER = np.random.randint(5)
+            # MAP_NUMBER = 1
 
             # MAP_PATH = "./Maps/Grid{}/map{}.txt".format(self.GRID_SIZE-2, MAP_NUMBER)
-            # self.set_map(MAP_PATH)
+            MAP_PATH = "./Maps/Grid{}/impossible_map_empty{}.txt".format(self.GRID_SIZE-2, MAP_NUMBER)
+            self.set_map(MAP_PATH)
 
-            # self.reset()
-            self.quick_reset()
+            self.reset()
+            # self.quick_reset()
 
             GAME_OVER = False
 

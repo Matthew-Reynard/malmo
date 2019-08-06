@@ -157,7 +157,7 @@ def custom_epsilon(episodes, peaks, scale, end):
     plt.show()
 
 
-
+# Historgram functions
 class Histogram():
     
     def __init__(self, number_of_choices, number_of_sections, total_episodes):
@@ -216,7 +216,7 @@ class Histogram():
         ax.legend()
 
         fig.tight_layout()
-
+        plt.savefig("histogram_all.pdf")
         plt.show()  
 
 

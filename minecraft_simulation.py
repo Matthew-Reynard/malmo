@@ -13,14 +13,13 @@ from Malmo_Environment import Environment
 from utils import print_readable_time, Histogram
 
 
-
 # Train
 def train():
 
-	MODEL_NAME = "test_impossiblemap16"
-	MODEL_NAME_save = "test_impossiblemap16"
+	MODEL_NAME = "explore_grid16"
+	MODEL_NAME_save = "explore_grid16"
 
-	FOLDER = "Other"
+	FOLDER = "Impossible"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -31,35 +30,35 @@ def train():
 	GRID_SIZE = 16
 	LOCAL_GRID_SIZE = 15
 	MAP_NUMBER = 0
-	RANDOMIZE_MAPS = False
+	RANDOMIZE_MAPS = True
 
 	# MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
-	# MAP_PATH = None
-	MAP_PATH = "./Maps/Grid{}/impossible_map0.txt".format(GRID_SIZE, MAP_NUMBER)
+	MAP_PATH = None
+	# MAP_PATH = "./Maps/Grid{}/impossible_map0.txt".format(GRID_SIZE, MAP_NUMBER)
 
 	print("\n ---- Training the Deep Neural Network ----- \n")
 
 	RENDER_TO_SCREEN = False
-	RENDER_TO_SCREEN = True
+	# RENDER_TO_SCREEN = True 
 
 	env = Environment(wrap = False,
 					  grid_size = GRID_SIZE,
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80,
-					  max_time = 200,
+					  max_time = 100,
 					  food_count = 0,
 					  stick_count = 0,
 					  obstacle_count = 0,
 					  lava_count = 0,
 					  zombie_count = 0,
-					  history = 0,
+					  history = 100,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
 	if RENDER_TO_SCREEN:
 		env.prerender()
 
-	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True, path="./Models/Tensorflow/"+FOLDER+"/")
+	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=False, path="./Models/Tensorflow/"+FOLDER+"/")
 
 	brain = Brain(epsilon=0.1, action_space = env.number_of_actions())
 
@@ -83,8 +82,8 @@ def train():
 	cumulative_reward = 0
 
 	# Number of episodes
-	print_episode = 100
-	total_episodes = 10000
+	print_episode = 1000
+	total_episodes = 100000
 
 	saver = tf.train.Saver()
 
@@ -118,11 +117,11 @@ def train():
 		for episode in range(total_episodes):
 
 			if RANDOMIZE_MAPS:
-				MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, np.random.randint(10))
+				MAP_PATH = "./Maps/Grid{}/impossible_map_empty{}.txt".format(GRID_SIZE, np.random.randint(5))
 				env.set_map(MAP_PATH)
 
-			# state, info = env.reset()
-			state, info = env.quick_reset()
+			state, info = env.reset()
+			# state, info = env.quick_reset()
 			done = False
 
 			# brain.linear_epsilon_decay(total_episodes, episode, start=1.0, end=0.05, percentage=0.5)
@@ -196,12 +195,12 @@ def train_MetaNetwork():
 
 	print("\n ---- Training the Meta Network ----- \n")
 
-	MODEL_NAME = "meta15_input6_100k_2"
-	MODEL_NAME_save = "meta15_input6_100k_2"
+	MODEL_NAME = "meta_grid16_all"
+	MODEL_NAME_save = "meta_grid16_all"
 
-	DIAMOND_MODEL_NAME = "diamond15_input6_best"
-	ZOMBIE_MODEL_NAME = "zombie15_input6"
-	EXPLORE_MODEL_NAME = "explore15_input6"
+	DIAMOND_MODEL_NAME = "diamond_grid16"
+	ZOMBIE_MODEL_NAME = "zombie_grid16"
+	EXPLORE_MODEL_NAME = "explore_grid16"
 	# EXTRA_MODEL_NAME = "extra15_input6_2"
 
 	# MODEL_NAME = "meta15_input6_1M_unfrozen_dojos"
@@ -214,8 +213,8 @@ def train_MetaNetwork():
 	# ZOMBIE_MODEL_NAME = "zombie15_input4_1M_random_unfrozen_cointoss"
 	# EXPLORE_MODEL_NAME = "explore15_input4_1M_random_unfrozen_cointoss"k
 
-	FOLDER = "Best_Meta"
-	DOJO_FOLDER = "Best_Dojos"
+	FOLDER = "Impossible"
+	DOJO_FOLDER = "Impossible"
 
 	MODEL_PATH_SAVE = "./Models/Tensorflow/"+FOLDER+"/"+MODEL_NAME+"/"+MODEL_NAME+".ckpt"
 
@@ -223,7 +222,7 @@ def train_MetaNetwork():
 
 	USE_SAVED_MODEL_FILE = False
 
-	GRID_SIZE = 10
+	GRID_SIZE = 16
 	LOCAL_GRID_SIZE = 15
 	MAP_PATH = None
 
@@ -236,12 +235,12 @@ def train_MetaNetwork():
 					  grid_size = GRID_SIZE,
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80,
-					  max_time = 100,
-					  food_count = 10,
+					  max_time = 120,
+					  food_count = 0,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 2,
-					  history = 40,
+					  zombie_count = 0,
+					  history = 50,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
@@ -323,10 +322,11 @@ def train_MetaNetwork():
 
 			if RANDOMIZE_MAPS:
 				# Make a random map 0: lava, 1: obstacle
-				MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, np.random.randint(10))
+				MAP_PATH = "./Maps/Grid{}/impossible_map{}.txt".format(GRID_SIZE, np.random.randint(5))
 				env.set_map(MAP_PATH)
 
-			state, info = env.reset()
+			# state, info = env.reset()
+			state, info = env.quick_reset()
 			done = False
 
 			# brain.linear_epsilon_decay(total_episodes, episode, start=1.0, end=0.05, percentage=0.5)
@@ -353,24 +353,24 @@ def train_MetaNetwork():
 
 				if dojo == 0:
 					dojo_state = state
-					dojo_state[2]=0
-					dojo_state[3]=0
+					# dojo_state[2]=0
+					# dojo_state[3]=0
 					# dojo_state = np.delete(dojo_state, 2, 0)# Take out the zombie layer
 					# dojo_state = np.delete(dojo_state, 2, 0)# Take out the history layer
 					action = brain.choose_dojo(dojo_state, sess, diamond_net, env.number_of_actions(), 0.05)
 
 				elif dojo == 1:
 					dojo_state = state
-					dojo_state[1]=0
-					dojo_state[3]=0
+					# dojo_state[1]=0
+					# dojo_state[3]=0
 					# dojo_state = np.delete(dojo_state, 1, 0)# Take out the diamond layer
 					# dojo_state = np.delete(dojo_state, 2, 0)# Take out the history layer
 					action = brain.choose_dojo(dojo_state, sess, zombie_net, env.number_of_actions(), 0.05)
 
 				elif dojo == 2:
 					dojo_state = state
-					dojo_state[1]=0
-					dojo_state[2]=0
+					# dojo_state[1]=0
+					# dojo_state[2]=0
 					# dojo_state = np.delete(dojo_state, 1, 0)# Take out the diamond layer
 					# dojo_state = np.delete(dojo_state, 1, 0)# Take out the zombie layer
 					action = brain.choose_dojo(dojo_state, sess, explore_net, env.number_of_actions(), 0.05)
@@ -759,22 +759,22 @@ def play():
 	GRID_SIZE = 16
 	LOCAL_GRID_SIZE = 15 # for printing out the state
 
-	# MAP_NUMBER = 1
-	MAP_NUMBER = np.random.randint(10)
+	MAP_NUMBER = 0
+	# MAP_NUMBER = np.random.randint(5)
 	# MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
 	# MAP_PATH = None
-	MAP_PATH = "./Maps/Grid{}/impossible_map3.txt".format(GRID_SIZE, MAP_NUMBER)
+	MAP_PATH = "./Maps/Grid{}/impossible_map{}.txt".format(GRID_SIZE, MAP_NUMBER)
 
 	env = Environment(wrap = False, 
 					  grid_size = GRID_SIZE, 
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 100,
-					  food_count = 10,
+					  food_count = 0,
 					  stick_count = 0,
 					  obstacle_count = 0,
 					  lava_count = 0,
-					  zombie_count = 4,
-					  history = 40,
+					  zombie_count = 0,
+					  history = 100,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
@@ -784,9 +784,9 @@ def play():
 # Main function 
 if __name__ == '__main__':
 
-	train()
+	# train()
 
-	# train_MetaNetwork()
+	train_MetaNetwork()
 
 	# run()
 
