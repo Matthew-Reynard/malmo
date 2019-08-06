@@ -759,7 +759,7 @@ def play():
 	GRID_SIZE = 16
 	LOCAL_GRID_SIZE = 15 # for printing out the state
 
-	MAP_NUMBER = 0
+	MAP_NUMBER = 4
 	# MAP_NUMBER = np.random.randint(5)
 	# MAP_PATH = "./Maps/Grid{}/map{}.txt".format(GRID_SIZE, MAP_NUMBER)
 	# MAP_PATH = None
@@ -786,11 +786,11 @@ if __name__ == '__main__':
 
 	# train()
 
-	train_MetaNetwork()
+	# train_MetaNetwork()
 
 	# run()
 
 	# run_MetaNetwork()
 
-	# play()
+	play()
  
