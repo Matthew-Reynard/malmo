@@ -936,15 +936,15 @@ class Environment:
 
         for i in range(10):
 
-            MAP_NUMBER = np.random.randint(5)
+            # MAP_NUMBER = np.random.randint(5)
             # MAP_NUMBER = 1
 
             # MAP_PATH = "./Maps/Grid{}/map{}.txt".format(self.GRID_SIZE-2, MAP_NUMBER)
-            MAP_PATH = "./Maps/Grid{}/impossible_map_empty{}.txt".format(self.GRID_SIZE-2, MAP_NUMBER)
-            self.set_map(MAP_PATH)
+            # MAP_PATH = "./Maps/Grid{}/impossible_map_empty{}.txt".format(self.GRID_SIZE-2, MAP_NUMBER)
+            # self.set_map(MAP_PATH)
 
-            self.reset()
-            # self.quick_reset()
+            # self.reset()
+            self.quick_reset()
 
             GAME_OVER = False
 
