@@ -16,8 +16,8 @@ from utils import print_readable_time, Histogram
 # Train
 def train():
 
-	MODEL_NAME = "explore_grid16"
-	MODEL_NAME_save = "explore_grid16"
+	MODEL_NAME = "default_grid16_map0_100k"
+	MODEL_NAME_save = "default_grid16_map0_100k"
 
 	FOLDER = "Impossible"
 
@@ -45,7 +45,7 @@ def train():
 					  grid_size = GRID_SIZE,
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80,
-					  max_time = 100,
+					  max_time = 120,
 					  food_count = 0,
 					  stick_count = 0,
 					  obstacle_count = 0,
@@ -117,11 +117,13 @@ def train():
 		for episode in range(total_episodes):
 
 			if RANDOMIZE_MAPS:
-				MAP_PATH = "./Maps/Grid{}/impossible_map_empty{}.txt".format(GRID_SIZE, np.random.randint(5))
+				MAP_NUMBER =  0
+				MAP_PATH = "./Maps/Grid{}/impossible_map{}.txt".format(GRID_SIZE, MAP_NUMBER)
+				# MAP_PATH = "./Maps/Grid{}/impossible_map_empty{}.txt".format(GRID_SIZE, np.random.randint(5))
 				env.set_map(MAP_PATH)
 
-			state, info = env.reset()
-			# state, info = env.quick_reset()
+			# state, info = env.reset()
+			state, info = env.quick_reset()
 			done = False
 
 			# brain.linear_epsilon_decay(total_episodes, episode, start=1.0, end=0.05, percentage=0.5)
@@ -195,12 +197,12 @@ def train_MetaNetwork():
 
 	print("\n ---- Training the Meta Network ----- \n")
 
-	MODEL_NAME = "meta_grid16_all"
-	MODEL_NAME_save = "meta_grid16_all"
+	MODEL_NAME = "meta_grid16_zero_2"
+	MODEL_NAME_save = "meta_grid16_zero_2"
 
-	DIAMOND_MODEL_NAME = "diamond_grid16"
-	ZOMBIE_MODEL_NAME = "zombie_grid16"
-	EXPLORE_MODEL_NAME = "explore_grid16"
+	DIAMOND_MODEL_NAME = "diamond_grid16_4"
+	ZOMBIE_MODEL_NAME = "zombie_grid16_2"
+	EXPLORE_MODEL_NAME = "explore_grid16_2"
 	# EXTRA_MODEL_NAME = "extra15_input6_2"
 
 	# MODEL_NAME = "meta15_input6_1M_unfrozen_dojos"
@@ -240,7 +242,7 @@ def train_MetaNetwork():
 					  obstacle_count = 0,
 					  lava_count = 0,
 					  zombie_count = 0,
-					  history = 50,
+					  history = 100,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
@@ -784,9 +786,9 @@ def play():
 # Main function 
 if __name__ == '__main__':
 
-	# train()
+	train()
 
-	train_MetaNetwork()
+	# train_MetaNetwork()
 
 	# run()
 

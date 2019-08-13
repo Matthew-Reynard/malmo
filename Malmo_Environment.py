@@ -164,7 +164,7 @@ class Environment:
         # Reset the score to 0
         self.score = 0
 
-        self.steve.health = 3
+        self.steve.health = 1
   
         # Positions on the grid that are not allowed to spawn things
         disallowed = []
@@ -590,7 +590,7 @@ class Environment:
         # For fun
         if self.score == 5:
             self.steve.hasSword = True
-            done = True
+            # done = True
 
         # To make it compatible with malmo
         if self.score == self.NUM_OF_FOOD:
