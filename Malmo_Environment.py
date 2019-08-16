@@ -164,7 +164,7 @@ class Environment:
         # Reset the score to 0
         self.score = 0
 
-        self.steve.health = 1
+        self.steve.health = 3
   
         # Positions on the grid that are not allowed to spawn things
         disallowed = []
@@ -588,7 +588,7 @@ class Environment:
             reward = reward_collecting_diamond
 
         # For fun
-        if self.score == 5:
+        if self.score == 3:
             self.steve.hasSword = True
             # done = True
 

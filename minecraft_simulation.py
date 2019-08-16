@@ -16,8 +16,8 @@ from utils import print_readable_time, Histogram
 # Train
 def train():
 
-	MODEL_NAME = "default_grid16_map0_100k"
-	MODEL_NAME_save = "default_grid16_map0_100k"
+	MODEL_NAME = "diamond_grid16_100k"
+	MODEL_NAME_save = "diamond_grid16_100k"
 
 	FOLDER = "Impossible"
 
@@ -46,19 +46,19 @@ def train():
 					  local_size = LOCAL_GRID_SIZE,
 					  rate = 80,
 					  max_time = 120,
-					  food_count = 0,
+					  food_count = 20,
 					  stick_count = 0,
 					  obstacle_count = 0,
 					  lava_count = 0,
 					  zombie_count = 0,
-					  history = 100,
+					  history = 0,
 					  action_space = 5,
 					  map_path = MAP_PATH)
 
 	if RENDER_TO_SCREEN:
 		env.prerender()
 
-	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=False, path="./Models/Tensorflow/"+FOLDER+"/")
+	model = Network(local_size=LOCAL_GRID_SIZE, name=MODEL_NAME, load=True, path="./Models/Tensorflow/"+FOLDER+"/")
 
 	brain = Brain(epsilon=0.1, action_space = env.number_of_actions())
 
@@ -83,7 +83,7 @@ def train():
 
 	# Number of episodes
 	print_episode = 1000
-	total_episodes = 100000
+	total_episodes = 32000
 
 	saver = tf.train.Saver()
 
@@ -117,13 +117,13 @@ def train():
 		for episode in range(total_episodes):
 
 			if RANDOMIZE_MAPS:
-				MAP_NUMBER =  0
-				MAP_PATH = "./Maps/Grid{}/impossible_map{}.txt".format(GRID_SIZE, MAP_NUMBER)
-				# MAP_PATH = "./Maps/Grid{}/impossible_map_empty{}.txt".format(GRID_SIZE, np.random.randint(5))
+				MAP_NUMBER =  np.random.randint(5)
+				# MAP_PATH = "./Maps/Grid{}/impossible_map{}.txt".format(GRID_SIZE, MAP_NUMBER)
+				MAP_PATH = "./Maps/Grid{}/impossible_map_empty{}.txt".format(GRID_SIZE, np.random.randint(5))
 				env.set_map(MAP_PATH)
 
-			# state, info = env.reset()
-			state, info = env.quick_reset()
+			state, info = env.reset()
+			# state, info = env.quick_reset()
 			done = False
 
 			# brain.linear_epsilon_decay(total_episodes, episode, start=1.0, end=0.05, percentage=0.5)
@@ -794,5 +794,5 @@ if __name__ == '__main__':
 
 	# run_MetaNetwork()
 
-	play()
+	# play()
  
