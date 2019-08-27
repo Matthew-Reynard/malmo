@@ -164,7 +164,7 @@ class Environment:
         # Reset the score to 0
         self.score = 0
 
-        self.steve.health = 1
+        self.steve.health = 3
   
         # Positions on the grid that are not allowed to spawn things
         disallowed = []
