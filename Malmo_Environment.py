@@ -588,9 +588,9 @@ class Environment:
             reward = reward_collecting_diamond
 
         # For fun
-        if self.score == 5:
+        if self.score == 3:
             self.steve.hasSword = True
-            # done = True
+            done = True
 
         # To make it compatible with malmo
         if self.score == self.NUM_OF_FOOD:

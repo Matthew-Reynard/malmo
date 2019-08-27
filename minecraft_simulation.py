@@ -16,8 +16,8 @@ from utils import print_readable_time, Histogram
 # Train
 def train():
 
-	MODEL_NAME = "default_grid16_map0_100k"
-	MODEL_NAME_save = "default_grid16_map0_100k"
+	MODEL_NAME = "default_grid16_map3_100k_2"
+	MODEL_NAME_save = "default_grid16_map3_100k_2"
 
 	FOLDER = "Impossible"
 
@@ -117,7 +117,7 @@ def train():
 		for episode in range(total_episodes):
 
 			if RANDOMIZE_MAPS:
-				MAP_NUMBER =  0
+				MAP_NUMBER =  3
 				MAP_PATH = "./Maps/Grid{}/impossible_map{}.txt".format(GRID_SIZE, MAP_NUMBER)
 				# MAP_PATH = "./Maps/Grid{}/impossible_map_empty{}.txt".format(GRID_SIZE, np.random.randint(5))
 				env.set_map(MAP_PATH)
@@ -794,5 +794,5 @@ if __name__ == '__main__':
 
 	# run_MetaNetwork()
 
-	play()
+	# play()
  
